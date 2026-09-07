@@ -1,68 +1,448 @@
 "use client";
 
-type NavbarProps = {
-  cartCount: number;
-  search: string;
-  onSearchChange: (value: string) => void;
-};
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  ChevronDown,
+  Heart,
+  Menu,
+  Search,
+  ShoppingCart,
+  User,
+  X,
+} from "lucide-react";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  YoutubeIcon,
+} from "@/components/SocialIcons";
+import { LOGO_SRC } from "@/data/media";
+import { useAuth } from "@/components/AuthProvider";
 
-export default function Navbar({
-  cartCount,
-  search,
-  onSearchChange,
-}: NavbarProps) {
+const categories = [
+  { href: "/categorias/herramientas", label: "Herramientas" },
+  { href: "/categorias/electricos", label: "Eléctricos" },
+  { href: "/categorias/seguridad", label: "Seguridad industrial" },
+  { href: "/categorias/ferreteria", label: "Ferretería general" },
+  { href: "/categorias/abrasivos", label: "Abrasivos" },
+] as const;
+
+const mainLinks = [
+  { href: "/", label: "Inicio" },
+  { href: "/catalogo", label: "Catálogo" },
+  { href: "/ofertas", label: "Ofertas" },
+  { href: "/nosotros", label: "Nosotros" },
+  { href: "/contacto", label: "Contacto" },
+] as const;
+
+const topLinks = [
+  { href: "/nosotros", label: "Nosotros" },
+  { href: "/contacto", label: "Contacto" },
+] as const;
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const { openAuth } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [logoFailed, setLogoFailed] = useState(false);
+  const categoriesRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    function onClickOutside(event: MouseEvent) {
+      if (
+        categoriesRef.current &&
+        !categoriesRef.current.contains(event.target as Node)
+      ) {
+        setCategoriesOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileSearchOpen) return;
+    mobileSearchRef.current?.focus();
+  }, [mobileSearchOpen]);
+
+  function handleSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+  }
+
+  function isActive(href: string) {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  }
+
   return (
-    <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-6">
-        <a href="/" className="shrink-0 text-xl font-bold tracking-tight text-amber-700">
-          Chamo Import
-        </a>
+    <header className="sticky top-0 z-50 w-full shadow-sm">
+      {/* Barra superior */}
+      <div className="bg-brand-dark text-white">
+        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 text-xs sm:px-6 lg:px-8 xl:px-10">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-white/85">
+            <span>Envíos a todo el Perú</span>
+            <span className="hidden text-white/30 sm:inline">|</span>
+            <span className="hidden sm:inline">
+              Atención mayorista y distribuidores
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <nav className="hidden items-center gap-4 sm:flex" aria-label="Utilidad">
+              {topLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-white/80 transition hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-2.5">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/70 transition hover:text-white"
+                aria-label="Facebook"
+              >
+                <FacebookIcon className="h-3.5 w-3.5" />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/70 transition hover:text-white"
+                aria-label="Instagram"
+              >
+                <InstagramIcon className="h-3.5 w-3.5" />
+              </a>
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/70 transition hover:text-white"
+                aria-label="YouTube"
+              >
+                <YoutubeIcon className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <label className="relative block min-w-0 flex-1">
-          <span className="sr-only">Buscar productos</span>
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Buscar productos..."
-            className="w-full rounded-full border border-zinc-300 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-200"
+      {/* Logo + buscador + cuenta */}
+      <div className="bg-white">
+        <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-4 py-3.5 sm:gap-5 sm:px-6 lg:gap-8 lg:px-8 xl:px-10">
+          <Link
+            href="/"
+            className="relative flex h-12 w-32 shrink-0 items-center sm:h-14 sm:w-40 lg:w-48"
+            aria-label="Chamo Import — inicio"
+          >
+            {!logoFailed ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={LOGO_SRC}
+                alt="Chamo Import"
+                className="h-full w-full object-contain object-left"
+                onError={() => setLogoFailed(true)}
+              />
+            ) : (
+              <span className="font-display text-2xl font-extrabold italic tracking-tight sm:text-3xl">
+                <span className="text-brand-primary">CHAMO</span>
+                <span className="text-brand-dark"> IMPORT</span>
+              </span>
+            )}
+          </Link>
+
+          <form
+            onSubmit={handleSearch}
+            className="hidden min-w-0 flex-1 md:block"
+            role="search"
+          >
+            <label htmlFor="navbar-search" className="sr-only">
+              Buscar productos
+            </label>
+            <div className="flex overflow-hidden rounded-md border border-brand-dark/12 bg-brand-gray/60 shadow-sm focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/20">
+              <input
+                id="navbar-search"
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Buscar productos, marcas o categorías..."
+                className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-brand-dark outline-none placeholder:text-brand-dark/40"
+              />
+              <button
+                type="submit"
+                className="inline-flex h-auto w-12 shrink-0 items-center justify-center bg-brand-primary text-white transition hover:bg-brand-dark"
+                aria-label="Buscar"
+              >
+                <Search className="h-5 w-5" strokeWidth={2.25} />
+              </button>
+            </div>
+          </form>
+
+          <div className="ml-auto flex items-center gap-1 sm:gap-2 md:ml-0">
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary md:hidden"
+              onClick={() => setMobileSearchOpen((open) => !open)}
+              aria-expanded={mobileSearchOpen}
+              aria-controls="mobile-search-panel"
+              aria-label={mobileSearchOpen ? "Cerrar búsqueda" : "Abrir búsqueda"}
+            >
+              {mobileSearchOpen ? (
+                <X className="h-5 w-5" strokeWidth={2} />
+              ) : (
+                <Search className="h-5 w-5" strokeWidth={2} />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => openAuth("login")}
+              className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+            >
+              <User className="h-5 w-5" strokeWidth={2} />
+              <span className="text-[11px] font-semibold">Cuenta</span>
+            </button>
+
+            <Link
+              href="/favoritos"
+              className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+            >
+              <Heart className="h-5 w-5" strokeWidth={2} />
+              <span className="text-[11px] font-semibold">Favoritos</span>
+            </Link>
+
+            <Link
+              href="/carrito"
+              className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+            >
+              <ShoppingCart className="h-5 w-5" strokeWidth={2} />
+              <span className="text-[11px] font-semibold">Carrito</span>
+              <span className="absolute top-0.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
+                0
+              </span>
+            </Link>
+
+            {/* Compact icons on very small screens */}
+            <Link
+              href="/favoritos"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
+              aria-label="Favoritos"
+            >
+              <Heart className="h-5 w-5" strokeWidth={2} />
+            </Link>
+            <Link
+              href="/carrito"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
+              aria-label="Carrito"
+            >
+              <ShoppingCart className="h-5 w-5" strokeWidth={2} />
+              <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
+                0
+              </span>
+            </Link>
+
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray lg:hidden"
+              onClick={() => setMobileOpen(true)}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-menu"
+              aria-label="Abrir menú"
+            >
+              <Menu className="h-5 w-5" strokeWidth={2} />
+            </button>
+          </div>
+        </div>
+
+        {mobileSearchOpen && (
+          <form
+            id="mobile-search-panel"
+            onSubmit={handleSearch}
+            className="border-t border-brand-dark/5 px-4 py-3 md:hidden"
+            role="search"
+          >
+            <label htmlFor="navbar-search-mobile" className="sr-only">
+              Buscar productos
+            </label>
+            <div className="flex overflow-hidden rounded-md border-2 border-brand-primary">
+              <input
+                ref={mobileSearchRef}
+                id="navbar-search-mobile"
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Buscar productos, marcas o categorías..."
+                className="min-w-0 flex-1 bg-white px-3 py-2.5 text-sm text-brand-dark outline-none"
+              />
+              <button
+                type="submit"
+                className="inline-flex w-11 items-center justify-center bg-brand-primary text-white"
+                aria-label="Buscar"
+              >
+                <Search className="h-5 w-5" strokeWidth={2.25} />
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Nav azul */}
+      <div className="bg-brand-primary text-white">
+        <div className="mx-auto flex max-w-[1600px] items-stretch gap-1 px-2 sm:px-4 lg:px-8 xl:px-10">
+          <div className="relative hidden lg:block" ref={categoriesRef}>
+            <button
+              type="button"
+              onClick={() => setCategoriesOpen((open) => !open)}
+              className="inline-flex h-full items-center gap-2 bg-brand-dark px-4 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition hover:bg-[#082a43]"
+              aria-expanded={categoriesOpen}
+            >
+              <Menu className="h-4 w-4" strokeWidth={2.5} />
+              Categorías
+              <ChevronDown
+                className={`h-4 w-4 transition ${categoriesOpen ? "rotate-180" : ""}`}
+                strokeWidth={2.5}
+              />
+            </button>
+
+            {categoriesOpen && (
+              <div className="absolute top-full left-0 z-50 mt-0 min-w-[240px] overflow-hidden rounded-b-lg border border-brand-dark/10 bg-white shadow-xl">
+                <ul className="py-2">
+                  {categories.map((category) => (
+                    <li key={category.href}>
+                      <Link
+                        href={category.href}
+                        onClick={() => setCategoriesOpen(false)}
+                        className="block px-4 py-2.5 text-sm font-medium text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
+                      >
+                        {category.label}
+                      </Link>
+                    </li>
+                  ))}
+                  <li>
+                    <Link
+                      href="/categorias"
+                      onClick={() => setCategoriesOpen(false)}
+                      className="block border-t border-brand-dark/10 px-4 py-2.5 text-sm font-bold text-brand-primary"
+                    >
+                      Ver todas
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <nav
+            className="hidden flex-1 items-center gap-0.5 lg:flex"
+            aria-label="Principal"
+          >
+            {mainLinks.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`inline-flex items-center px-3.5 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition xl:px-5 ${
+                    active ? "bg-brand-dark/35" : "hover:bg-brand-dark/25"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[60] lg:hidden" id="mobile-menu">
+          <button
+            type="button"
+            className="absolute inset-0 bg-brand-dark/50 backdrop-blur-sm"
+            aria-label="Cerrar menú"
+            onClick={() => setMobileOpen(false)}
           />
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-400"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3-3" />
-          </svg>
-        </label>
 
-        <button
-          type="button"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-700"
-        >
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M6 6h15l-1.5 9h-12z" />
-            <path d="M6 6 5 3H2" />
-            <circle cx="9" cy="20" r="1.5" />
-            <circle cx="18" cy="20" r="1.5" />
-          </svg>
-          Carrito
-          <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-amber-500 px-1.5 text-xs font-semibold text-zinc-900">
-            {cartCount}
-          </span>
-        </button>
-      </nav>
+          <aside className="absolute top-0 right-0 flex h-full w-[min(100%,22rem)] flex-col bg-white shadow-2xl">
+            <div className="flex items-center justify-between bg-brand-primary px-4 py-4 text-white">
+              <p className="font-display text-lg font-bold">Menú</p>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-white/15"
+                aria-label="Cerrar menú"
+              >
+                <X className="h-5 w-5" strokeWidth={2} />
+              </button>
+            </div>
+
+            <nav className="flex flex-1 flex-col overflow-y-auto p-4" aria-label="Móvil">
+              <p className="mb-2 text-xs font-bold tracking-wide text-brand-dark/50 uppercase">
+                Categorías
+              </p>
+              {categories.map((category) => (
+                <Link
+                  key={category.href}
+                  href={category.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                >
+                  {category.label}
+                </Link>
+              ))}
+
+              <p className="mt-4 mb-2 text-xs font-bold tracking-wide text-brand-dark/50 uppercase">
+                Navegación
+              </p>
+              {mainLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-3 py-2.5 font-display text-base font-semibold text-brand-dark hover:bg-brand-gray"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="border-t border-brand-dark/10 p-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  openAuth("login");
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
+              >
+                <User className="h-5 w-5" strokeWidth={2} />
+                Mi cuenta
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
     </header>
   );
 }

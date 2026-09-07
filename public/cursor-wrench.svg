@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <!-- Llave inglesa  cursor ferretería -->
+  <g transform="translate(2 2) rotate(-35 14 14)">
+    <path
+      d="M20.5 4.2a5.2 5.2 0 0 0-7.2 5.9l-7.8 7.8a2.4 2.4 0 1 0 3.4 3.4l7.8-7.8a5.2 5.2 0 0 0 5.9-7.2l-2.5 2.5-2.1-2.1 2.5-2.5z"
+      fill="#0B3554"
+      stroke="#E4B714"
+      stroke-width="1.4"
+      stroke-linejoin="round"
+    />
+    <circle cx="8.2" cy="21.8" r="1.35" fill="#E4B714" />
+  </g>
+</svg>

@@ -1,29 +1,54 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow, Barlow_Semi_Condensed } from "next/font/google";
+import { AuthProvider } from "@/components/AuthProvider";
+import AuthModal from "@/components/AuthModal";
+import Footer from "@/components/Footer";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
+import WrenchCursor from "@/components/WrenchCursor";
+import { ICON_SRC } from "@/data/media";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+
+const barlow = Barlow({
+  variable: "--font-barlow",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const barlowSemiCondensed = Barlow_Semi_Condensed({
+  variable: "--font-barlow-semi-condensed",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
   title: "Chamo Import",
-  description: "Tienda de productos importados",
+  description: "Importaciones mayoristas y distribución en todo el Perú",
+  icons: {
+    icon: [{ url: ICON_SRC, type: "image/png" }],
+    apple: [{ url: ICON_SRC }],
+  },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${barlow.variable} ${barlowSemiCondensed.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">
+        <AuthProvider>
+          <WrenchCursor />
+          <div className="flex min-h-full flex-1 flex-col">{children}</div>
+          <Footer />
+          <WhatsAppFloat />
+          <AuthModal />
+        </AuthProvider>
+      </body>
     </html>
   );
 }
