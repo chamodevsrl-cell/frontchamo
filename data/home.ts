@@ -78,6 +78,36 @@ export const mainCategories: MainCategory[] = [
     imageAlt: "Productos para el hogar",
     tint: "#f6f0f2",
   },
+  {
+    href: "/categorias/herramientas",
+    label: "Herramientas",
+    eyebrow: "Eléctricas y manuales",
+    bullets: ["Marcas líderes", "Garantía mayorista", "Stock rotativo"],
+    image:
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+    imageAlt: "Herramientas eléctricas profesionales",
+    tint: "#eef6f2",
+  },
+  {
+    href: "/categorias/construccion",
+    label: "Construcción",
+    eyebrow: "Obra y acabados",
+    bullets: ["Materiales de obra", "Despacho a obra", "Cotización rápida"],
+    image:
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
+    imageAlt: "Sitio de construcción",
+    tint: "#f4f1ea",
+  },
+  {
+    href: "/categorias/pinturas",
+    label: "Pinturas",
+    eyebrow: "Acabados y color",
+    bullets: ["Línea profesional", "Volúmenes mayoristas", "Asesoría de color"],
+    image:
+      "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80",
+    imageAlt: "Pintura y acabados",
+    tint: "#f2f0f7",
+  },
 ];
 
 /** Logos en public/images/marcas/ — nombres de archivo sugeridos */
