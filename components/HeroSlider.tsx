@@ -85,7 +85,7 @@ export default function HeroSlider() {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <div className="relative mx-auto aspect-[21/9] min-h-[220px] w-full max-w-[1600px] sm:min-h-[280px] md:min-h-[340px] lg:min-h-[420px]">
+      <div className="relative aspect-[21/9] min-h-[220px] w-full sm:min-h-[280px] md:min-h-[340px] lg:min-h-[420px]">
         {slides.map((slide, i) => {
           const active = i === index;
           const showImage = loaded[slide.id] && !failed[slide.id];
