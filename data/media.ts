@@ -21,16 +21,18 @@ export const slides: Slide[] = [
   {
     id: 2,
     src: "/images/slider/baner 2.png",
-    alt: "Anuncio 2",
-    title: "Envíos a todo el Perú",
-    subtitle: "Atención mayorista y distribuidores",
+    alt: "Herramientas profesionales DeWalt y Bosch",
+    title: "Herramientas profesionales",
+    subtitle: "Marcas líderes para obra y ferretería",
+    fullBleed: true,
   },
   {
     id: 3,
     src: "/images/slider/baner 3.png",
-    alt: "Anuncio 3",
-    title: "Precios mayoristas",
-    subtitle: "Calidad importada, stock listo",
+    alt: "Envíos Chamo Import a toda la sierra del Perú",
+    title: "Envíos a todo el Perú",
+    subtitle: "Llevamos tus productos a toda la sierra",
+    fullBleed: true,
   },
 ];
 
