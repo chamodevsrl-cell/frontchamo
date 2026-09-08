@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** Que la línea del nav (barra amarilla) se mueva a donde esté seleccionado, como en el mockup.
 - **Archivos:** `components/Navbar.tsx`
-- **Commit:** (al push)
+- **Commit:** `d7775a1`
 
 ## Qué había antes
 
