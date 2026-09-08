@@ -1,11 +1,39 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type TouchEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+  type TouchEvent,
+} from "react";
 import { ImageIcon } from "lucide-react";
 import { slides } from "@/data/media";
 
 const INTERVAL_MS = 5500;
 const SWIPE_THRESHOLD = 45;
+
+function markImageStatus(
+  img: HTMLImageElement,
+  id: number,
+  setLoaded: Dispatch<SetStateAction<Record<number, boolean>>>,
+  setFailed: Dispatch<SetStateAction<Record<number, boolean>>>,
+) {
+  if (!img.complete) return;
+  if (img.naturalWidth > 0) {
+    setLoaded((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+    setFailed((prev) => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  } else {
+    setFailed((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+  }
+}
 
 export default function HeroSlider() {
   const [index, setIndex] = useState(0);
@@ -76,17 +104,25 @@ export default function HeroSlider() {
                 {!failed[slide.id] && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={slide.src}
+                    src={encodeURI(slide.src)}
                     alt={slide.alt}
                     draggable={false}
                     className={`h-full w-full object-cover transition-opacity duration-500 select-none ${
                       showImage ? "opacity-100" : "opacity-0"
                     }`}
-                    onLoad={() =>
-                      setLoaded((prevState) => ({
-                        ...prevState,
-                        [slide.id]: true,
-                      }))
+                    ref={(el) => {
+                      if (!el) return;
+                      queueMicrotask(() =>
+                        markImageStatus(el, slide.id, setLoaded, setFailed),
+                      );
+                    }}
+                    onLoad={(event) =>
+                      markImageStatus(
+                        event.currentTarget,
+                        slide.id,
+                        setLoaded,
+                        setFailed,
+                      )
                     }
                     onError={() =>
                       setFailed((prevState) => ({
@@ -117,26 +153,30 @@ export default function HeroSlider() {
                   </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-brand-dark/35 to-transparent" />
+                {showImage && !slide.fullBleed && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-brand-dark/35 to-transparent" />
+                )}
               </div>
 
-              <div
-                className={`relative z-10 flex h-full max-w-xl flex-col justify-end px-6 pb-12 sm:px-10 sm:pb-14 lg:px-14 ${
-                  active
-                    ? "translate-y-0 opacity-100 transition-all delay-150 duration-700"
-                    : "translate-y-4 opacity-0"
-                }`}
-              >
-                <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-brand-gold uppercase sm:text-sm">
-                  Chamo Import
-                </p>
-                <h2 className="font-display text-2xl font-bold text-white sm:text-4xl lg:text-5xl">
-                  {slide.title}
-                </h2>
-                <p className="mt-2 text-sm text-white/85 sm:text-base lg:text-lg">
-                  {slide.subtitle}
-                </p>
-              </div>
+              {(!showImage || !slide.fullBleed) && (
+                <div
+                  className={`relative z-10 flex h-full max-w-xl flex-col justify-end px-6 pb-12 sm:px-10 sm:pb-14 lg:px-14 ${
+                    active
+                      ? "translate-y-0 opacity-100 transition-all delay-150 duration-700"
+                      : "translate-y-4 opacity-0"
+                  }`}
+                >
+                  <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-brand-gold uppercase sm:text-sm">
+                    Chamo Import
+                  </p>
+                  <h2 className="font-display text-2xl font-bold text-white sm:text-4xl lg:text-5xl">
+                    {slide.title}
+                  </h2>
+                  <p className="mt-2 text-sm text-white/85 sm:text-base lg:text-lg">
+                    {slide.subtitle}
+                  </p>
+                </div>
+              )}
             </div>
           );
         })}
