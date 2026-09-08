@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** Usar el diseño de la imagen para la ficha técnica (cabecera Especificación/Detalle, filas alternadas).
 - **Archivos:** `components/ProductModal.tsx`
-- **Commit:** (al push)
+- **Commit:** `9c20a70`
 
 ## Qué había antes
 
