@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** En el hover del nav, que solo se iluminen las letras, no el bloque del enlace.
 - **Archivos:** `components/Navbar.tsx`
-- **Commit:** (al push)
+- **Commit:** `d263021`
 
 ## Qué había antes
 
