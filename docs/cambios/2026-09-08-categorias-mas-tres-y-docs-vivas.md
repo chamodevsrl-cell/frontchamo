@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** Aumentar 3 categorías más; documentar juntos los cambios (manual de cambios, documentación técnica, de usuario y sugerencias), actualizándolas en cada avance.
 - **Archivos:** `data/home.ts`, `components/CategoriesGrid.tsx`, `docs/*`
-- **Commit:** (se completa al push)
+- **Commit:** `3940345`
 
 ## Qué había antes
 
