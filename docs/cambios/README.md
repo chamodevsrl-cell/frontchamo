@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-08 | Ficha técnica: diseño tabla cabecera + filas | [2026-09-08-ficha-tecnica-diseno-tabla.md](./2026-09-08-ficha-tecnica-diseno-tabla.md) |
 | 2026-09-08 | Modal ficha técnica + relacionados | [2026-09-08-modal-ficha-relacionados.md](./2026-09-08-modal-ficha-relacionados.md) |
 | 2026-09-08 | Carrusel categorías en PC con flechas | [2026-09-08-categorias-carrusel-flechas-pc.md](./2026-09-08-categorias-carrusel-flechas-pc.md) |
 | 2026-09-08 | Categorías en carrusel (como productos) | [2026-09-08-categorias-carrusel.md](./2026-09-08-categorias-carrusel.md) |

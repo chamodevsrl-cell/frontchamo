@@ -77,7 +77,8 @@ Cada producto incluye `category` / `categoryLabel`, `specs[]` (ficha técnica) y
 Modal (diseño ficha):
 1. Galería + thumbs  
 2. Marca / SKU / OFF, descripción, caja de precios, stock, cantidad, CTAs  
-3. Tabla **Especificaciones técnicas** (filas alternadas)  
+3. Tabla **Especificaciones técnicas**: cabecera `brand-dark` con columnas
+   “Especificación / Detalle”, filas blancas / `#eef6fc`, esquinas redondeadas + borde brillante  
 4. **Productos relacionados de la misma categoría** (clic cambia el producto del modal)
 
 WhatsApp del modal: `wa.me/51959723602`.

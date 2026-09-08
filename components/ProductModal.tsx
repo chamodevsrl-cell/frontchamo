@@ -293,60 +293,45 @@ export default function ProductModal({
               >
                 Especificaciones técnicas
               </h3>
-              <div className="mt-3 overflow-hidden rounded-xl border border-brand-dark/10">
-                <table className="w-full text-left text-sm">
+              <div className="mt-3 overflow-hidden rounded-2xl border border-brand-primary/25 shadow-[0_0_0_1px_rgba(18,126,201,0.08),0_0_18px_rgba(18,126,201,0.2)]">
+                <table className="w-full border-collapse text-left text-sm">
+                  <thead>
+                    <tr className="bg-brand-dark text-white">
+                      <th
+                        scope="col"
+                        className="w-[42%] px-4 py-3 font-semibold sm:px-5"
+                      >
+                        Especificación
+                      </th>
+                      <th scope="col" className="px-4 py-3 font-semibold sm:px-5">
+                        Detalle
+                      </th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    {product.specs.map((spec, index) => (
+                    {[
+                      ...product.specs,
+                      { label: "Empaque unidad", value: product.packaging.unidad },
+                      { label: "Empaque docena", value: product.packaging.docena },
+                      { label: "Empaque caja", value: product.packaging.caja },
+                    ].map((spec, index) => (
                       <tr
-                        key={spec.label}
+                        key={`${spec.label}-${index}`}
                         className={
-                          index % 2 === 0 ? "bg-white" : "bg-brand-gray/70"
+                          index % 2 === 0 ? "bg-white" : "bg-[#eef6fc]"
                         }
                       >
                         <th
                           scope="row"
-                          className="w-[42%] border-r border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
+                          className="px-4 py-3 font-bold text-brand-dark sm:px-5"
                         >
                           {spec.label}
                         </th>
-                        <td className="px-3 py-2.5 text-brand-dark/75 sm:px-4">
+                        <td className="px-4 py-3 text-brand-dark/80 sm:px-5">
                           {spec.value}
                         </td>
                       </tr>
                     ))}
-                    <tr className="bg-white">
-                      <th
-                        scope="row"
-                        className="border-r border-t border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
-                      >
-                        Empaque unidad
-                      </th>
-                      <td className="border-t border-brand-dark/8 px-3 py-2.5 text-brand-dark/75 sm:px-4">
-                        {product.packaging.unidad}
-                      </td>
-                    </tr>
-                    <tr className="bg-brand-gray/70">
-                      <th
-                        scope="row"
-                        className="border-r border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
-                      >
-                        Empaque docena
-                      </th>
-                      <td className="px-3 py-2.5 text-brand-dark/75 sm:px-4">
-                        {product.packaging.docena}
-                      </td>
-                    </tr>
-                    <tr className="bg-white">
-                      <th
-                        scope="row"
-                        className="border-r border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
-                      >
-                        Empaque caja
-                      </th>
-                      <td className="px-3 py-2.5 text-brand-dark/75 sm:px-4">
-                        {product.packaging.caja}
-                      </td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
