@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** Que las categorías sean tipo carrusel, igual que los productos destacados.
 - **Archivos:** `components/CategoriesGrid.tsx`
-- **Commit:** (al push)
+- **Commit:** `064bec8`
 
 ## Qué había antes
 
