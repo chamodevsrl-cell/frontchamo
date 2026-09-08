@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** Llevar las categorías al formato del mockup (eyebrow, título, bullets, botón Explorar e imagen abajo), manteniendo las tarjetas brillantes en el borde.
 - **Archivos:** `components/CategoriesGrid.tsx`, `data/home.ts`
-- **Commit:** (pendiente al push)
+- **Commit:** `46fcd2c`
 
 ## Qué había antes
 
