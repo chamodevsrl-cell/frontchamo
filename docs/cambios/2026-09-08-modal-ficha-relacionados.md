@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** Que los productos de la misma categoría salgan abajo como relacionados; que el modal siga el diseño de la ficha (sobre todo especificaciones técnicas).
 - **Archivos:** `components/ProductModal.tsx`, `components/FeaturedOffers.tsx`, `data/products.ts`
-- **Commit:** (al push)
+- **Commit:** `9b0794c`
 
 ## Qué había antes
 
