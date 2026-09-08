@@ -1,8 +1,9 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
 
 const shinyCard =
@@ -11,7 +12,7 @@ const shinyCard =
 function CategoryCard({ category }: { category: MainCategory }) {
   return (
     <article
-      className={`group flex h-full flex-col overflow-hidden rounded-xl transition duration-300 hover:-translate-y-0.5 lg:rounded-2xl ${shinyCard}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl transition duration-300 hover:-translate-y-0.5 ${shinyCard}`}
       style={{ backgroundColor: category.tint }}
     >
       <div className="flex flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-4 lg:px-6 lg:pt-6">
@@ -53,7 +54,7 @@ function CategoryCard({ category }: { category: MainCategory }) {
             alt={category.imageAlt}
             fill
             className="object-cover transition duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width: 1024px) 72vw, 25vw"
+            sizes="(max-width: 1024px) 72vw, 18.5rem"
           />
         </div>
       </div>
@@ -62,40 +63,104 @@ function CategoryCard({ category }: { category: MainCategory }) {
 }
 
 export default function CategoriesGrid() {
+  const scrollerRef = useRef<HTMLUListElement>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(true);
+
+  const updateArrows = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setCanPrev(el.scrollLeft > 4);
+    setCanNext(el.scrollLeft < max - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    updateArrows();
+    el.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    return () => {
+      el.removeEventListener("scroll", updateArrows);
+      window.removeEventListener("resize", updateArrows);
+    };
+  }, [updateArrows]);
+
+  function scrollByCard(direction: -1 | 1) {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.querySelector("li");
+    const step = card
+      ? card.getBoundingClientRect().width + 16
+      : el.clientWidth * 0.8;
+    el.scrollBy({ left: direction * step, behavior: "smooth" });
+  }
+
   return (
     <section aria-labelledby="categorias-heading">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="h-8 w-1 rounded-full bg-brand-primary" aria-hidden />
-          <h2
-            id="categorias-heading"
-            className="font-display text-2xl font-bold text-brand-dark sm:text-3xl"
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
+        <div className="flex min-w-0 flex-1 flex-wrap items-end justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="h-8 w-1 rounded-full bg-brand-primary" aria-hidden />
+            <h2
+              id="categorias-heading"
+              className="font-display text-2xl font-bold text-brand-dark sm:text-3xl"
+            >
+              Categorías principales
+            </h2>
+          </div>
+          <Link
+            href="/categorias"
+            className="text-sm font-semibold text-brand-primary transition hover:text-brand-dark"
           >
-            Categorías principales
-          </h2>
+            Ver todas
+          </Link>
         </div>
-        <Link
-          href="/categorias"
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-gray px-4 py-2.5 text-sm font-semibold text-brand-dark transition hover:bg-brand-primary hover:text-white"
-        >
-          Ver todas las categorías
-          <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
-        </Link>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => scrollByCard(-1)}
+            disabled={!canPrev}
+            aria-label="Categorías anteriores"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-[0_2px_10px_rgba(11,53,84,0.12)] transition hover:border-brand-primary/40 hover:text-brand-primary disabled:pointer-events-none disabled:opacity-35"
+          >
+            <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollByCard(1)}
+            disabled={!canNext}
+            aria-label="Categorías siguientes"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-[0_2px_10px_rgba(11,53,84,0.12)] transition hover:border-brand-primary/40 hover:text-brand-primary disabled:pointer-events-none disabled:opacity-35"
+          >
+            <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
-      {/* Móvil/tablet: carrusel horizontal (misma idea que FeaturedOffers) */}
       <div className="-mx-4 sm:-mx-6 lg:mx-0">
-        <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 scrollbar-none sm:gap-4 sm:px-6 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0 lg:pb-0 xl:grid-cols-4">
+        <ul
+          ref={scrollerRef}
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 scrollbar-none sm:gap-4 sm:px-6 lg:gap-5 lg:px-0"
+        >
           {mainCategories.map((category) => (
             <li
               key={category.href}
-              className="w-[min(78vw,18rem)] shrink-0 snap-start sm:w-[min(48vw,20rem)] lg:w-auto lg:shrink"
+              className="w-[min(78vw,18rem)] shrink-0 snap-start sm:w-[min(48vw,20rem)] lg:w-[17.5rem] xl:w-[18.75rem]"
             >
               <CategoryCard category={category} />
             </li>
           ))}
         </ul>
       </div>
+
+      <p className="mt-1 flex items-center justify-center gap-2 text-xs text-brand-dark/45 lg:hidden">
+        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />
+        Desliza para ver más
+        <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
+      </p>
     </section>
   );
 }

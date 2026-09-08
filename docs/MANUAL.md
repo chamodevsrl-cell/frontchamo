@@ -65,9 +65,9 @@ Cada ítem: `href`, `label`, `eyebrow`, `bullets` (3), `image`, `imageAlt`, `tin
 
 **Actual (7):** Ferretería, Electricidad, Seguridad, Hogar, Herramientas, Construcción, Pinturas.
 
-UI en `CategoriesGrid.tsx`: **carrusel horizontal** con `snap-x` en móvil/tablet
-(mismo patrón que `FeaturedOffers`); en `lg`/`xl` pasa a grilla (`2` / `4` cols).
-Borde brillante (`border-brand-primary` + glow).
+UI en `CategoriesGrid.tsx`: **carrusel horizontal en todos los breakpoints**
+(`snap-x` + scroll). En PC/móvil hay **flechas circulares** (arriba a la derecha)
+que desplazan una tarjeta; también se puede deslizar. Borde brillante de marca.
 
 ### A.6 Slider
 
@@ -125,10 +125,10 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 **Categorías principales**
 - 7 tarjetas con borde brillante azul: Ferretería, Electricidad, Seguridad, Hogar,
   Herramientas, Construcción, Pinturas
-- En móvil/tablet se **deslizan en carrusel** (como productos destacados); en desktop
-  se ven en grilla
+- **Carrusel en móvil y PC**: flechas circulares ← → arriba a la derecha; también
+  se puede deslizar con el dedo o el trackpad
 - Cada una: subtítulo, título, 3 beneficios, botón **Explorar** e imagen
-- Enlace "Ver todas las categorías" → `/categorias` (página aún pendiente)
+- Enlace "Ver todas" → `/categorias` (página aún pendiente)
 
 **Productos destacados / ofertas**
 - Tarjetas con precio, stock y "Añadir al carrito"; clic abre el detalle (modal)
