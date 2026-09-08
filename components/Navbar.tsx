@@ -51,10 +51,37 @@ export default function Navbar() {
   const [logoFailed, setLogoFailed] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
+  const mainNavRef = useRef<HTMLElement>(null);
+  const [navIndicator, setNavIndicator] = useState({
+    left: 0,
+    width: 0,
+    ready: false,
+  });
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
   }, []);
+
+  useEffect(() => {
+    function updateNavIndicator() {
+      const nav = mainNavRef.current;
+      if (!nav) return;
+      const activeLink = nav.querySelector<HTMLElement>('[data-nav-active="true"]');
+      if (!activeLink) {
+        setNavIndicator((prev) => ({ ...prev, width: 0, ready: false }));
+        return;
+      }
+      setNavIndicator({
+        left: activeLink.offsetLeft,
+        width: activeLink.offsetWidth,
+        ready: true,
+      });
+    }
+
+    updateNavIndicator();
+    window.addEventListener("resize", updateNavIndicator);
+    return () => window.removeEventListener("resize", updateNavIndicator);
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
@@ -353,7 +380,8 @@ export default function Navbar() {
           </div>
 
           <nav
-            className="hidden flex-1 items-center gap-0.5 lg:flex"
+            ref={mainNavRef}
+            className="relative hidden flex-1 items-center gap-0.5 lg:flex"
             aria-label="Principal"
           >
             {mainLinks.map((link) => {
@@ -362,14 +390,27 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`inline-flex items-center px-3.5 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition xl:px-5 ${
-                    active ? "bg-brand-dark/35" : "hover:bg-brand-dark/25"
+                  data-nav-active={active ? "true" : undefined}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative z-10 inline-flex items-center px-3.5 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition xl:px-5 ${
+                    active
+                      ? "text-brand-gold"
+                      : "text-white hover:bg-brand-dark/20 hover:text-brand-gold/90"
                   }`}
                 >
                   {link.label}
                 </Link>
               );
             })}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 h-[3px] rounded-full bg-brand-gold transition-all duration-300 ease-out"
+              style={{
+                left: navIndicator.left,
+                width: navIndicator.width,
+                opacity: navIndicator.ready ? 1 : 0,
+              }}
+            />
           </nav>
         </div>
       </div>
@@ -415,16 +456,24 @@ export default function Navbar() {
               <p className="mt-4 mb-2 text-xs font-bold tracking-wide text-brand-dark/50 uppercase">
                 Navegación
               </p>
-              {mainLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2.5 font-display text-base font-semibold text-brand-dark hover:bg-brand-gray"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {mainLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                    className={`rounded-lg px-3 py-2.5 font-display text-base font-semibold transition ${
+                      active
+                        ? "bg-brand-primary/10 text-brand-primary ring-2 ring-brand-gold/80"
+                        : "text-brand-dark hover:bg-brand-gray"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
 
             <div className="border-t border-brand-dark/10 p-4">

@@ -123,6 +123,8 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 **Barra superior**
 - Buscar productos, cuenta, favoritos y carrito
 - Menú: Inicio, Catálogo, Ofertas, Nosotros, Contacto
+- El ítem activo del menú azul se marca en **dorado** (`brand-gold`) con una
+  **barra inferior** que se anima al cambiar de página
 - **Categorías** (desplegable)
 
 **Slider de anuncios**
