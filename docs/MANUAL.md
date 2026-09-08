@@ -94,8 +94,10 @@ WhatsApp del modal: `wa.me/51959723602`.
 - Razón social: Chamo Import S.R.L.
 - Teléfono / WhatsApp oficial: **+51 959 723 602**
 - Ubicación: Lima, Perú — https://maps.app.goo.gl/mrh3WueTJErXS2sg6
-- ⚠️ Pendiente: `WhatsAppFloat.tsx` / `Footer.tsx` pueden seguir con placeholder;
-  el modal de producto ya usa el número oficial.
+- ⚠️ Pendiente: `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y
+  `app/contacto/page.tsx` todavía usan el placeholder `+51 999 999 999`;
+  `ProductModal.tsx` es el único que ya usa el número oficial — usarlo de referencia
+  al corregir el resto.
 
 ### A.9 Scripts
 

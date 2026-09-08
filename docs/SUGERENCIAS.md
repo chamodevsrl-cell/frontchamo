@@ -18,17 +18,20 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [ ] Filtros y búsqueda real contra catálogo / API
 - [ ] Cotización mayorista con formulario + WhatsApp prellenado por producto
 - [ ] Modo oscuro: revisar contraste en tarjetas pastel de categorías
+- [ ] Sumar más productos por categoría en `data/products.ts` (hoy "Seguridad" tiene solo 1 → el modal no muestra "Productos relacionados" para ese ítem)
 
 ## Técnico
 
 - [ ] Conectar backend / API de productos (dejar de hardcodear `data/products.ts`)
+- [ ] Completar specs técnicas reales por SKU (material, voltaje, dimensiones, país de origen, etc.) cuando el cliente envíe fichas oficiales — hoy son de ejemplo
 - [ ] CMS o admin liviano para banners y categorías
 - [ ] `allowedDevOrigins` en `next.config` si se prueba por IP LAN (`192.168.x.x`)
 - [ ] Tests básicos de smoke (home carga, slider tiene N slides)
 
 ## Contenido
 
-- [ ] Textos reales de teléfono / correo (hoy hay placeholders en footer)
+- [ ] Reemplazar el teléfono placeholder `+51 999 999 999` por el oficial `+51 959 723 602` en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx` (`ProductModal.tsx` ya está correcto, usarlo de referencia)
+- [ ] Confirmar correo de contacto oficial (footer y `/contacto` usan `ventas@chamoimport.com` como provisional)
 - [ ] Políticas (términos, privacidad) enlazadas desde el footer
 
 ## Hecho recientemente (referencia)

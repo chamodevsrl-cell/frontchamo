@@ -395,7 +395,7 @@ export default function Navbar() {
                   className={`relative z-10 inline-flex items-center px-3.5 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition xl:px-5 ${
                     active
                       ? "text-brand-gold"
-                      : "text-white hover:bg-brand-dark/20 hover:text-brand-gold/90"
+                      : "text-white hover:text-brand-gold"
                   }`}
                 >
                   {link.label}
