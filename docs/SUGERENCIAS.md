@@ -38,4 +38,5 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [x] 2026-09-08 — Categorías layout Explorar + glow
 - [x] 2026-09-08 — Categorías en carrusel horizontal (patrón FeaturedOffers)
 - [x] 2026-09-08 — Carrusel de categorías también en PC con flechas circulares
+- [x] 2026-09-08 — Modal de producto con ficha técnica + relacionados por categoría
 - [x] 2026-09-08 — 7 categorías en home (se añadieron 3)

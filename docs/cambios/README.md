@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-08 | Modal ficha técnica + relacionados | [2026-09-08-modal-ficha-relacionados.md](./2026-09-08-modal-ficha-relacionados.md) |
 | 2026-09-08 | Carrusel categorías en PC con flechas | [2026-09-08-categorias-carrusel-flechas-pc.md](./2026-09-08-categorias-carrusel-flechas-pc.md) |
 | 2026-09-08 | Categorías en carrusel (como productos) | [2026-09-08-categorias-carrusel.md](./2026-09-08-categorias-carrusel.md) |
 | 2026-09-08 | Consolidar docs en 3 secciones (cambios / sugerencias / técnica+usuario) | [2026-09-08-consolidar-3-secciones-docs.md](./2026-09-08-consolidar-3-secciones-docs.md) |

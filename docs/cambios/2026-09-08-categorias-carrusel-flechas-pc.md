@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-08
 - **Solicitud:** En PC que también sea carrusel movible con flechas (estilo mockup: botones circulares arriba a la derecha).
 - **Archivos:** `components/CategoriesGrid.tsx`
-- **Commit:** (al push)
+- **Commit:** `ed61915`
 
 ## Qué había antes
 

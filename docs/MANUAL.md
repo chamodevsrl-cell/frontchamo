@@ -69,21 +69,34 @@ UI en `CategoriesGrid.tsx`: **carrusel horizontal en todos los breakpoints**
 (`snap-x` + scroll). En PC/móvil hay **flechas circulares** (arriba a la derecha)
 que desplazan una tarjeta; también se puede deslizar. Borde brillante de marca.
 
-### A.6 Slider
+### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
+
+Cada producto incluye `category` / `categoryLabel`, `specs[]` (ficha técnica) y
+`packaging`. Helper `getRelatedProducts(product)` filtra por la misma categoría.
+
+Modal (diseño ficha):
+1. Galería + thumbs  
+2. Marca / SKU / OFF, descripción, caja de precios, stock, cantidad, CTAs  
+3. Tabla **Especificaciones técnicas** (filas alternadas)  
+4. **Productos relacionados de la misma categoría** (clic cambia el producto del modal)
+
+WhatsApp del modal: `wa.me/51959723602`.
+
+### A.7 Slider
 
 - Rutas en `data/media.ts`; archivos en `public/images/slider/`.
 - `fullBleed: true` evita overlay de texto sobre el arte (el banner ya trae texto).
 - Imagen `w-full h-auto object-contain` (sin recorte), puntos + swipe táctil, sin flechas.
 
-### A.7 Datos oficiales de contacto
+### A.8 Datos oficiales de contacto
 
 - Razón social: Chamo Import S.R.L.
 - Teléfono / WhatsApp oficial: **+51 959 723 602**
 - Ubicación: Lima, Perú — https://maps.app.goo.gl/mrh3WueTJErXS2sg6
-- ⚠️ Pendiente: el código aún usa el placeholder `+51 999 999 999` en
-  `components/WhatsAppFloat.tsx` y `components/Footer.tsx` — sincronizar (ver `SUGERENCIAS.md`).
+- ⚠️ Pendiente: `WhatsAppFloat.tsx` / `Footer.tsx` pueden seguir con placeholder;
+  el modal de producto ya usa el número oficial.
 
-### A.8 Scripts
+### A.9 Scripts
 
 ```bash
 npm run dev      # http://localhost:3000
@@ -132,6 +145,9 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 **Productos destacados / ofertas**
 - Tarjetas con precio, stock y "Añadir al carrito"; clic abre el detalle (modal)
+- En el modal: precios unitario/mayorista, cantidad, cotización / WhatsApp,
+  **ficha técnica** (tabla) y **productos relacionados** de la misma categoría
+  (al tocar uno se abre ese producto en el mismo modal)
 
 **WhatsApp**
 - Botón flotante verde para cotizar / contactar

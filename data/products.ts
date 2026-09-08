@@ -1,8 +1,16 @@
+export type ProductSpec = {
+  label: string;
+  value: string;
+};
+
 export type FeaturedProduct = {
   id: string;
   name: string;
   brand: string;
   sku: string;
+  /** Slug de categoría (misma familia → relacionados) */
+  category: string;
+  categoryLabel: string;
   price: number;
   oldPrice: number;
   wholesalePrice: number;
@@ -13,6 +21,8 @@ export type FeaturedProduct = {
   images: string[];
   description: string;
   features: string[];
+  /** Ficha técnica (tabla del modal) */
+  specs: ProductSpec[];
   packaging: {
     unidad: string;
     docena: string;
@@ -34,15 +44,20 @@ const TOOL_IMAGES = [
 
 function gallery(seed: number): string[] {
   const start = seed % TOOL_IMAGES.length;
-  return Array.from({ length: 5 }, (_, i) => TOOL_IMAGES[(start + i) % TOOL_IMAGES.length]);
+  return Array.from(
+    { length: 5 },
+    (_, i) => TOOL_IMAGES[(start + i) % TOOL_IMAGES.length],
+  );
 }
 
 export const featuredProducts: FeaturedProduct[] = [
   {
     id: "1",
-    name: "Taladro percutor 1/2\" 750W industrial",
+    name: 'Taladro percutor 1/2" 750W industrial',
     brand: "TRUPER",
     sku: "TRU-7821",
+    category: "herramientas",
+    categoryLabel: "Herramientas",
     price: 89.9,
     oldPrice: 105.0,
     wholesalePrice: 79.9,
@@ -59,6 +74,14 @@ export const featuredProducts: FeaturedProduct[] = [
       "Mandril metálico 13 mm",
       "Cable reforzado 2 m",
     ],
+    specs: [
+      { label: "Potencia", value: "750 W" },
+      { label: "Velocidad", value: "0 – 2800 RPM" },
+      { label: "Mandril", value: '1/2" (13 mm) metálico' },
+      { label: "Percusión", value: "Sí (concreto)" },
+      { label: "Cable", value: "2 m reforzado" },
+      { label: "Uso", value: "Obra / taller industrial" },
+    ],
     packaging: {
       unidad: "1 taladro + llave mandril",
       docena: "12 unidades (caja mayorista)",
@@ -69,9 +92,11 @@ export const featuredProducts: FeaturedProduct[] = [
   },
   {
     id: "2",
-    name: "Amoladora angular 4 1/2\" 850W",
+    name: 'Amoladora angular 4 1/2" 850W',
     brand: "BOSCH",
     sku: "BOS-GWS850",
+    category: "herramientas",
+    categoryLabel: "Herramientas",
     price: 219.9,
     oldPrice: 274.9,
     wholesalePrice: 199.9,
@@ -83,10 +108,18 @@ export const featuredProducts: FeaturedProduct[] = [
     description:
       "Amoladora compacta para corte y desbaste. Protector de disco y interruptor de seguridad para uso intensivo.",
     features: [
-      "Disco 115 mm (4 1/2\")",
+      'Disco 115 mm (4 1/2")',
       "850W de potencia",
       "Arranque suave",
       "Empuñadura auxiliar",
+    ],
+    specs: [
+      { label: "Potencia", value: "850 W" },
+      { label: "Disco", value: "115 mm (4 1/2\")" },
+      { label: "Arranque", value: "Suave" },
+      { label: "Empuñadura", value: "Auxiliar incluida" },
+      { label: "Uso", value: "Corte y desbaste" },
+      { label: "Marca", value: "Bosch" },
     ],
     packaging: {
       unidad: "1 amoladora + protector",
@@ -101,6 +134,8 @@ export const featuredProducts: FeaturedProduct[] = [
     name: "Juego de llaves mixtas 12 piezas",
     brand: "STANLEY",
     sku: "STA-12MIX",
+    category: "ferreteria",
+    categoryLabel: "Ferretería",
     price: 149.9,
     oldPrice: 179.9,
     wholesalePrice: 132.0,
@@ -117,6 +152,14 @@ export const featuredProducts: FeaturedProduct[] = [
       "Estuche rígido incluido",
       "Boca abierta + estrella",
     ],
+    specs: [
+      { label: "Material", value: "Acero cromo vanadio" },
+      { label: "Piezas", value: "12" },
+      { label: "Medidas", value: "8 – 19 mm" },
+      { label: "Acabado", value: "Cromado" },
+      { label: "Tipo", value: "Mixta (abierta + estrella)" },
+      { label: "Estuche", value: "Rígido incluido" },
+    ],
     packaging: {
       unidad: "1 juego (12 pz)",
       docena: "12 juegos",
@@ -130,6 +173,8 @@ export const featuredProducts: FeaturedProduct[] = [
     name: "Foco LED A60 9W luz fría E27",
     brand: "PHILIPS",
     sku: "PHI-A609W",
+    category: "electricos",
+    categoryLabel: "Electricidad",
     price: 12.5,
     oldPrice: 15.9,
     wholesalePrice: 9.9,
@@ -146,6 +191,14 @@ export const featuredProducts: FeaturedProduct[] = [
       "Casquillo E27",
       "Vida útil ~15,000 h",
     ],
+    specs: [
+      { label: "Potencia", value: "9 W" },
+      { label: "Equivalencia", value: "≈ 60 W incandescente" },
+      { label: "Temperatura", value: "6500 K (luz fría)" },
+      { label: "Casquillo", value: "E27" },
+      { label: "Vida útil", value: "≈ 15,000 h" },
+      { label: "Uso", value: "Residencial / comercial" },
+    ],
     packaging: {
       unidad: "1 foco",
       docena: "12 focos",
@@ -159,6 +212,8 @@ export const featuredProducts: FeaturedProduct[] = [
     name: "Cinta aislante PVC 18 mm x 20 m",
     brand: "3M",
     sku: "3M-PVC1820",
+    category: "electricos",
+    categoryLabel: "Electricidad",
     price: 8.9,
     oldPrice: 11.5,
     wholesalePrice: 6.5,
@@ -174,6 +229,14 @@ export const featuredProducts: FeaturedProduct[] = [
       "Adhesivo de calidad",
       "Color negro",
     ],
+    specs: [
+      { label: "Ancho", value: "18 mm" },
+      { label: "Largo", value: "20 m" },
+      { label: "Material", value: "PVC" },
+      { label: "Aislamiento", value: "Hasta 600 V" },
+      { label: "Color", value: "Negro" },
+      { label: "Marca", value: "3M" },
+    ],
     packaging: {
       unidad: "1 rollo",
       docena: "12 rollos",
@@ -187,6 +250,8 @@ export const featuredProducts: FeaturedProduct[] = [
     name: "Interruptor simple empotrable",
     brand: "BTICINO",
     sku: "BTI-INT01",
+    category: "electricos",
+    categoryLabel: "Electricidad",
     price: 18.9,
     oldPrice: 22.0,
     wholesalePrice: 15.5,
@@ -203,6 +268,14 @@ export const featuredProducts: FeaturedProduct[] = [
       "Diseño compacto",
       "Fácil instalación",
     ],
+    specs: [
+      { label: "Corriente", value: "10 A" },
+      { label: "Voltaje", value: "250 V" },
+      { label: "Tipo", value: "Unipolar empotrable" },
+      { label: "Contactos", value: "Plata" },
+      { label: "Montaje", value: "Empotrado" },
+      { label: "Marca", value: "Bticino" },
+    ],
     packaging: {
       unidad: "1 interruptor",
       docena: "12 unidades",
@@ -216,6 +289,8 @@ export const featuredProducts: FeaturedProduct[] = [
     name: "Cable THW 2.5 mm² rollo 100 m",
     brand: "INDECO",
     sku: "IND-THW25",
+    category: "electricos",
+    categoryLabel: "Electricidad",
     price: 189.0,
     oldPrice: 220.0,
     wholesalePrice: 175.0,
@@ -232,6 +307,14 @@ export const featuredProducts: FeaturedProduct[] = [
       "Aislamiento PVC",
       "Uso interior",
     ],
+    specs: [
+      { label: "Sección", value: "2.5 mm²" },
+      { label: "Longitud", value: "100 m (rollo)" },
+      { label: "Tipo", value: "THW cobre" },
+      { label: "Aislamiento", value: "PVC" },
+      { label: "Uso", value: "Interior / instalaciones fijas" },
+      { label: "Marca", value: "Indeco" },
+    ],
     packaging: {
       unidad: "1 rollo 100 m",
       docena: "12 rollos",
@@ -245,6 +328,8 @@ export const featuredProducts: FeaturedProduct[] = [
     name: "Candado laminado 40 mm",
     brand: "STANLEY",
     sku: "STA-PAD40",
+    category: "seguridad",
+    categoryLabel: "Seguridad",
     price: 24.9,
     oldPrice: 29.9,
     wholesalePrice: 21.0,
@@ -260,6 +345,14 @@ export const featuredProducts: FeaturedProduct[] = [
       "2 llaves incluidas",
       "Acabado anticorrosivo",
     ],
+    specs: [
+      { label: "Tamaño", value: "40 mm" },
+      { label: "Tipo", value: "Laminado" },
+      { label: "Arco", value: "Endurecido" },
+      { label: "Llaves", value: "2 incluidas" },
+      { label: "Acabado", value: "Anticorrosivo" },
+      { label: "Marca", value: "Stanley" },
+    ],
     packaging: {
       unidad: "1 candado + 2 llaves",
       docena: "12 candados",
@@ -269,3 +362,13 @@ export const featuredProducts: FeaturedProduct[] = [
       "Advertencia de contenido: indique si requiere unidad, docena o caja al momento de la compra.",
   },
 ];
+
+/** Productos de la misma categoría (excluye el actual) */
+export function getRelatedProducts(
+  product: FeaturedProduct,
+  limit = 4,
+): FeaturedProduct[] {
+  return featuredProducts
+    .filter((item) => item.category === product.category && item.id !== product.id)
+    .slice(0, limit);
+}

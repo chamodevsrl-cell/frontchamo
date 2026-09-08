@@ -3,15 +3,22 @@
 import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import {
-  AlertTriangle,
-  Package,
+  GitCompareArrows,
+  Heart,
+  Minus,
+  Plus,
+  ShieldCheck,
   ShoppingCart,
+  Truck,
   X,
 } from "lucide-react";
-import type { FeaturedProduct } from "@/data/products";
+import {
+  getRelatedProducts,
+  type FeaturedProduct,
+} from "@/data/products";
 
 const WHATSAPP_URL =
-  "https://wa.me/51999999999?text=Hola%2C%20quiero%20cotizar%20este%20producto%3A%20";
+  "https://wa.me/51959723602?text=Hola%2C%20quiero%20cotizar%20este%20producto%3A%20";
 
 function formatPrice(value: number) {
   return value.toLocaleString("es-PE", {
@@ -37,17 +44,35 @@ function WhatsAppIcon({ className }: { className?: string }) {
 type ProductModalProps = {
   product: FeaturedProduct;
   onClose: () => void;
+  onSelectProduct?: (product: FeaturedProduct) => void;
 };
 
-export default function ProductModal({ product, onClose }: ProductModalProps) {
+export default function ProductModal({
+  product,
+  onClose,
+  onSelectProduct,
+}: ProductModalProps) {
   const titleId = useId();
   const [activeImage, setActiveImage] = useState(0);
-  const images = product.images.length >= 5 ? product.images : product.images.concat(
-    Array.from(
-      { length: 5 - product.images.length },
-      (_, i) => product.images[i % product.images.length] ?? product.image,
-    ),
-  );
+  const [qty, setQty] = useState(1);
+
+  const images =
+    product.images.length >= 5
+      ? product.images
+      : product.images.concat(
+          Array.from(
+            { length: 5 - product.images.length },
+            (_, i) =>
+              product.images[i % product.images.length] ?? product.image,
+          ),
+        );
+
+  const related = getRelatedProducts(product, 4);
+
+  useEffect(() => {
+    setActiveImage(0);
+    setQty(1);
+  }, [product.id]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -63,11 +88,11 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   }, [onClose]);
 
   const whatsappHref = `${WHATSAPP_URL}${encodeURIComponent(
-    `${product.name} (${product.sku})`,
+    `${product.name} (${product.sku}) x${qty}`,
   )}`;
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6">
       <button
         type="button"
         className="absolute inset-0 bg-brand-dark/55 backdrop-blur-[2px]"
@@ -79,154 +104,299 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-10 flex max-h-[min(92vh,900px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-brand-primary/40 bg-white shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_40px_rgba(18,126,201,0.45),0_24px_60px_rgba(11,53,84,0.35)]"
+        className="relative z-10 flex max-h-[min(94vh,960px)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-brand-primary/35 bg-white shadow-[0_0_0_1px_rgba(18,126,201,0.2),0_0_40px_rgba(18,126,201,0.4),0_24px_60px_rgba(11,53,84,0.35)]"
       >
-        <div className="flex items-center justify-between border-b border-brand-dark/8 px-4 py-3 sm:px-5">
-          <div>
-            <p className="text-xs font-bold tracking-wide text-brand-primary uppercase">
-              {product.brand}
-            </p>
-            <h2
-              id={titleId}
-              className="font-display text-lg font-bold text-brand-dark sm:text-xl"
-            >
-              {product.name}
-            </h2>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-gray text-brand-dark transition hover:bg-brand-primary hover:text-white"
-            aria-label="Cerrar"
-          >
-            <X className="h-5 w-5" strokeWidth={2} />
-          </button>
-        </div>
-
-        <div className="grid flex-1 overflow-y-auto lg:grid-cols-2">
-          <div className="border-b border-brand-dark/8 p-4 sm:p-5 lg:border-r lg:border-b-0">
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-brand-gray">
-              <Image
-                src={images[activeImage]}
-                alt={`${product.name} — imagen ${activeImage + 1}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-            </div>
-            <ul className="mt-3 grid grid-cols-5 gap-2">
-              {images.slice(0, 5).map((src, index) => (
-                <li key={`${src}-${index}`}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveImage(index)}
-                    className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 transition ${
-                      activeImage === index
-                        ? "border-brand-primary shadow-[0_0_12px_rgba(18,126,201,0.55)]"
-                        : "border-transparent opacity-80 hover:opacity-100"
-                    }`}
-                    aria-label={`Ver imagen ${index + 1}`}
-                    aria-pressed={activeImage === index}
-                  >
-                    <Image
-                      src={src}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                    />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-4 p-4 sm:p-5">
-            <div className="flex items-baseline gap-2">
-              <span className="font-display text-3xl font-bold text-brand-primary">
-                {formatPrice(product.price)}
-              </span>
-              <span className="text-sm text-brand-dark/40 line-through">
-                {formatPrice(product.oldPrice)}
-              </span>
-            </div>
-            <p className="text-sm text-brand-dark/70">
-              Mayorista:{" "}
-              <span className="font-semibold text-brand-dark">
-                {formatPrice(product.wholesalePrice)}
-              </span>{" "}
-              (x volumen)
-            </p>
-            <p className="text-sm text-brand-dark/55">SKU: {product.sku}</p>
-
-            <div>
-              <h3 className="font-display text-sm font-bold text-brand-dark uppercase">
-                Descripción
-              </h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-brand-dark/75">
-                {product.description}
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-display text-sm font-bold text-brand-dark uppercase">
-                Características
-              </h3>
-              <ul className="mt-1.5 list-disc space-y-1 pl-5 text-sm text-brand-dark/75">
-                {product.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
+        <div className="flex-1 overflow-y-auto">
+          {/* Cabecera: galería + ficha comercial */}
+          <div className="grid lg:grid-cols-2">
+            <div className="border-b border-brand-dark/8 p-4 sm:p-5 lg:border-r lg:border-b-0">
+              <div className="relative aspect-square overflow-hidden rounded-xl border border-brand-dark/10 bg-brand-gray">
+                <Image
+                  src={images[activeImage]}
+                  alt={`${product.name} — imagen ${activeImage + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+              </div>
+              <ul className="mt-3 grid grid-cols-5 gap-2">
+                {images.slice(0, 5).map((src, index) => (
+                  <li key={`${src}-${index}`}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveImage(index)}
+                      className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 transition ${
+                        activeImage === index
+                          ? "border-brand-primary shadow-[0_0_12px_rgba(18,126,201,0.55)]"
+                          : "border-brand-dark/10 opacity-80 hover:opacity-100"
+                      }`}
+                      aria-label={`Ver imagen ${index + 1}`}
+                      aria-pressed={activeImage === index}
+                    >
+                      <Image
+                        src={src}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                      />
+                    </button>
+                  </li>
                 ))}
               </ul>
             </div>
 
-            <div className="rounded-xl border border-brand-primary/20 bg-brand-primary/5 p-3">
-              <p className="mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wide text-brand-primary uppercase">
-                <Package className="h-3.5 w-3.5" strokeWidth={2.25} />
-                Contenido / empaque
-              </p>
-              <dl className="grid gap-1.5 text-sm text-brand-dark/80">
-                <div className="flex justify-between gap-3">
-                  <dt className="font-semibold">Unidad</dt>
-                  <dd className="text-right">{product.packaging.unidad}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="font-semibold">Docena</dt>
-                  <dd className="text-right">{product.packaging.docena}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="font-semibold">Caja</dt>
-                  <dd className="text-right">{product.packaging.caja}</dd>
-                </div>
-              </dl>
-            </div>
-
-            <div className="flex gap-2 rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-2.5 text-sm text-amber-950">
-              <AlertTriangle
-                className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"
-                strokeWidth={2.25}
-              />
-              <p>{product.warning}</p>
-            </div>
-
-            <div className="mt-auto flex flex-col gap-2 sm:flex-row">
+            <div className="relative flex flex-col gap-4 p-4 sm:p-5">
               <button
                 type="button"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_0_16px_rgba(18,126,201,0.4)] transition hover:bg-brand-dark"
+                onClick={onClose}
+                className="absolute top-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-gray text-brand-dark transition hover:bg-brand-primary hover:text-white sm:top-4 sm:right-4"
+                aria-label="Cerrar"
               >
-                <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                Añadir al carrito
+                <X className="h-4 w-4" strokeWidth={2.25} />
               </button>
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-[0_0_16px_rgba(37,211,102,0.4)] transition hover:bg-[#1ebe57]"
-              >
-                <WhatsAppIcon className="h-4 w-4" />
-                Cotizar
-              </a>
+
+              <div className="flex flex-wrap items-center gap-2 pr-10">
+                <span className="rounded-full bg-[#cfe8f8] px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-brand-primary uppercase">
+                  {product.brand}
+                </span>
+                <span className="text-xs text-brand-dark/50">
+                  SKU: {product.sku}
+                </span>
+                {product.discount ? (
+                  <span className="rounded-full bg-[#cfe8f8] px-2.5 py-0.5 text-[11px] font-extrabold text-brand-primary">
+                    -{product.discount}% OFF
+                  </span>
+                ) : null}
+              </div>
+
+              <div>
+                <h2
+                  id={titleId}
+                  className="font-display pr-8 text-xl font-bold text-brand-dark sm:text-2xl"
+                >
+                  {product.name}
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-brand-dark/70">
+                  {product.description}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-brand-primary/20 bg-brand-primary/5 p-4">
+                <p className="font-display text-3xl font-bold text-brand-primary">
+                  {formatPrice(product.price)}
+                </p>
+                <p className="mt-0.5 text-xs text-brand-dark/55">
+                  Precio unitario sugerido
+                  {product.oldPrice ? (
+                    <>
+                      {" "}
+                      ·{" "}
+                      <span className="line-through">
+                        {formatPrice(product.oldPrice)}
+                      </span>
+                    </>
+                  ) : null}
+                </p>
+                <div className="my-3 border-t border-dashed border-brand-primary/25" />
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-xs font-semibold tracking-wide text-brand-dark/55 uppercase">
+                    Precio mayorista por volumen
+                  </p>
+                  <p className="font-display text-lg font-bold text-brand-primary">
+                    {formatPrice(product.wholesalePrice)}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-sm font-medium text-emerald-600">
+                Estado: En stock ({product.stock} unidades disponibles)
+              </p>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center overflow-hidden rounded-lg border border-brand-dark/12 bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setQty((n) => Math.max(1, n - 1))}
+                    className="inline-flex h-10 w-10 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
+                    aria-label="Disminuir cantidad"
+                  >
+                    <Minus className="h-4 w-4" strokeWidth={2.25} />
+                  </button>
+                  <span className="min-w-10 text-center text-sm font-semibold text-brand-dark">
+                    {qty}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQty((n) => n + 1)}
+                    className="inline-flex h-10 w-10 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
+                    aria-label="Aumentar cantidad"
+                  >
+                    <Plus className="h-4 w-4" strokeWidth={2.25} />
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary"
+                  aria-label="Agregar a favoritos"
+                >
+                  <Heart className="h-4 w-4" strokeWidth={2} />
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary"
+                  aria-label="Comparar producto"
+                >
+                  <GitCompareArrows className="h-4 w-4" strokeWidth={2} />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary"
+                >
+                  <ShoppingCart className="h-4 w-4" strokeWidth={2} />
+                  Agregar a cotización
+                </button>
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1ebe57]"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                  Cotizar por WhatsApp
+                </a>
+              </div>
+
+              <div className="flex flex-wrap gap-4 text-xs text-brand-dark/55">
+                <span className="inline-flex items-center gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-brand-primary" />
+                  Garantía oficial
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Truck className="h-3.5 w-3.5 text-brand-primary" />
+                  Despacho a provincia
+                </span>
+              </div>
             </div>
+          </div>
+
+          {/* Ficha técnica + relacionados */}
+          <div className="space-y-8 border-t border-brand-dark/8 px-4 py-6 sm:px-6 sm:py-7">
+            <section aria-labelledby="specs-heading">
+              <h3
+                id="specs-heading"
+                className="font-display text-lg font-bold text-brand-dark sm:text-xl"
+              >
+                Especificaciones técnicas
+              </h3>
+              <div className="mt-3 overflow-hidden rounded-xl border border-brand-dark/10">
+                <table className="w-full text-left text-sm">
+                  <tbody>
+                    {product.specs.map((spec, index) => (
+                      <tr
+                        key={spec.label}
+                        className={
+                          index % 2 === 0 ? "bg-white" : "bg-brand-gray/70"
+                        }
+                      >
+                        <th
+                          scope="row"
+                          className="w-[42%] border-r border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
+                        >
+                          {spec.label}
+                        </th>
+                        <td className="px-3 py-2.5 text-brand-dark/75 sm:px-4">
+                          {spec.value}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr className="bg-white">
+                      <th
+                        scope="row"
+                        className="border-r border-t border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
+                      >
+                        Empaque unidad
+                      </th>
+                      <td className="border-t border-brand-dark/8 px-3 py-2.5 text-brand-dark/75 sm:px-4">
+                        {product.packaging.unidad}
+                      </td>
+                    </tr>
+                    <tr className="bg-brand-gray/70">
+                      <th
+                        scope="row"
+                        className="border-r border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
+                      >
+                        Empaque docena
+                      </th>
+                      <td className="px-3 py-2.5 text-brand-dark/75 sm:px-4">
+                        {product.packaging.docena}
+                      </td>
+                    </tr>
+                    <tr className="bg-white">
+                      <th
+                        scope="row"
+                        className="border-r border-brand-dark/8 px-3 py-2.5 font-semibold text-brand-dark sm:px-4"
+                      >
+                        Empaque caja
+                      </th>
+                      <td className="px-3 py-2.5 text-brand-dark/75 sm:px-4">
+                        {product.packaging.caja}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {related.length > 0 ? (
+              <section aria-labelledby="related-heading">
+                <h3
+                  id="related-heading"
+                  className="font-display text-lg font-bold text-brand-dark sm:text-xl"
+                >
+                  Productos relacionados de la misma categoría
+                </h3>
+                <p className="mt-1 text-sm text-brand-dark/55">
+                  Más opciones en {product.categoryLabel}
+                </p>
+                <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                  {related.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        onClick={() => onSelectProduct?.(item)}
+                        className="group flex h-full w-full flex-col overflow-hidden rounded-xl border border-brand-primary/25 bg-white text-left shadow-[0_0_12px_rgba(18,126,201,0.2)] transition hover:-translate-y-0.5 hover:shadow-[0_0_18px_rgba(18,126,201,0.4)]"
+                      >
+                        <div className="relative aspect-square overflow-hidden bg-brand-gray">
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                            sizes="160px"
+                          />
+                        </div>
+                        <div className="flex flex-1 flex-col gap-1 p-2.5 sm:p-3">
+                          <p className="text-[10px] font-bold tracking-wide text-brand-primary uppercase">
+                            {item.brand}
+                          </p>
+                          <p className="line-clamp-2 font-display text-xs font-bold text-brand-dark sm:text-sm">
+                            {item.name}
+                          </p>
+                          <p className="mt-auto font-display text-sm font-bold text-brand-primary">
+                            {formatPrice(item.price)}
+                          </p>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
           </div>
         </div>
       </div>

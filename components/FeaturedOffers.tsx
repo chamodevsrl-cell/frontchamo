@@ -171,7 +171,11 @@ export default function FeaturedOffers() {
       </div>
 
       {selected ? (
-        <ProductModal product={selected} onClose={() => setSelected(null)} />
+        <ProductModal
+          product={selected}
+          onClose={() => setSelected(null)}
+          onSelectProduct={(product) => setSelected(product)}
+        />
       ) : null}
     </section>
   );
