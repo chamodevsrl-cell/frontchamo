@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chamo Import — Front
 
-## Getting Started
+Catálogo web mayorista de **Chamo Import S.R.L.**: ferretería e importaciones para
+distribuidores en todo el Perú. Construido con Next.js (App Router), TypeScript y
+Tailwind CSS v4.
 
-First, run the development server:
+## ✨ Características
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Navbar de 3 niveles** estilo ferretería: barra de utilidad, logo + buscador + cuenta,
+  y barra de categorías/navegación principal.
+- **Slider de anuncios** en el home con animación de entrada, puntos y swipe táctil.
+- **Carrusel de marcas** distribuidoras y grilla de categorías con estilo "Explorar".
+- **CTA de WhatsApp** flotante para cotizaciones mayoristas.
+- **Autenticación** (login / registro) con contexto global y modal.
+- **Modo oscuro** vía clase `.dark` y preferencia persistida en `localStorage`.
+- **Footer corporativo** con mapa de Google Maps, métodos de pago y boletín.
+- Cursor personalizado (llave inglesa) en dispositivos de escritorio.
+
+## 🛠 Stack tecnológico
+
+| Tecnología | Uso |
+| --- | --- |
+| [Next.js](https://nextjs.org) 16 (App Router) | Framework / routing |
+| [React](https://react.dev) 19 + TypeScript | UI y tipado |
+| [Tailwind CSS](https://tailwindcss.com) v4 | Estilos (tokens en `app/globals.css`) |
+| [Lucide React](https://lucide.dev) | Iconografía |
+| `next/font/google` (Barlow, Barlow Semi Condensed) | Tipografía |
+
+## 🎨 Marca
+
+| Color | Hex | Uso |
+| --- | --- | --- |
+| Azul oscuro | `#0B3554` | Barra superior, footer, botón categorías |
+| Azul principal | `#127EC9` | Barra de navegación, CTAs, acentos |
+| Amarillo dorado | `#E4B714` | Badges Oferta / Nuevo, detalles |
+| Verde WhatsApp | `#25D366` | CTA flotante de WhatsApp |
+
+**Empresa:** Chamo Import S.R.L. · **WhatsApp / Tel:** +51 959 723 602 · Lima, Perú
+
+## 📂 Estructura del proyecto
+
+```
+app/                  # App Router (páginas y layout)
+components/            # UI reutilizable (Navbar, Footer, Slider, Auth, etc.)
+data/                  # Contenido tipado (slider, home, productos)
+docs/                  # Documentación viva (manual, técnica, usuario, sugerencias)
+  cambios/             # Historial antes/después por solicitud
+public/images/         # Slider, logo e íconos
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Documentación:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Índice: [`docs/README.md`](./docs/README.md)
+- Memoria de agentes: [`CLAUDE.md`](./CLAUDE.md) + [`AGENTS.md`](./AGENTS.md)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Cada cambio funcional actualiza `docs/` (técnica / usuario / sugerencias según aplique) y deja nota en [`docs/cambios/`](./docs/cambios/).
 
-## Learn More
+## 🚀 Empezar
 
-To learn more about Next.js, take a look at the following resources:
+Requisitos: Node.js 20+ y npm.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Abre [http://localhost:3000](http://localhost:3000) para ver el sitio. La página se
+actualiza automáticamente al editar los archivos en `app/`.
 
-## Deploy on Vercel
+### Otros comandos
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run build    # build de producción
+npm run start    # sirve el build de producción
+npm run lint      # ESLint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔀 Flujo de trabajo con Git
+
+```bash
+git add -A
+git commit -m "mensaje descriptivo"
+git push
+```
+
+Cada cambio funcional se documenta según [`docs/MANUAL_CAMBIOS.md`](./docs/MANUAL_CAMBIOS.md)
+y se registra en [`docs/cambios/`](./docs/cambios/) (plantilla:
+[`docs/cambios/_plantilla.md`](./docs/cambios/_plantilla.md)).
+
+## 📄 Licencia
+
+Proyecto privado de Chamo Import S.R.L. Todos los derechos reservados.
