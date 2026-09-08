@@ -61,8 +61,9 @@ app/                  # App Router (páginas y layout)
   contacto/           # Contacto + enlace a Maps
 components/           # UI reutilizable
 data/media.ts         # Rutas de slider, logo e icono
+docs/cambios/         # Registro antes/después de cada solicitud
 public/images/
-  slider/             # Anuncios del home (slide-1.jpg …)
+  slider/             # Anuncios del home (baner 1.png …)
   logo/               # logo.png (navbar / footer)
   icon/               # icon.png (favicon)
 ```
@@ -72,3 +73,4 @@ public/images/
 - Ubicación Google Maps: https://maps.app.goo.gl/mrh3WueTJErXS2sg6 (CHAMO IMPORT S.R.L.)
 - Modo oscuro (clase `.dark` + preferencia en `localStorage`)
 - Idioma base: `es`
+- Cada cambio solicitado se documenta en `docs/cambios/` (código anterior, nuevo y recomendación) y se sube a Git
