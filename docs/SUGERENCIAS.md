@@ -36,6 +36,8 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [x] 2026-09-08 — Slider full-bleed y sin recorte
 - [x] 2026-09-08 — Marcas debajo del slider
 - [x] 2026-09-08 — Categorías layout Explorar + glow
+- [x] 2026-09-08 — Categorías en carrusel horizontal (patrón FeaturedOffers)
 - [x] 2026-09-08 — 7 categorías en home (se añadieron 3)
 - [x] 2026-09-08 — Carpeta `docs/` con manual, técnica, usuario y sugerencias
+- [ ] Flechas prev/next opcionales en carrusel de categorías (desktop)
 - [x] 2026-09-08 — Consolidada en 3 secciones fijas: cambios / sugerencias / técnica+usuario (`MANUAL.md`)
