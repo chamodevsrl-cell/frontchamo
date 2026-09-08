@@ -99,7 +99,15 @@ WhatsApp del modal: `wa.me/51959723602`.
   `ProductModal.tsx` es el único que ya usa el número oficial — usarlo de referencia
   al corregir el resto.
 
-### A.9 Scripts
+### A.9 Navbar — interacción del menú principal
+
+`components/Navbar.tsx`, barra `brand-primary` (nivel 3): el link activo y el hover
+solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo
+además lleva una barra dorada animada debajo, calculada con `offsetLeft`/`offsetWidth`
+del link marcado `data-nav-active="true"` (estado `navIndicator`, se recalcula al
+cambiar `pathname`). Si se agregan ítems a `mainLinks`, el indicador los sigue solo.
+
+### A.10 Scripts
 
 ```bash
 npm run dev      # http://localhost:3000

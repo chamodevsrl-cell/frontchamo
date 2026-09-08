@@ -43,3 +43,5 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [x] 2026-09-08 — Carrusel de categorías también en PC con flechas circulares
 - [x] 2026-09-08 — Modal de producto con ficha técnica + relacionados por categoría
 - [x] 2026-09-08 — 7 categorías en home (se añadieron 3)
+- [x] 2026-09-08 — Navbar: hover solo en texto + barra dorada animada bajo el ítem activo
+- [x] 2026-09-08 — Auditoría de docs: sincronizar CLAUDE.md/MANUAL.md con el código real (carrusel, modal, navbar)

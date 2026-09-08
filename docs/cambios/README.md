@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-08 | Auditoría: sincronizar CLAUDE.md/MANUAL.md con el código real | [2026-09-08-auditoria-sync-docs.md](./2026-09-08-auditoria-sync-docs.md) |
 | 2026-09-08 | Navbar hover: solo texto, sin bloque | [2026-09-08-navbar-hover-solo-texto.md](./2026-09-08-navbar-hover-solo-texto.md) |
 | 2026-09-08 | Navbar: barra dorada en ítem activo | [2026-09-08-navbar-barra-dorada-activa.md](./2026-09-08-navbar-barra-dorada-activa.md) |
 | 2026-09-08 | Ficha técnica: diseño tabla cabecera + filas | [2026-09-08-ficha-tecnica-diseno-tabla.md](./2026-09-08-ficha-tecnica-diseno-tabla.md) |
