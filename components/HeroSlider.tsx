@@ -85,7 +85,7 @@ export default function HeroSlider() {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <div className="relative aspect-[21/9] min-h-[220px] w-full sm:min-h-[280px] md:min-h-[340px] lg:min-h-[420px]">
+      <div className="relative w-full">
         {slides.map((slide, i) => {
           const active = i === index;
           const showImage = loaded[slide.id] && !failed[slide.id];
@@ -93,23 +93,23 @@ export default function HeroSlider() {
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 transition-all duration-700 ease-out ${
-                active
-                  ? "z-10 translate-x-0 scale-100 opacity-100"
-                  : "pointer-events-none z-0 translate-x-4 scale-[1.02] opacity-0"
+              className={`${
+                active ? "relative z-10" : "pointer-events-none absolute inset-0 z-0"
+              } transition-opacity duration-700 ease-out ${
+                active ? "opacity-100" : "opacity-0"
               }`}
               aria-hidden={!active}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-brand-primary via-[#0f6fb3] to-brand-dark">
+              <div className="relative w-full bg-gradient-to-br from-brand-primary via-[#0f6fb3] to-brand-dark">
                 {!failed[slide.id] && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={encodeURI(slide.src)}
                     alt={slide.alt}
                     draggable={false}
-                    className={`h-full w-full object-cover transition-opacity duration-500 select-none ${
+                    className={`block h-auto w-full object-contain transition-opacity duration-500 select-none ${
                       showImage ? "opacity-100" : "opacity-0"
-                    }`}
+                    } ${active ? "relative" : "absolute inset-0 h-full w-full"}`}
                     ref={(el) => {
                       if (!el) return;
                       queueMicrotask(() =>
@@ -134,7 +134,11 @@ export default function HeroSlider() {
                 )}
 
                 {!showImage && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 border border-dashed border-white/20 bg-brand-dark/30">
+                  <div
+                    className={`flex w-full flex-col items-center justify-center gap-3 border border-dashed border-white/20 bg-brand-dark/30 py-16 sm:py-24 ${
+                      active ? "relative aspect-[21/9]" : "absolute inset-0"
+                    }`}
+                  >
                     <ImageIcon
                       className="h-10 w-10 text-white/35 sm:h-12 sm:w-12"
                       strokeWidth={1.5}
@@ -156,32 +160,32 @@ export default function HeroSlider() {
                 {showImage && !slide.fullBleed && (
                   <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-brand-dark/35 to-transparent" />
                 )}
-              </div>
 
-              {(!showImage || !slide.fullBleed) && (
-                <div
-                  className={`relative z-10 flex h-full max-w-xl flex-col justify-end px-6 pb-12 sm:px-10 sm:pb-14 lg:px-14 ${
-                    active
-                      ? "translate-y-0 opacity-100 transition-all delay-150 duration-700"
-                      : "translate-y-4 opacity-0"
-                  }`}
-                >
-                  <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-brand-gold uppercase sm:text-sm">
-                    Chamo Import
-                  </p>
-                  <h2 className="font-display text-2xl font-bold text-white sm:text-4xl lg:text-5xl">
-                    {slide.title}
-                  </h2>
-                  <p className="mt-2 text-sm text-white/85 sm:text-base lg:text-lg">
-                    {slide.subtitle}
-                  </p>
-                </div>
-              )}
+                {(!showImage || !slide.fullBleed) && (
+                  <div
+                    className={`absolute inset-0 z-10 flex max-w-xl flex-col justify-end px-6 pb-12 sm:px-10 sm:pb-14 lg:px-14 ${
+                      active
+                        ? "translate-y-0 opacity-100 transition-all delay-150 duration-700"
+                        : "translate-y-4 opacity-0"
+                    }`}
+                  >
+                    <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-brand-gold uppercase sm:text-sm">
+                      Chamo Import
+                    </p>
+                    <h2 className="font-display text-2xl font-bold text-white sm:text-4xl lg:text-5xl">
+                      {slide.title}
+                    </h2>
+                    <p className="mt-2 text-sm text-white/85 sm:text-base lg:text-lg">
+                      {slide.subtitle}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
 
-        <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-4">
           {slides.map((slide, i) => (
             <button
               key={slide.id}
