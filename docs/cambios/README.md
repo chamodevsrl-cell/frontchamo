@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-08 | Consolidar docs en 3 secciones (cambios / sugerencias / técnica+usuario) | [2026-09-08-consolidar-3-secciones-docs.md](./2026-09-08-consolidar-3-secciones-docs.md) |
 | 2026-09-08 | +3 categorías y docs vivas (manual/técnica/usuario/sugerencias) | [2026-09-08-categorias-mas-tres-y-docs-vivas.md](./2026-09-08-categorias-mas-tres-y-docs-vivas.md) |
 | 2026-09-08 | Categorías layout Explorar + borde brillante | [2026-09-08-categorias-layout-explorar.md](./2026-09-08-categorias-layout-explorar.md) |
 | 2026-09-08 | Marcas distribuidoras debajo del slider | [2026-09-08-marcas-debajo-del-slider.md](./2026-09-08-marcas-debajo-del-slider.md) |

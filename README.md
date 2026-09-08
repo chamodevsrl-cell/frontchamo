@@ -43,17 +43,23 @@ Tailwind CSS v4.
 app/                  # App Router (páginas y layout)
 components/            # UI reutilizable (Navbar, Footer, Slider, Auth, etc.)
 data/                  # Contenido tipado (slider, home, productos)
-docs/                  # Documentación viva (manual, técnica, usuario, sugerencias)
-  cambios/             # Historial antes/después por solicitud
+docs/                  # Documentación viva en 3 secciones fijas
+  cambios/             # 1. Cambios — historial antes/después por solicitud
+  SUGERENCIAS.md        # 2. Sugerencias de cambios (backlog vivo)
+  MANUAL.md             # 3. Documentación técnica + manual de usuario
 public/images/         # Slider, logo e íconos
 ```
 
-Documentación:
+Documentación (3 secciones, ver [`docs/README.md`](./docs/README.md)):
 
-- Índice: [`docs/README.md`](./docs/README.md)
-- Memoria de agentes: [`CLAUDE.md`](./CLAUDE.md) + [`AGENTS.md`](./AGENTS.md)
+1. **Cambios** → [`docs/cambios/`](./docs/cambios/)
+2. **Sugerencias** → [`docs/SUGERENCIAS.md`](./docs/SUGERENCIAS.md)
+3. **Documentación técnica y manual de usuario** → [`docs/MANUAL.md`](./docs/MANUAL.md)
 
-Cada cambio funcional actualiza `docs/` (técnica / usuario / sugerencias según aplique) y deja nota en [`docs/cambios/`](./docs/cambios/).
+Memoria de agentes: [`CLAUDE.md`](./CLAUDE.md) + [`AGENTS.md`](./AGENTS.md).
+
+Cada cambio del proyecto —código, texto o incluso una sola imagen— debe dejar nota en
+`docs/cambios/` y actualizar `docs/MANUAL.md` / `docs/SUGERENCIAS.md` si corresponde.
 
 ## 🚀 Empezar
 
@@ -83,7 +89,7 @@ git commit -m "mensaje descriptivo"
 git push
 ```
 
-Cada cambio funcional se documenta según [`docs/MANUAL_CAMBIOS.md`](./docs/MANUAL_CAMBIOS.md)
+Cada cambio funcional se documenta según el flujo de [`docs/README.md`](./docs/README.md)
 y se registra en [`docs/cambios/`](./docs/cambios/) (plantilla:
 [`docs/cambios/_plantilla.md`](./docs/cambios/_plantilla.md)).
 

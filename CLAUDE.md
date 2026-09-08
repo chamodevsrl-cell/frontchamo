@@ -110,13 +110,11 @@ data/
   media.ts              # Rutas de slider, logo e icono (LOGO_SRC, ICON_SRC, slides)
   home.ts                # Datos de secciones del home (marcas, categorías, trust bar…)
   products.ts            # Catálogo de productos de ejemplo
-docs/                   # Documentación viva (ver §9)
-  README.md              # Índice
-  MANUAL_CAMBIOS.md      # Flujo obligatorio por solicitud
-  TECNICA.md             # Arquitectura / stack / datos
-  USUARIO.md             # Guía de uso del sitio
-  SUGERENCIAS.md         # Backlog y recomendaciones
-  cambios/               # Nota antes/después por solicitud
+docs/                   # Documentación viva en 3 secciones fijas (ver §9)
+  README.md              # Índice + flujo obligatorio
+  cambios/               # Sección 1 — nota antes/después por solicitud
+  SUGERENCIAS.md         # Sección 2 — backlog y recomendaciones
+  MANUAL.md              # Sección 3 — documentación técnica (Parte A) + manual de usuario (Parte B)
 public/images/
   slider/                # Anuncios del home (baner 1.png, baner 2.png, baner 3.png)
   logo/                  # logo-chamo-import.png (navbar / footer)
@@ -143,16 +141,21 @@ git push
 - Rama principal: `main`. Se trabaja directo sobre `main` salvo que se indique lo contrario.
 - Usuario de Git configurado: `chamodevsrl-cell`.
 
-## 9. Documentación y registro de cambios (`docs/`)
+## 9. Documentación y registro de cambios (`docs/`) — 3 secciones fijas
 
-Cada solicitud de cambio debe:
+Toda la documentación viva vive en **3 secciones** (índice en `docs/README.md`). Se
+actualizan con **cualquier** cambio del proyecto, sin importar el tamaño — hasta
+reemplazar una sola imagen cuenta:
 
-1. Actualizar código.
-2. Añadir nota en `docs/cambios/` (plantilla `_plantilla.md`).
-3. Retocar `TECNICA.md` / `USUARIO.md` / `SUGERENCIAS.md` si el cambio es estructural o visible.
-4. Commit + push.
+1. **Cambios** (`docs/cambios/`) — una nota antes/después por solicitud, plantilla en `cambios/_plantilla.md`, índice en `cambios/README.md`.
+2. **Sugerencias** (`docs/SUGERENCIAS.md`) — backlog vivo; marcar ítems resueltos y anotar ideas nuevas que surjan.
+3. **Documentación técnica y manual de usuario** (`docs/MANUAL.md`) — Parte A (arquitectura/componentes/datos) y Parte B (qué ve y hace el usuario/negocio hoy).
 
-Índice de historial: `docs/cambios/README.md`. Último avance (2026-09-08): **7 categorías** en home (se sumaron Herramientas, Construcción, Pinturas) + set completo de docs vivas.
+Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
+`MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
+
+Último avance (2026-09-08): consolidación de la documentación viva en estas 3 secciones
+(antes eran 5 archivos sueltos).
 
 ## 10. Pendientes conocidos
 

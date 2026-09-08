@@ -38,3 +38,4 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [x] 2026-09-08 — Categorías layout Explorar + glow
 - [x] 2026-09-08 — 7 categorías en home (se añadieron 3)
 - [x] 2026-09-08 — Carpeta `docs/` con manual, técnica, usuario y sugerencias
+- [x] 2026-09-08 — Consolidada en 3 secciones fijas: cambios / sugerencias / técnica+usuario (`MANUAL.md`)
