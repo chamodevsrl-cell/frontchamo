@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-09
 - **Solicitud:** En productos destacados, que esté solo en una fila, como las categorías.
 - **Archivos:** `components/FeaturedOffers.tsx`, `components/ProductCard.tsx`
-- **Commit:** (se registra al subir)
+- **Commit:** `7ffd205` — feat: featured products as a single-row carousel
 
 ## Qué había antes
 
