@@ -12,14 +12,14 @@ const shinyCard =
 function CategoryCard({ category }: { category: MainCategory }) {
   return (
     <article
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl transition duration-300 hover:-translate-y-0.5 ${shinyCard}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl text-brand-dark transition duration-300 hover:-translate-y-0.5 dark:bg-[#102a40] dark:text-white ${shinyCard}`}
       style={{ backgroundColor: category.tint }}
     >
-      <div className="flex flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-4 lg:px-6 lg:pt-6">
+      <div className="flex flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-4 lg:px-6 lg:pt-6 dark:bg-[#102a40]">
         <p className="text-[10px] font-bold tracking-[0.12em] text-brand-primary uppercase sm:text-[11px] lg:text-xs">
           {category.eyebrow}
         </p>
-        <h3 className="font-display mt-1.5 text-xl font-extrabold tracking-tight text-brand-dark uppercase sm:mt-2 sm:text-2xl lg:text-[1.65rem]">
+        <h3 className="font-display mt-1.5 text-xl font-extrabold tracking-tight text-brand-dark uppercase sm:mt-2 sm:text-2xl lg:text-[1.65rem] dark:text-white">
           {category.label}
         </h3>
 
@@ -27,7 +27,7 @@ function CategoryCard({ category }: { category: MainCategory }) {
           {category.bullets.map((bullet) => (
             <li
               key={bullet}
-              className="flex items-start gap-2 text-xs text-brand-dark/75 sm:gap-2.5 sm:text-sm"
+              className="flex items-start gap-2 text-xs text-brand-dark/75 sm:gap-2.5 sm:text-sm dark:text-white/80"
             >
               <span
                 className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-primary"
@@ -105,7 +105,7 @@ export default function CategoriesGrid() {
             <span className="h-8 w-1 rounded-full bg-brand-primary" aria-hidden />
             <h2
               id="categorias-heading"
-              className="font-display text-2xl font-bold text-brand-dark sm:text-3xl"
+              className="font-display text-2xl font-bold text-brand-dark sm:text-3xl dark:text-white"
             >
               Categorías principales
             </h2>

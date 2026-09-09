@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-08**
+Última actualización: **2026-09-09**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -25,30 +25,32 @@ cambio visible o estructural — ver el flujo en [`docs/README.md`](./README.md)
 | `brand-primary` | `#127EC9` | CTAs, bordes brillantes, acentos |
 | `brand-gold` | `#E4B714` | Badges Oferta/Nuevo, detalles |
 | `brand-gray` | `#F4F4F4` | Fondos suaves |
-| — (`#25D366`, sin token aún) | Verde WhatsApp | Burbuja flotante (`WhatsAppFloat.tsx`) |
+| `brand-whatsapp` | `#25D366` | Burbuja flotante y CTAs de WhatsApp |
 
 ### A.3 Estructura relevante
 
 ```
 app/page.tsx              # Home: orden de secciones
+app/categorias/           # Listado + detalle [slug]
+app/catalogo/             # Búsqueda y filtros (API)
+app/carrito/              # Cotización local
+app/cotizar/              # Formulario + WhatsApp
+app/api/productos/        # GET catálogo filtrable
+app/terminos/ /privacidad/
 components/
-  Navbar.tsx              # Header 3 niveles
-  HeroSlider.tsx           # Banners full-bleed, imagen completa
-  BrandsCarousel.tsx       # Marcas debajo del slider
-  TrustInfoBar.tsx
-  CategoriesGrid.tsx       # Tarjetas Explorar + glow
-  FeaturedOffers.tsx       # Productos destacados
-  ProductModal.tsx
-  Footer.tsx
-  WhatsAppFloat.tsx
-  WrenchCursor.tsx
-  AuthProvider.tsx / AuthModal.tsx / AuthForm.tsx
+  Navbar.tsx              # Header 3 niveles (categorías = mainCategories)
+  CartProvider.tsx        # Carrito en localStorage
+  CatalogFilters.tsx      # Filtros de /catalogo
+  ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
+  QuoteForm.tsx
 data/
+  contact.ts               # Teléfono, WhatsApp, correo, Maps
   media.ts                 # Slides / logo / icon
   home.ts                   # trustItems, mainCategories, distributorBrands
-  products.ts                # Ofertas destacadas
-docs/                       # Documentación viva (este set de 3 secciones)
-public/images/slider/       # baner 1–3.png
+  products.ts               # Catálogo de ejemplo + searchCatalog
+public/images/slider/       # baner-1.png … baner-3.png
+public/images/categorias/   # Fotos locales por categoría
+public/images/marcas/       # Wordmarks SVG
 ```
 
 ### A.4 Home — orden actual
@@ -61,18 +63,25 @@ public/images/slider/       # baner 1–3.png
 
 ### A.5 Categorías (`data/home.ts` → `mainCategories`)
 
-Cada ítem: `href`, `label`, `eyebrow`, `bullets` (3), `image`, `imageAlt`, `tint`.
+Cada ítem: `slug`, `href`, `label`, `eyebrow`, `bullets` (3), `image` (local), `imageAlt`, `tint`.
+
+Fuente única también del dropdown **Categorías** del Navbar.
 
 **Actual (7):** Ferretería, Electricidad, Seguridad, Hogar, Herramientas, Construcción, Pinturas.
 
 UI en `CategoriesGrid.tsx`: **carrusel horizontal en todos los breakpoints**
 (`snap-x` + scroll). En PC/móvil hay **flechas circulares** (arriba a la derecha)
-que desplazan una tarjeta; también se puede deslizar. Borde brillante de marca.
+que desplazan una tarjeta; también se puede deslizar. En modo oscuro las tarjetas
+usan fondo `#102a40` y texto claro para contraste.
 
 ### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
 
 Cada producto incluye `category` / `categoryLabel`, `specs[]` (ficha técnica) y
-`packaging`. Helper `getRelatedProducts(product)` filtra por la misma categoría.
+`packaging`. Helpers: `getRelatedProducts`, `searchCatalog`, `getProductsByCategory`.
+Hay **al menos 3 productos por categoría** (22 SKUs de ejemplo).
+
+El listado público pasa por `GET /api/productos?q=&category=&brand=`.
+`CartProvider` guarda líneas `{ productId, qty }` en `localStorage` (`chamo-cart-v1`).
 
 Modal (diseño ficha):
 1. Galería + thumbs  
@@ -81,23 +90,22 @@ Modal (diseño ficha):
    “Especificación / Detalle”, filas blancas / `#eef6fc`, esquinas redondeadas + borde brillante  
 4. **Productos relacionados de la misma categoría** (clic cambia el producto del modal)
 
-WhatsApp del modal: `wa.me/51959723602`.
+WhatsApp unificado: `data/contact.ts` → `wa.me/51959723602`.
 
 ### A.7 Slider
 
-- Rutas en `data/media.ts`; archivos en `public/images/slider/`.
+- Rutas en `data/media.ts`; archivos en `public/images/slider/` (`baner-1.png` … `baner-3.png`, sin espacios).
 - `fullBleed: true` evita overlay de texto sobre el arte (el banner ya trae texto).
 - Imagen `w-full h-auto object-contain` (sin recorte), puntos + swipe táctil, sin flechas.
 
 ### A.8 Datos oficiales de contacto
 
+Fuente: `data/contact.ts`.
+
 - Razón social: Chamo Import S.R.L.
-- Teléfono / WhatsApp oficial: **+51 959 723 602**
+- Teléfono / WhatsApp oficial: **+51 959 723 602** (`wa.me/51959723602`) — ya sincronizado en float, footer, cotizar, contacto y modal
 - Ubicación: Lima, Perú — https://maps.app.goo.gl/mrh3WueTJErXS2sg6
-- ⚠️ Pendiente: `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y
-  `app/contacto/page.tsx` todavía usan el placeholder `+51 999 999 999`;
-  `ProductModal.tsx` es el único que ya usa el número oficial — usarlo de referencia
-  al corregir el resto.
+- Correo `ventas@chamoimport.com` sigue provisional
 
 ### A.9 Navbar — interacción del menú principal
 
@@ -114,6 +122,7 @@ npm run dev      # http://localhost:3000
 npm run build
 npm run start
 npm run lint
+npm test         # Vitest smoke (slider, categorías, búsqueda)
 ```
 
 ---
@@ -154,28 +163,32 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 - **Carrusel en móvil y PC**: flechas circulares ← → arriba a la derecha; también
   se puede deslizar con el dedo o el trackpad
 - Cada una: subtítulo, título, 3 beneficios, botón **Explorar** e imagen
-- Enlace "Ver todas" → `/categorias` (página aún pendiente)
+- Enlace "Ver todas" → `/categorias` (listado) y **Explorar** → `/categorias/[slug]`
 
 **Productos destacados / ofertas**
-- Tarjetas con precio, stock y "Añadir al carrito"; clic abre el detalle (modal)
+- Tarjetas con precio, stock y "Añadir al carrito" (suma al carrito); clic abre el detalle (modal)
 - En el modal: precios unitario/mayorista, cantidad, cotización / WhatsApp,
   **ficha técnica** (tabla) y **productos relacionados** de la misma categoría
   (al tocar uno se abre ese producto en el mismo modal)
 
 **WhatsApp**
-- Botón flotante verde para cotizar / contactar
+- Botón flotante verde para cotizar / contactar (`+51 959 723 602`)
 
 **Pie de página**
-- Enlaces, contacto, mapa, medios de pago, boletín
+- Enlaces, contacto, mapa, medios de pago, boletín, términos y privacidad
 
 ### B.3 Otras páginas
 
 | Ruta | Uso |
 | --- | --- |
+| `/catalogo` | Búsqueda y filtros (categoría / marca) contra la API |
+| `/categorias` | Todas las líneas; detalle en `/categorias/[slug]` |
+| `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
 | `/nosotros` | Información de la empresa |
 | `/contacto` | Datos de contacto y Maps |
-| `/ofertas` | Vista de ofertas (en evolución) |
-| `/cotizar` | Cotización / WhatsApp |
+| `/ofertas` | Productos con badge de oferta |
+| `/cotizar` | Formulario mayorista + WhatsApp prellenado |
+| `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
 | Login (modal / cuenta) | Iniciar sesión o registrarse |
 
 ### B.4 Contenido que el negocio puede cambiar sin programar
@@ -183,7 +196,8 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 Hoy los textos e imágenes viven en archivos del proyecto (`data/` y `public/images/`).
 Más adelante conviene un panel admin; por ahora:
 
-- Banners → `public/images/slider/` + `data/media.ts`
-- Categorías del home → `data/home.ts`
+- Banners → `public/images/slider/` (`baner-1.png` …) + `data/media.ts`
+- Categorías del home → `data/home.ts` + `public/images/categorias/`
 - Logos de marcas → `public/images/marcas/`
-- Productos destacados → `data/products.ts`
+- Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
+- Teléfono / WhatsApp / correo → `data/contact.ts`

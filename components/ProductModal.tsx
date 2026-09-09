@@ -16,17 +16,9 @@ import {
   getRelatedProducts,
   type FeaturedProduct,
 } from "@/data/products";
-
-const WHATSAPP_URL =
-  "https://wa.me/51959723602?text=Hola%2C%20quiero%20cotizar%20este%20producto%3A%20";
-
-function formatPrice(value: number) {
-  return value.toLocaleString("es-PE", {
-    style: "currency",
-    currency: "PEN",
-    minimumFractionDigits: 2,
-  });
-}
+import { whatsappUrl } from "@/data/contact";
+import { formatPrice } from "@/lib/format";
+import { useCart } from "@/components/CartProvider";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -53,8 +45,10 @@ export default function ProductModal({
   onSelectProduct,
 }: ProductModalProps) {
   const titleId = useId();
+  const { addItem } = useCart();
   const [activeImage, setActiveImage] = useState(0);
   const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
 
   const images =
     product.images.length >= 5
@@ -70,11 +64,6 @@ export default function ProductModal({
   const related = getRelatedProducts(product, 4);
 
   useEffect(() => {
-    setActiveImage(0);
-    setQty(1);
-  }, [product.id]);
-
-  useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     function onKey(event: KeyboardEvent) {
@@ -87,9 +76,9 @@ export default function ProductModal({
     };
   }, [onClose]);
 
-  const whatsappHref = `${WHATSAPP_URL}${encodeURIComponent(
-    `${product.name} (${product.sku}) x${qty}`,
-  )}`;
+  const whatsappHref = whatsappUrl(
+    `Hola, quiero cotizar este producto: ${product.name} (${product.sku}) x${qty}`,
+  );
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6">
@@ -255,16 +244,21 @@ export default function ProductModal({
               <div className="flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
+                  onClick={() => {
+                    addItem(product.id, qty);
+                    setAdded(true);
+                    window.setTimeout(() => setAdded(false), 1400);
+                  }}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary"
                 >
                   <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                  Agregar a cotización
+                  {added ? "Agregado" : "Agregar a cotización"}
                 </button>
                 <a
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1ebe57]"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-whatsapp px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1ebe57]"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   Cotizar por WhatsApp

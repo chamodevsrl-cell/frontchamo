@@ -31,6 +31,12 @@ export type FeaturedProduct = {
   warning: string;
 };
 
+export type CatalogFilters = {
+  q?: string;
+  category?: string;
+  brand?: string;
+};
+
 const TOOL_IMAGES = [
   "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
   "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=800&q=80",
@@ -42,6 +48,9 @@ const TOOL_IMAGES = [
   "https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=800&q=80",
 ] as const;
 
+const DEFAULT_WARNING =
+  "Verifique el contenido del empaque: unidad, docena o caja. El precio mayorista aplica según volumen.";
+
 function gallery(seed: number): string[] {
   const start = seed % TOOL_IMAGES.length;
   return Array.from(
@@ -50,8 +59,27 @@ function gallery(seed: number): string[] {
   );
 }
 
+type ProductDraft = Omit<FeaturedProduct, "image" | "images" | "warning"> & {
+  imageIndex: number;
+  warning?: string;
+};
+
+function makeProduct(draft: ProductDraft): FeaturedProduct {
+  const { imageIndex, warning, ...rest } = draft;
+  const hasOrigin = rest.specs.some((spec) => spec.label === "País de origen");
+  return {
+    ...rest,
+    specs: hasOrigin
+      ? rest.specs
+      : [...rest.specs, { label: "País de origen", value: "Importación (ficha de ejemplo)" }],
+    image: TOOL_IMAGES[imageIndex % TOOL_IMAGES.length],
+    images: gallery(imageIndex),
+    warning: warning ?? DEFAULT_WARNING,
+  };
+}
+
 export const featuredProducts: FeaturedProduct[] = [
-  {
+  makeProduct({
     id: "1",
     name: 'Taladro percutor 1/2" 750W industrial',
     brand: "TRUPER",
@@ -64,8 +92,7 @@ export const featuredProducts: FeaturedProduct[] = [
     discount: 14,
     badge: "oferta",
     stock: 45,
-    image: TOOL_IMAGES[0],
-    images: gallery(0),
+    imageIndex: 0,
     description:
       "Taladro percutor profesional para concreto, metal y madera. Ideal para obra y taller, con empuñadura ergonómica y mandril de 1/2\".",
     features: [
@@ -87,10 +114,8 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 unidades (caja mayorista)",
       caja: "24 unidades por master box",
     },
-    warning:
-      "Verifique el contenido del empaque: unidad, docena o caja. El precio mayorista aplica según volumen.",
-  },
-  {
+  }),
+  makeProduct({
     id: "2",
     name: 'Amoladora angular 4 1/2" 850W',
     brand: "BOSCH",
@@ -103,8 +128,7 @@ export const featuredProducts: FeaturedProduct[] = [
     discount: 20,
     badge: "oferta",
     stock: 32,
-    image: TOOL_IMAGES[1],
-    images: gallery(1),
+    imageIndex: 1,
     description:
       "Amoladora compacta para corte y desbaste. Protector de disco y interruptor de seguridad para uso intensivo.",
     features: [
@@ -115,7 +139,7 @@ export const featuredProducts: FeaturedProduct[] = [
     ],
     specs: [
       { label: "Potencia", value: "850 W" },
-      { label: "Disco", value: "115 mm (4 1/2\")" },
+      { label: "Disco", value: '115 mm (4 1/2")' },
       { label: "Arranque", value: "Suave" },
       { label: "Empuñadura", value: "Auxiliar incluida" },
       { label: "Uso", value: "Corte y desbaste" },
@@ -126,10 +150,8 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 unidades",
       caja: "18 unidades por caja",
     },
-    warning:
-      "Confirme si su pedido es por unidad, docena o caja completa antes de despachar.",
-  },
-  {
+  }),
+  makeProduct({
     id: "3",
     name: "Juego de llaves mixtas 12 piezas",
     brand: "STANLEY",
@@ -142,8 +164,7 @@ export const featuredProducts: FeaturedProduct[] = [
     discount: 17,
     badge: "destacado",
     stock: 60,
-    image: TOOL_IMAGES[2],
-    images: gallery(2),
+    imageIndex: 2,
     description:
       "Juego cromado de llaves mixtas métricas. Acabado durable y estuche organizado para ferretería y taller.",
     features: [
@@ -165,10 +186,8 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 juegos",
       caja: "24 juegos por caja",
     },
-    warning:
-      "El contenido varía según presentación: unidad (1 juego), docena o caja master.",
-  },
-  {
+  }),
+  makeProduct({
     id: "4",
     name: "Foco LED A60 9W luz fría E27",
     brand: "PHILIPS",
@@ -181,8 +200,7 @@ export const featuredProducts: FeaturedProduct[] = [
     discount: 21,
     badge: "oferta",
     stock: 500,
-    image: TOOL_IMAGES[3],
-    images: gallery(3),
+    imageIndex: 3,
     description:
       "Foco LED eficiente para uso residencial y comercial. Bajo consumo y larga vida útil.",
     features: [
@@ -204,10 +222,8 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 focos",
       caja: "50 focos por caja",
     },
-    warning:
-      "Importante: pedidos mayoristas se despachan por docena o caja. Indique la presentación al cotizar.",
-  },
-  {
+  }),
+  makeProduct({
     id: "5",
     name: "Cinta aislante PVC 18 mm x 20 m",
     brand: "3M",
@@ -219,8 +235,7 @@ export const featuredProducts: FeaturedProduct[] = [
     wholesalePrice: 6.5,
     badge: "destacado",
     stock: 240,
-    image: TOOL_IMAGES[4],
-    images: gallery(4),
+    imageIndex: 4,
     description:
       "Cinta aislante de alta adherencia para instalaciones eléctricas. Resistente a humedad y temperatura.",
     features: [
@@ -242,10 +257,8 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 rollos",
       caja: "100 rollos por caja",
     },
-    warning:
-      "Revise el empaque: unidad (rollo), docena o caja. No mezclar presentaciones en un mismo ítem.",
-  },
-  {
+  }),
+  makeProduct({
     id: "6",
     name: "Interruptor simple empotrable",
     brand: "BTICINO",
@@ -258,8 +271,7 @@ export const featuredProducts: FeaturedProduct[] = [
     discount: 14,
     badge: "oferta",
     stock: 180,
-    image: TOOL_IMAGES[5],
-    images: gallery(5),
+    imageIndex: 5,
     description:
       "Interruptor unipolar de línea residencial. Montaje empotrado con placa incluida según kit.",
     features: [
@@ -281,10 +293,8 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 unidades",
       caja: "60 unidades por caja",
     },
-    warning:
-      "El contenido del pedido puede ser unidad, docena o caja. Confirme stock por presentación.",
-  },
-  {
+  }),
+  makeProduct({
     id: "7",
     name: "Cable THW 2.5 mm² rollo 100 m",
     brand: "INDECO",
@@ -297,8 +307,7 @@ export const featuredProducts: FeaturedProduct[] = [
     discount: 14,
     badge: "oferta",
     stock: 28,
-    image: TOOL_IMAGES[6],
-    images: gallery(6),
+    imageIndex: 6,
     description:
       "Cable de cobre THW para instalaciones fijas. Cumple normas técnicas para uso residencial y comercial.",
     features: [
@@ -320,10 +329,8 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 rollos",
       caja: "No aplica (por pallet)",
     },
-    warning:
-      "Venta por unidad (rollo), docena o volumen especial. Verifique metraje al recibir.",
-  },
-  {
+  }),
+  makeProduct({
     id: "8",
     name: "Candado laminado 40 mm",
     brand: "STANLEY",
@@ -335,8 +342,7 @@ export const featuredProducts: FeaturedProduct[] = [
     wholesalePrice: 21.0,
     badge: "destacado",
     stock: 95,
-    image: TOOL_IMAGES[7],
-    images: gallery(7),
+    imageIndex: 7,
     description:
       "Candado laminado resistente a la corrosión. Ideal para portones, almacenes y herramientas.",
     features: [
@@ -358,10 +364,547 @@ export const featuredProducts: FeaturedProduct[] = [
       docena: "12 candados",
       caja: "48 candados por caja",
     },
-    warning:
-      "Advertencia de contenido: indique si requiere unidad, docena o caja al momento de la compra.",
-  },
+  }),
+  makeProduct({
+    id: "9",
+    name: "Atornillador inalámbrico 12V",
+    brand: "BOSCH",
+    sku: "BOS-GSR12",
+    category: "herramientas",
+    categoryLabel: "Herramientas",
+    price: 259.0,
+    oldPrice: 299.0,
+    wholesalePrice: 239.0,
+    discount: 13,
+    badge: "destacado",
+    stock: 22,
+    imageIndex: 0,
+    description:
+      "Atornillador compacto para ensamble y mantenimiento. Incluye batería y cargador según kit mayorista.",
+    features: [
+      "12V litio",
+      "Portabrocas 10 mm",
+      "Luz LED de trabajo",
+      "2 velocidades",
+    ],
+    specs: [
+      { label: "Voltaje", value: "12 V" },
+      { label: "Portabrocas", value: "10 mm" },
+      { label: "Velocidades", value: "2" },
+      { label: "Batería", value: "Litio (kit)" },
+      { label: "Uso", value: "Ensamble / mantenimiento" },
+      { label: "Marca", value: "Bosch" },
+    ],
+    packaging: {
+      unidad: "1 atornillador + batería",
+      docena: "6 unidades (kit)",
+      caja: "12 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "10",
+    name: "Juego de destornilladores 6 piezas",
+    brand: "STANLEY",
+    sku: "STA-DS06",
+    category: "ferreteria",
+    categoryLabel: "Ferretería",
+    price: 39.9,
+    oldPrice: 49.9,
+    wholesalePrice: 34.5,
+    discount: 20,
+    badge: "oferta",
+    stock: 110,
+    imageIndex: 2,
+    description:
+      "Juego plano y estrella para ferretería general. Mangos antideslizantes y puntas templadas.",
+    features: [
+      "3 planos + 3 estrella",
+      "Acero templado",
+      "Mango ergonómico",
+      "Uso profesional",
+    ],
+    specs: [
+      { label: "Piezas", value: "6" },
+      { label: "Tipos", value: "Plano y Phillips" },
+      { label: "Material", value: "Acero templado" },
+      { label: "Mango", value: "Antideslizante" },
+      { label: "Uso", value: "Ferretería / taller" },
+      { label: "Marca", value: "Stanley" },
+    ],
+    packaging: {
+      unidad: "1 juego (6 pz)",
+      docena: "12 juegos",
+      caja: "36 juegos por caja",
+    },
+  }),
+  makeProduct({
+    id: "11",
+    name: "Cerradura de sobreponer 3 golpes",
+    brand: "STANLEY",
+    sku: "STA-CER3G",
+    category: "ferreteria",
+    categoryLabel: "Ferretería",
+    price: 54.9,
+    oldPrice: 64.9,
+    wholesalePrice: 47.0,
+    discount: 15,
+    badge: "destacado",
+    stock: 70,
+    imageIndex: 1,
+    description:
+      "Cerradura metálica de sobreponer para puertas de madera. Incluye 3 llaves según presentación.",
+    features: [
+      "3 golpes",
+      "Cuerpo metálico",
+      "3 llaves",
+      "Instalación superficial",
+    ],
+    specs: [
+      { label: "Tipo", value: "Sobreponer 3 golpes" },
+      { label: "Material", value: "Acero" },
+      { label: "Llaves", value: "3 incluidas" },
+      { label: "Montaje", value: "Superficial" },
+      { label: "Uso", value: "Puertas de madera" },
+      { label: "Marca", value: "Stanley" },
+    ],
+    packaging: {
+      unidad: "1 cerradura + 3 llaves",
+      docena: "12 unidades",
+      caja: "24 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "12",
+    name: "Casco de seguridad con suspensión",
+    brand: "3M",
+    sku: "3M-CASCO01",
+    category: "seguridad",
+    categoryLabel: "Seguridad",
+    price: 32.9,
+    oldPrice: 39.9,
+    wholesalePrice: 27.5,
+    discount: 18,
+    badge: "oferta",
+    stock: 150,
+    imageIndex: 6,
+    description:
+      "Casco dieléctrico para obra y almacén. Suspensión ajustable y ranura para accesorios.",
+    features: [
+      "Clase E dieléctrico",
+      "Suspensión 4 puntos",
+      "Ajuste de ruleta",
+      "Color amarillo",
+    ],
+    specs: [
+      { label: "Tipo", value: "Casco de seguridad" },
+      { label: "Clase", value: "E (dieléctrico)" },
+      { label: "Suspensión", value: "4 puntos" },
+      { label: "Color", value: "Amarillo" },
+      { label: "Uso", value: "Obra / industrial" },
+      { label: "Marca", value: "3M" },
+    ],
+    packaging: {
+      unidad: "1 casco",
+      docena: "12 cascos",
+      caja: "20 cascos por caja",
+    },
+  }),
+  makeProduct({
+    id: "13",
+    name: "Guantes de nitrilo recubierto talla L",
+    brand: "3M",
+    sku: "3M-GNL",
+    category: "seguridad",
+    categoryLabel: "Seguridad",
+    price: 14.5,
+    oldPrice: 18.0,
+    wholesalePrice: 11.9,
+    discount: 19,
+    badge: "destacado",
+    stock: 320,
+    imageIndex: 7,
+    description:
+      "Guantes de trabajo con recubrimiento de nitrilo para agarre en seco y ligera humedad.",
+    features: [
+      "Talla L",
+      "Palma nitrilo",
+      "Dorso transpirable",
+      "Uso general",
+    ],
+    specs: [
+      { label: "Talla", value: "L" },
+      { label: "Recubrimiento", value: "Nitrilo" },
+      { label: "Par", value: "1 par" },
+      { label: "Uso", value: "Manejo de materiales" },
+      { label: "Norma (ejemplo)", value: "EN 388" },
+      { label: "Marca", value: "3M" },
+    ],
+    packaging: {
+      unidad: "1 par",
+      docena: "12 pares",
+      caja: "120 pares por caja",
+    },
+  }),
+  makeProduct({
+    id: "14",
+    name: "Organizador de herramientas 15\"",
+    brand: "STANLEY",
+    sku: "STA-ORG15",
+    category: "hogar",
+    categoryLabel: "Hogar",
+    price: 69.9,
+    oldPrice: 84.9,
+    wholesalePrice: 61.0,
+    discount: 18,
+    badge: "oferta",
+    stock: 40,
+    imageIndex: 4,
+    description:
+      "Caja organizadora para el hogar y taller liviano. Compartimentos internos y cierre seguro.",
+    features: [
+      '15"',
+      "Bandeja extraíble",
+      "Cierre metálico",
+      "Asa ergonómica",
+    ],
+    specs: [
+      { label: "Tamaño", value: '15"' },
+      { label: "Material", value: "Plástico reforzado" },
+      { label: "Bandeja", value: "Extraíble" },
+      { label: "Cierre", value: "Metálico" },
+      { label: "Uso", value: "Hogar / taller" },
+      { label: "Marca", value: "Stanley" },
+    ],
+    packaging: {
+      unidad: "1 organizador",
+      docena: "6 unidades",
+      caja: "12 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "15",
+    name: "Manguera jardín 1/2\" x 20 m",
+    brand: "TRUPER",
+    sku: "TRU-MANG20",
+    category: "hogar",
+    categoryLabel: "Hogar",
+    price: 44.9,
+    oldPrice: 54.9,
+    wholesalePrice: 38.0,
+    discount: 18,
+    badge: "destacado",
+    stock: 85,
+    imageIndex: 5,
+    description:
+      "Manguera de 3 capas para riego doméstico. Incluye conectores básicos según kit.",
+    features: [
+      '1/2" x 20 m',
+      "3 capas",
+      "Refuerzo textil",
+      "Uso residencial",
+    ],
+    specs: [
+      { label: "Diámetro", value: '1/2"' },
+      { label: "Longitud", value: "20 m" },
+      { label: "Capas", value: "3" },
+      { label: "Uso", value: "Riego residencial" },
+      { label: "Conectores", value: "Kit básico" },
+      { label: "Marca", value: "Truper" },
+    ],
+    packaging: {
+      unidad: "1 manguera 20 m",
+      docena: "6 unidades",
+      caja: "12 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "16",
+    name: "Lámpara LED de escritorio 7W",
+    brand: "PHILIPS",
+    sku: "PHI-LAMP7",
+    category: "hogar",
+    categoryLabel: "Hogar",
+    price: 79.9,
+    oldPrice: 95.0,
+    wholesalePrice: 69.0,
+    discount: 16,
+    badge: "oferta",
+    stock: 54,
+    imageIndex: 3,
+    description:
+      "Lámpara de escritorio con brazo flexible y luz neutra. Ideal para hogar y oficina.",
+    features: [
+      "7W LED",
+      "Brazo flexible",
+      "Luz 4000K",
+      "Base estable",
+    ],
+    specs: [
+      { label: "Potencia", value: "7 W" },
+      { label: "Temperatura", value: "4000 K" },
+      { label: "Brazo", value: "Flexible" },
+      { label: "Uso", value: "Escritorio / hogar" },
+      { label: "Alimentación", value: "220 V" },
+      { label: "Marca", value: "Philips" },
+    ],
+    packaging: {
+      unidad: "1 lámpara",
+      docena: "12 unidades",
+      caja: "24 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "17",
+    name: "Disco de corte metal 4 1/2\"",
+    brand: "TRUPER",
+    sku: "TRU-DC115",
+    category: "construccion",
+    categoryLabel: "Construcción",
+    price: 6.9,
+    oldPrice: 8.5,
+    wholesalePrice: 5.2,
+    discount: 19,
+    badge: "oferta",
+    stock: 400,
+    imageIndex: 1,
+    description:
+      "Disco abrasivo para corte de metal en amoladora 4 1/2\". Consumible de alta rotación en obra.",
+    features: [
+      "115 x 1.0 x 22.2 mm",
+      "Corte de metal",
+      "Alta velocidad",
+      "Uso en amoladora",
+    ],
+    specs: [
+      { label: "Diámetro", value: "115 mm (4 1/2\")" },
+      { label: "Espesor", value: "1.0 mm" },
+      { label: "Orificio", value: "22.2 mm" },
+      { label: "Material", value: "Metal" },
+      { label: "RPM máx. (ejemplo)", value: "13,300" },
+      { label: "Marca", value: "Truper" },
+    ],
+    packaging: {
+      unidad: "1 disco",
+      docena: "25 discos (pack)",
+      caja: "100 discos por caja",
+    },
+  }),
+  makeProduct({
+    id: "18",
+    name: "Nivel de aluminio 24\" 3 burbujas",
+    brand: "STANLEY",
+    sku: "STA-NIV24",
+    category: "construccion",
+    categoryLabel: "Construcción",
+    price: 42.9,
+    oldPrice: 52.0,
+    wholesalePrice: 37.5,
+    discount: 17,
+    badge: "destacado",
+    stock: 66,
+    imageIndex: 0,
+    description:
+      "Nivel de aluminio para obra y acabados. Tres burbujas para horizontal, vertical y 45°.",
+    features: [
+      '24"',
+      "3 viales",
+      "Cuerpo de aluminio",
+      "Superficie fresada",
+    ],
+    specs: [
+      { label: "Longitud", value: '24"' },
+      { label: "Viales", value: "3" },
+      { label: "Material", value: "Aluminio" },
+      { label: "Uso", value: "Obra / acabados" },
+      { label: "Precisión (ejemplo)", value: "0.5 mm/m" },
+      { label: "Marca", value: "Stanley" },
+    ],
+    packaging: {
+      unidad: "1 nivel",
+      docena: "12 unidades",
+      caja: "24 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "19",
+    name: "Cinta métrica 5 m x 19 mm",
+    brand: "STANLEY",
+    sku: "STA-CM5",
+    category: "construccion",
+    categoryLabel: "Construcción",
+    price: 18.9,
+    oldPrice: 23.5,
+    wholesalePrice: 15.9,
+    discount: 20,
+    badge: "oferta",
+    stock: 210,
+    imageIndex: 2,
+    description:
+      "Cinta métrica compacta para medición en obra. Freno y clip para cinturón.",
+    features: [
+      "5 m x 19 mm",
+      "Cinta recubierta",
+      "Freno de palanca",
+      "Clip metálico",
+    ],
+    specs: [
+      { label: "Longitud", value: "5 m" },
+      { label: "Ancho de cinta", value: "19 mm" },
+      { label: "Carcasa", value: "ABS" },
+      { label: "Freno", value: "Palanca" },
+      { label: "Uso", value: "Obra / taller" },
+      { label: "Marca", value: "Stanley" },
+    ],
+    packaging: {
+      unidad: "1 cinta",
+      docena: "12 unidades",
+      caja: "48 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "20",
+    name: "Rodillo de pintura 9\" con mango",
+    brand: "TRUPER",
+    sku: "TRU-ROD9",
+    category: "pinturas",
+    categoryLabel: "Pinturas",
+    price: 16.9,
+    oldPrice: 21.0,
+    wholesalePrice: 13.5,
+    discount: 20,
+    badge: "oferta",
+    stock: 175,
+    imageIndex: 7,
+    description:
+      "Rodillo de felpa para látex en interiores. Mango atornillable incluido.",
+    features: [
+      'Felpa 9"',
+      "Pelo medio",
+      "Mango incluido",
+      "Uso interior",
+    ],
+    specs: [
+      { label: "Ancho", value: '9"' },
+      { label: "Felpa", value: "Pelo medio" },
+      { label: "Uso", value: "Látex interior" },
+      { label: "Mango", value: "Incluido" },
+      { label: "Núcleo", value: "Plástico" },
+      { label: "Marca", value: "Truper" },
+    ],
+    packaging: {
+      unidad: "1 rodillo + mango",
+      docena: "12 unidades",
+      caja: "36 unidades por caja",
+    },
+  }),
+  makeProduct({
+    id: "21",
+    name: "Pintura látex interior 1 galón blanco",
+    brand: "SIKA",
+    sku: "SIK-LAT1G",
+    category: "pinturas",
+    categoryLabel: "Pinturas",
+    price: 64.9,
+    oldPrice: 74.9,
+    wholesalePrice: 57.0,
+    discount: 13,
+    badge: "destacado",
+    stock: 90,
+    imageIndex: 5,
+    description:
+      "Látex lavable para interiores. Presentación de 1 galón, color blanco listo para aplicar.",
+    features: [
+      "1 galón",
+      "Acabado mate",
+      "Lavable",
+      "Bajo olor",
+    ],
+    specs: [
+      { label: "Presentación", value: "1 galón" },
+      { label: "Color", value: "Blanco" },
+      { label: "Acabado", value: "Mate" },
+      { label: "Rendimiento (ejemplo)", value: "10–12 m²/galón" },
+      { label: "Uso", value: "Interior" },
+      { label: "Marca", value: "Sika" },
+    ],
+    packaging: {
+      unidad: "1 galón",
+      docena: "4 galones (pack)",
+      caja: "4 galones por caja",
+    },
+  }),
+  makeProduct({
+    id: "22",
+    name: "Thinner estándar galón",
+    brand: "SIKA",
+    sku: "SIK-THI1G",
+    category: "pinturas",
+    categoryLabel: "Pinturas",
+    price: 28.9,
+    oldPrice: 34.0,
+    wholesalePrice: 24.5,
+    discount: 15,
+    badge: "oferta",
+    stock: 120,
+    imageIndex: 4,
+    description:
+      "Disolvente para limpieza de herramientas y dilución según ficha del recubrimiento.",
+    features: [
+      "1 galón",
+      "Uso general",
+      "Tapa sellada",
+      "Almacén ventilado",
+    ],
+    specs: [
+      { label: "Presentación", value: "1 galón" },
+      { label: "Tipo", value: "Thinner estándar" },
+      { label: "Uso", value: "Limpieza / dilución" },
+      { label: "Envase", value: "Metálico" },
+      { label: "Almacenamiento", value: "Lugar ventilado" },
+      { label: "Marca", value: "Sika" },
+    ],
+    packaging: {
+      unidad: "1 galón",
+      docena: "4 galones (pack)",
+      caja: "4 galones por caja",
+    },
+  }),
 ];
+
+export const homeFeaturedProducts = featuredProducts.slice(0, 8);
+
+export function getProductById(id: string) {
+  return featuredProducts.find((product) => product.id === id);
+}
+
+export function getProductsByCategory(category: string) {
+  return featuredProducts.filter((product) => product.category === category);
+}
+
+export function getCatalogBrands() {
+  return [...new Set(featuredProducts.map((product) => product.brand))].sort(
+    (a, b) => a.localeCompare(b, "es"),
+  );
+}
+
+export function searchCatalog({
+  q = "",
+  category = "",
+  brand = "",
+}: CatalogFilters = {}): FeaturedProduct[] {
+  const query = q.trim().toLowerCase();
+  const categorySlug = category.trim().toLowerCase();
+  const brandName = brand.trim().toLowerCase();
+
+  return featuredProducts.filter((product) => {
+    if (categorySlug && product.category !== categorySlug) return false;
+    if (brandName && product.brand.toLowerCase() !== brandName) return false;
+    if (!query) return true;
+    const haystack =
+      `${product.name} ${product.brand} ${product.sku} ${product.categoryLabel} ${product.description}`.toLowerCase();
+    return haystack.includes(query);
+  });
+}
 
 /** Productos de la misma categoría (excluye el actual) */
 export function getRelatedProducts(

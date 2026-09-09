@@ -17,18 +17,27 @@ import {
   YoutubeIcon,
 } from "@/components/SocialIcons";
 import { LOGO_SRC } from "@/data/media";
-
-const MAP_URL = "https://maps.app.goo.gl/mrh3WueTJErXS2sg6";
-
-const MAP_EMBED_URL =
-  "https://maps.google.com/maps?q=-12.0530247,-77.0263088&z=17&output=embed";
+import {
+  COMPANY_NAME,
+  EMAIL,
+  MAP_EMBED_URL,
+  MAP_URL,
+  PHONE_DISPLAY,
+  PHONE_TEL,
+} from "@/data/contact";
 
 const quickLinks = [
   { href: "/", label: "Inicio" },
   { href: "/catalogo", label: "Catálogo" },
+  { href: "/categorias", label: "Categorías" },
   { href: "/ofertas", label: "Ofertas" },
   { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
+] as const;
+
+const legalLinks = [
+  { href: "/terminos", label: "Términos y condiciones" },
+  { href: "/privacidad", label: "Política de privacidad" },
 ] as const;
 
 const paymentMethods = [
@@ -135,27 +144,27 @@ export default function Footer() {
                 className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary"
                 strokeWidth={2}
               />
-              CHAMO IMPORT S.R.L. — Lima, Perú
+              {COMPANY_NAME} — Lima, Perú
             </p>
             <a
-              href="tel:+51999999999"
+              href={`tel:${PHONE_TEL}`}
               className="flex items-center gap-2.5 transition hover:text-white"
             >
               <Phone
                 className="h-4 w-4 shrink-0 text-brand-primary"
                 strokeWidth={2}
               />
-              +51 999 999 999
+              {PHONE_DISPLAY}
             </a>
             <a
-              href="mailto:ventas@chamoimport.com"
+              href={`mailto:${EMAIL}`}
               className="flex items-center gap-2.5 transition hover:text-white"
             >
               <Mail
                 className="h-4 w-4 shrink-0 text-brand-primary"
                 strokeWidth={2}
               />
-              ventas@chamoimport.com
+              {EMAIL}
             </a>
             <p className="flex items-center gap-2.5">
               <Clock
@@ -236,7 +245,18 @@ export default function Footer() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-[1600px] flex-col items-center justify-between gap-3 px-4 py-4 text-center text-xs text-white/50 sm:flex-row sm:px-6 sm:text-left lg:px-8 xl:px-10">
-          <p>© {year} Chamo Import S.R.L. Todos los derechos reservados.</p>
+          <p>© {year} {COMPANY_NAME}. Todos los derechos reservados.</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-white/60 transition hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
           <div className="flex items-center gap-3">
             <a
               href="https://facebook.com"

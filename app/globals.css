@@ -7,6 +7,7 @@
   --brand-primary: #127ec9;
   --brand-gold: #e4b714;
   --brand-gray: #f4f4f4;
+  --brand-whatsapp: #25d366;
 }
 
 @theme inline {
@@ -16,6 +17,7 @@
   --color-brand-primary: var(--brand-primary);
   --color-brand-gold: var(--brand-gold);
   --color-brand-gray: var(--brand-gray);
+  --color-brand-whatsapp: var(--brand-whatsapp);
   --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-barlow-semi-condensed), var(--font-barlow),
     ui-sans-serif, system-ui, sans-serif;

@@ -1,15 +1,16 @@
-Coloca aquí los logos de marcas (PNG o WebP, fondo transparente preferible).
+Coloca aquí los logos de marcas (SVG, PNG o WebP; fondo transparente preferible).
 
-Archivos esperados (nombres exactos):
-  indeco.png
-  bticino.png
-  3m.png
-  sika.png
-  artesco.png
-  ledvance.png
-  schneider.png
-  stanley.png
-  truper.png
-  philips.png
+Archivos actuales (wordmarks SVG de respaldo):
+  indeco.svg
+  bticino.svg
+  3m.svg
+  sika.svg
+  artesco.svg
+  ledvance.svg
+  schneider.svg
+  stanley.svg
+  truper.svg
+  philips.svg
 
-Tamaño recomendado: ~200–300px de ancho, logos no muy grandes.
+Cuando lleguen logos oficiales del cliente, sustituir estos archivos
+(mantener el mismo nombre o actualizar `data/home.ts`).

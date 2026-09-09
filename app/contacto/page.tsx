@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
+import {
+  COMPANY_NAME,
+  EMAIL,
+  MAP_URL,
+  PHONE_DISPLAY,
+  PHONE_TEL,
+} from "@/data/contact";
 
 export const metadata: Metadata = {
   title: "Contacto | Chamo Import",
   description: "Contáctanos — Chamo Import S.R.L.",
 };
-
-const MAP_URL = "https://maps.app.goo.gl/mrh3WueTJErXS2sg6";
 
 export default function ContactoPage() {
   return (
@@ -27,14 +32,14 @@ export default function ContactoPage() {
         <ul className="mt-8 max-w-md space-y-4 text-sm text-brand-dark dark:text-white">
           <li className="flex items-center gap-3">
             <Phone className="h-5 w-5 text-brand-primary" strokeWidth={2} />
-            <a href="tel:+51999999999" className="hover:underline">
-              +51 999 999 999
+            <a href={`tel:${PHONE_TEL}`} className="hover:underline">
+              {PHONE_DISPLAY}
             </a>
           </li>
           <li className="flex items-center gap-3">
             <Mail className="h-5 w-5 text-brand-primary" strokeWidth={2} />
-            <a href="mailto:ventas@chamoimport.com" className="hover:underline">
-              ventas@chamoimport.com
+            <a href={`mailto:${EMAIL}`} className="hover:underline">
+              {EMAIL}
             </a>
           </li>
           <li className="flex items-center gap-3">
@@ -49,7 +54,7 @@ export default function ContactoPage() {
               rel="noopener noreferrer"
               className="hover:underline"
             >
-              CHAMO IMPORT S.R.L. — Ver en Google Maps
+              {COMPANY_NAME} — Ver en Google Maps
             </a>
           </li>
         </ul>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Barlow, Barlow_Semi_Condensed } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
+import { CartProvider } from "@/components/CartProvider";
 import AuthModal from "@/components/AuthModal";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
@@ -42,11 +43,13 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col font-sans">
         <AuthProvider>
-          <WrenchCursor />
-          <div className="flex min-h-full flex-1 flex-col">{children}</div>
-          <Footer />
-          <WhatsAppFloat />
-          <AuthModal />
+          <CartProvider>
+            <WrenchCursor />
+            <div className="flex min-h-full flex-1 flex-col">{children}</div>
+            <Footer />
+            <WhatsAppFloat />
+            <AuthModal />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

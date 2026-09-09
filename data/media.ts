@@ -12,7 +12,7 @@ export type Slide = {
 export const slides: Slide[] = [
   {
     id: 1,
-    src: "/images/slider/baner 1.png",
+    src: "/images/slider/baner-1.png",
     alt: "Campaña navideña Chamo Import",
     title: "Campaña navideña",
     subtitle: "Regala herramientas, construye grandes proyectos.",
@@ -20,7 +20,7 @@ export const slides: Slide[] = [
   },
   {
     id: 2,
-    src: "/images/slider/baner 2.png",
+    src: "/images/slider/baner-2.png",
     alt: "Herramientas profesionales DeWalt y Bosch",
     title: "Herramientas profesionales",
     subtitle: "Marcas líderes para obra y ferretería",
@@ -28,7 +28,7 @@ export const slides: Slide[] = [
   },
   {
     id: 3,
-    src: "/images/slider/baner 3.png",
+    src: "/images/slider/baner-3.png",
     alt: "Envíos Chamo Import a toda la sierra del Perú",
     title: "Envíos a todo el Perú",
     subtitle: "Llevamos tus productos a toda la sierra",

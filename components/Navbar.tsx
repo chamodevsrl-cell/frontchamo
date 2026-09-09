@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronDown,
   Heart,
@@ -18,15 +18,9 @@ import {
   YoutubeIcon,
 } from "@/components/SocialIcons";
 import { LOGO_SRC } from "@/data/media";
+import { mainCategories } from "@/data/home";
 import { useAuth } from "@/components/AuthProvider";
-
-const categories = [
-  { href: "/categorias/herramientas", label: "Herramientas" },
-  { href: "/categorias/electricos", label: "Eléctricos" },
-  { href: "/categorias/seguridad", label: "Seguridad industrial" },
-  { href: "/categorias/ferreteria", label: "Ferretería general" },
-  { href: "/categorias/abrasivos", label: "Abrasivos" },
-] as const;
+import { useCart } from "@/components/CartProvider";
 
 const mainLinks = [
   { href: "/", label: "Inicio" },
@@ -43,7 +37,9 @@ const topLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { openAuth } = useAuth();
+  const { count } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -110,6 +106,10 @@ export default function Navbar() {
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const query = searchQuery.trim();
+    router.push(query ? `/catalogo?q=${encodeURIComponent(query)}` : "/catalogo");
+    setMobileSearchOpen(false);
+    setMobileOpen(false);
   }
 
   function isActive(href: string) {
@@ -265,7 +265,7 @@ export default function Navbar() {
               <ShoppingCart className="h-5 w-5" strokeWidth={2} />
               <span className="text-[11px] font-semibold">Carrito</span>
               <span className="absolute top-0.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
-                0
+                {count}
               </span>
             </Link>
 
@@ -284,7 +284,7 @@ export default function Navbar() {
             >
               <ShoppingCart className="h-5 w-5" strokeWidth={2} />
               <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
-                0
+                {count}
               </span>
             </Link>
 
@@ -354,8 +354,8 @@ export default function Navbar() {
             {categoriesOpen && (
               <div className="absolute top-full left-0 z-50 mt-0 min-w-[240px] overflow-hidden rounded-b-lg border border-brand-dark/10 bg-white shadow-xl">
                 <ul className="py-2">
-                  {categories.map((category) => (
-                    <li key={category.href}>
+                  {mainCategories.map((category) => (
+                    <li key={category.slug}>
                       <Link
                         href={category.href}
                         onClick={() => setCategoriesOpen(false)}
@@ -442,9 +442,9 @@ export default function Navbar() {
               <p className="mb-2 text-xs font-bold tracking-wide text-brand-dark/50 uppercase">
                 Categorías
               </p>
-              {categories.map((category) => (
+              {mainCategories.map((category) => (
                 <Link
-                  key={category.href}
+                  key={category.slug}
                   href={category.href}
                   onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"

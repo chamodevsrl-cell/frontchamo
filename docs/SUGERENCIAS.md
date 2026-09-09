@@ -1,41 +1,49 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-08**
+Última actualización: **2026-09-09**
 
 Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al surgir una idea en un cambio, anótala aquí.
 
 ## Prioridad alta
 
-- [ ] Reemplazar imágenes Unsplash de categorías por fotos propias en `public/images/categorias/`
-- [ ] Completar logos reales en `public/images/marcas/` (hoy varios 404)
-- [ ] Renombrar banners del slider sin espacios (`baner-1.png`) para evitar encoding
-- [ ] Página `/categorias` (y detalle por categoría) — el CTA “Explorar” / “Ver todas” ya apunta ahí
-- [ ] Página `/carrito` (hoy el enlace puede dar 404)
+- [x] 2026-09-09 — Imágenes de categorías en `public/images/categorias/` (ya no se hotlinkea Unsplash)
+- [x] 2026-09-09 — Logos en `public/images/marcas/` (wordmarks SVG; el carrusel deja de dar 404)
+- [x] 2026-09-09 — Renombrar banners del slider sin espacios (`baner-1.png`)
+- [x] 2026-09-09 — Página `/categorias` (y detalle `/categorias/[slug]`)
+- [x] 2026-09-09 — Página `/carrito` (localStorage + badge del Navbar)
 
 ## Producto / UX
 
-- [ ] Unificar lista de categorías del **Navbar** con `mainCategories` (una sola fuente)
-- [ ] Filtros y búsqueda real contra catálogo / API
-- [ ] Cotización mayorista con formulario + WhatsApp prellenado por producto
-- [ ] Modo oscuro: revisar contraste en tarjetas pastel de categorías
-- [ ] Sumar más productos por categoría en `data/products.ts` (hoy "Seguridad" tiene solo 1 → el modal no muestra "Productos relacionados" para ese ítem)
+- [x] 2026-09-09 — Unificar lista de categorías del **Navbar** con `mainCategories`
+- [x] 2026-09-09 — Filtros y búsqueda contra catálogo / API (`/catalogo` + `GET /api/productos`)
+- [x] 2026-09-09 — Cotización mayorista con formulario + WhatsApp prellenado por producto/carrito
+- [x] 2026-09-09 — Modo oscuro: contraste en tarjetas de categorías (fondo `#102a40` + texto claro)
+- [x] 2026-09-09 — Sumar más productos por categoría (mín. 3 en cada una → el modal muestra relacionados)
 
 ## Técnico
 
-- [ ] Conectar backend / API de productos (dejar de hardcodear `data/products.ts`)
+- [x] 2026-09-09 — API interna de productos (`app/api/productos`) — el catálogo ya no se consulta solo hardcodeado en la UI
 - [ ] Completar specs técnicas reales por SKU (material, voltaje, dimensiones, país de origen, etc.) cuando el cliente envíe fichas oficiales — hoy son de ejemplo
 - [ ] CMS o admin liviano para banners y categorías
-- [ ] `allowedDevOrigins` en `next.config` si se prueba por IP LAN (`192.168.x.x`)
-- [ ] Tests básicos de smoke (home carga, slider tiene N slides)
+- [x] 2026-09-09 — `allowedDevOrigins` en `next.config` (LAN vía `ALLOWED_DEV_ORIGINS`)
+- [x] 2026-09-09 — Tests básicos de smoke (slider N slides, categorías, búsqueda, home HTTP si el server está arriba)
 
 ## Contenido
 
-- [ ] Reemplazar el teléfono placeholder `+51 999 999 999` por el oficial `+51 959 723 602` en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx` (`ProductModal.tsx` ya está correcto, usarlo de referencia)
+- [x] 2026-09-09 — Teléfono oficial `+51 959 723 602` en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx`
 - [ ] Confirmar correo de contacto oficial (footer y `/contacto` usan `ventas@chamoimport.com` como provisional)
-- [ ] Políticas (términos, privacidad) enlazadas desde el footer
+- [x] 2026-09-09 — Políticas (términos, privacidad) enlazadas desde el footer
+
+## Ideas nuevas de este bloque
+
+- [ ] Sustituir los JPEG de `public/images/categorias/` por fotos reales de tienda/almacén del cliente
+- [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
+- [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
+- [ ] Página `/favoritos` (el Navbar sigue enlazándola)
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-09 — Bloque SUGERENCIAS.md en orden (categorías, carrito, catálogo, cotizar, teléfono, tests)
 - [x] 2026-09-08 — Slider full-bleed y sin recorte
 - [x] 2026-09-08 — Marcas debajo del slider
 - [x] 2026-09-08 — Categorías layout Explorar + glow
