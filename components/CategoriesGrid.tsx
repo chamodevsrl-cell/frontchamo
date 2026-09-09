@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
 import Reveal from "@/components/Reveal";
+import CategoryIcon from "@/components/CategoryIcon";
 
 const shinyCard =
   "border border-brand-primary/35 shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_18px_rgba(18,126,201,0.35)] hover:shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_28px_rgba(18,126,201,0.55)]";
@@ -17,7 +18,8 @@ function CategoryCard({ category }: { category: MainCategory }) {
       style={{ backgroundColor: category.tint }}
     >
       <div className="flex flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-4 lg:px-6 lg:pt-6 dark:bg-[#102a40]">
-        <p className="text-[10px] font-bold tracking-[0.12em] text-brand-primary uppercase sm:text-[11px] lg:text-xs">
+        <p className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] text-brand-primary uppercase sm:text-[11px] lg:text-xs">
+          <CategoryIcon slug={category.slug} className="h-3.5 w-3.5" />
           {category.eyebrow}
         </p>
         <h3 className="font-display mt-1.5 text-xl font-extrabold tracking-tight text-brand-dark uppercase sm:mt-2 sm:text-2xl lg:text-[1.65rem] dark:text-white">

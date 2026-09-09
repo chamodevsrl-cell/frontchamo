@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Percent } from "lucide-react";
 
 type StampHeadingProps = {
   lead?: string;
@@ -54,8 +55,9 @@ export default function StampHeading({
         )}
       </Tag>
       {variant === "offer" ? (
-        <span className="absolute -top-3 -right-2 z-20 rotate-12 border-[3px] border-brand-dark bg-brand-gold px-2 py-0.5 font-display text-[11px] font-extrabold tracking-wide text-brand-dark uppercase sm:-top-4 sm:-right-3 sm:text-xs">
-          -%
+        <span className="absolute -top-3 -right-2 z-20 inline-flex rotate-12 items-center justify-center border-[3px] border-brand-dark bg-brand-gold p-1 text-brand-dark sm:-top-4 sm:-right-3 sm:p-1.5">
+          <Percent className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={3} aria-hidden />
+          <span className="sr-only">Descuento</span>
         </span>
       ) : null}
     </div>

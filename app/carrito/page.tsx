@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Reveal from "@/components/Reveal";
 import { useCart } from "@/components/CartProvider";
@@ -38,7 +38,8 @@ export default function CarritoPage() {
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-        <h1 className="font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
+        <h1 className="inline-flex items-center gap-3 font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
+          <ShoppingCart className="h-8 w-8 text-brand-primary" strokeWidth={2.25} aria-hidden />
           Carrito / cotización
         </h1>
         <p className="mt-2 max-w-xl text-brand-dark/70 dark:text-white/70">
@@ -48,7 +49,12 @@ export default function CarritoPage() {
 
         {lines.length === 0 ? (
           <div className="mt-10 rounded-2xl border border-brand-dark/10 bg-white px-5 py-10 text-center dark:bg-[#102a40]">
-            <p className="text-brand-dark/70 dark:text-white/70">
+            <ShoppingCart
+              className="mx-auto h-12 w-12 text-brand-primary/45"
+              strokeWidth={1.75}
+              aria-hidden
+            />
+            <p className="mt-3 text-brand-dark/70 dark:text-white/70">
               Tu carrito está vacío.
             </p>
             <Link

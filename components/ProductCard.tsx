@@ -2,7 +2,7 @@
 
 import { useState, type MouseEvent } from "react";
 import Image from "next/image";
-import { GitCompareArrows, Heart, ShoppingCart } from "lucide-react";
+import { BadgePercent, GitCompareArrows, Heart, ShoppingCart, Star } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { FeaturedProduct } from "@/data/products";
 
@@ -53,12 +53,17 @@ export default function ProductCard({
         />
 
         <span
-          className={`absolute top-2 left-2 rounded-md px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-brand-dark uppercase sm:top-3 sm:left-3 sm:px-2 sm:py-1 sm:text-[10px] ${
+          className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-brand-dark uppercase sm:top-3 sm:left-3 sm:px-2 sm:py-1 sm:text-[10px] ${
             product.badge === "oferta"
               ? "bg-[#cfe8f8]"
               : "bg-brand-gold/90 text-brand-dark"
           }`}
         >
+          {product.badge === "oferta" ? (
+            <BadgePercent className="h-3 w-3" strokeWidth={2.5} aria-hidden />
+          ) : (
+            <Star className="h-3 w-3" strokeWidth={2.5} aria-hidden />
+          )}
           {product.badge === "oferta" && product.discount
             ? `-${product.discount}% OFERTA`
             : "DESTACADO"}

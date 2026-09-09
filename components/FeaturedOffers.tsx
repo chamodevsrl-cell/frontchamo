@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { homeFeaturedProducts, type FeaturedProduct } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
@@ -51,8 +51,9 @@ export default function FeaturedOffers() {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
         <div className="flex min-w-0 flex-1 flex-wrap items-end justify-between gap-3">
           <div>
-            <span className="inline-flex rounded-full bg-[#cfe8f8] px-3 py-1 text-[11px] font-bold tracking-wide text-brand-primary uppercase">
-              # Selección destacada
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#cfe8f8] px-3 py-1 text-[11px] font-bold tracking-wide text-brand-primary uppercase">
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={2.25} aria-hidden />
+              Selección destacada
             </span>
             <h2
               id="ofertas-heading"

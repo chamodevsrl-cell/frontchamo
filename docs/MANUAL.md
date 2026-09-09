@@ -44,6 +44,7 @@ components/
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
   PageBanner.tsx          # Banner ancho (categorías + /nosotros)
   StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
+  CategoryIcon.tsx        # Iconos Lucide por categoría
   Reveal.tsx              # Fade/slide al entrar en viewport
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   QuoteForm.tsx
@@ -70,7 +71,8 @@ public/images/marcas/       # Wordmarks SVG
 
 Cada ítem: `slug`, `href`, `label`, `bannerTitle`, `eyebrow`, `bullets` (3), `image` (local), `imageAlt`, `tint`. Opcional: `bannerImage` (fondo del detalle).
 
-Fuente única también del dropdown **Categorías** del Navbar.
+Fuente única también del dropdown **Categorías** del Navbar (cada línea lleva
+icono Lucide: llave, rayo, escudo, casa, martillo, casco, cubeta).
 
 **Actual (7):** Ferretería, Electricidad, Seguridad, Hogar, Herramientas, Construcción, Pinturas.
 
@@ -183,13 +185,13 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
   Herramientas, Construcción, Pinturas
 - **Carrusel en móvil y PC**: flechas circulares ← → arriba a la derecha; también
   se puede deslizar con el dedo o el trackpad
-- Cada una: subtítulo, título, 3 beneficios, botón **Explorar** e imagen
+- Cada una: icono Lucide, subtítulo, título, 3 beneficios, botón **Explorar** e imagen
 - Enlace "Ver todas" → `/categorias` (listado) y **Explorar** → `/categorias/[slug]`
 
 **Productos destacados / ofertas**
 - **Carrusel de una sola fila** (igual que categorías): flechas circulares ← →
   arriba a la derecha en PC y móvil; también se puede deslizar
-- Tarjetas con precio, stock y "Añadir al carrito"; clic abre el detalle (modal)
+- Tarjetas con icono Lucide (oferta / destacado), precio, stock y "Añadir al carrito"; clic abre el detalle (modal)
 - En el modal: precios unitario/mayorista, cantidad, cotización / WhatsApp,
   **ficha técnica** (tabla) y **productos relacionados** de la misma categoría
   (al tocar uno se abre ese producto en el mismo modal)

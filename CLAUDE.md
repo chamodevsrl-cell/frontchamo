@@ -88,6 +88,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `CategoryBanner.tsx` | Detalle de categoría: reutiliza `PageBanner` (imagen + título centrado) |
 | `PageBanner.tsx` | Banner ancho compartido (categorías y `/nosotros`) |
 | `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
+| `CategoryIcon.tsx` | Icono Lucide por categoría (menú, home, `/categorias`) |
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
@@ -168,8 +169,8 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-09): productos destacados del home en **una sola fila**
-(carrusel con flechas, igual que categorías).
+Último avance (2026-09-09): iconos **Lucide** en carrito, categorías y productos
+(sin emoji).
 
 ## 10. Pendientes conocidos
 

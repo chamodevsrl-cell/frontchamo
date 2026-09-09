@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import {
+  BadgePercent,
   GitCompareArrows,
   Heart,
   Minus,
@@ -154,7 +155,8 @@ export default function ProductModal({
                   SKU: {product.sku}
                 </span>
                 {product.discount ? (
-                  <span className="rounded-full bg-[#cfe8f8] px-2.5 py-0.5 text-[11px] font-extrabold text-brand-primary">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#cfe8f8] px-2.5 py-0.5 text-[11px] font-extrabold text-brand-primary">
+                    <BadgePercent className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
                     -{product.discount}% OFF
                   </span>
                 ) : null}

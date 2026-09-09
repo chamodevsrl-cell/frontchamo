@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronDown,
   Heart,
+  LayoutGrid,
   Menu,
   Search,
   ShoppingCart,
@@ -21,6 +22,7 @@ import { LOGO_SRC } from "@/data/media";
 import { mainCategories } from "@/data/home";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
+import CategoryIcon from "@/components/CategoryIcon";
 
 const mainLinks = [
   { href: "/", label: "Inicio" },
@@ -350,7 +352,7 @@ export default function Navbar() {
               className="inline-flex h-full items-center gap-2 bg-brand-dark px-4 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition hover:bg-[#082a43]"
               aria-expanded={categoriesOpen}
             >
-              <Menu className="h-4 w-4" strokeWidth={2.5} />
+              <LayoutGrid className="h-4 w-4" strokeWidth={2.5} />
               Categorías
               <ChevronDown
                 className={`h-4 w-4 transition ${categoriesOpen ? "rotate-180" : ""}`}
@@ -366,8 +368,12 @@ export default function Navbar() {
                       <Link
                         href={category.href}
                         onClick={() => setCategoriesOpen(false)}
-                        className="block px-4 py-2.5 text-sm font-medium text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
                       >
+                        <CategoryIcon
+                          slug={category.slug}
+                          className="h-4 w-4 text-brand-primary"
+                        />
                         {category.label}
                       </Link>
                     </li>
@@ -454,8 +460,12 @@ export default function Navbar() {
                   key={category.slug}
                   href={category.href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
                 >
+                  <CategoryIcon
+                    slug={category.slug}
+                    className="h-4 w-4 text-brand-primary"
+                  />
                   {category.label}
                 </Link>
               ))}
