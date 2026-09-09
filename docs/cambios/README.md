@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-09 | Dev server: allowedDevOrigins incluye localhost | [2026-09-09-dev-server-localhost.md](./2026-09-09-dev-server-localhost.md) |
 | 2026-09-09 | Iconos Lucide (carrito, categorías, productos; sin emoji) | [2026-09-09-iconos-lucide.md](./2026-09-09-iconos-lucide.md) |
 | 2026-09-09 | Productos destacados: una sola fila (carrusel como categorías) | [2026-09-09-destacados-una-fila.md](./2026-09-09-destacados-una-fila.md) |
 | 2026-09-09 | Encabezados sticker: Catálogo, Nosotros, Ofertas, Contacto | [2026-09-09-encabezados-stamp.md](./2026-09-09-encabezados-stamp.md) |

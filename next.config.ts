@@ -7,7 +7,11 @@ const extraDevOrigins =
 
 const nextConfig: NextConfig = {
   /** Permite probar el dev server por IP LAN (ej. ALLOWED_DEV_ORIGINS=192.168.1.20). */
-  allowedDevOrigins: ["127.0.0.1", ...extraDevOrigins],
+  allowedDevOrigins: [
+    "localhost",
+    "127.0.0.1",
+    ...extraDevOrigins,
+  ],
   images: {
     remotePatterns: [
       {
