@@ -34,6 +34,7 @@ export default function NosotrosPage() {
           subtitle={companyProfile.headline}
           image={NOSOTROS_BANNER_SRC}
           imageAlt={NOSOTROS_BANNER_ALT}
+          stamp={{ lead: "SOBRE", accent: "NOSOTROS" }}
           crumbs={[
             { href: "/", label: "Inicio" },
             { label: "Nosotros" },

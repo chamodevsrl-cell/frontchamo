@@ -40,7 +40,7 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [x] 2026-09-09 — Banner de detalle de categoría: imagen ancha + título centrado (ELÉCTRICOS, FERRETERÍA, …)
 - [x] 2026-09-09 — `/nosotros` con banner **NOSOTROS**, historia Chamo Import, misión y visión
 - [x] 2026-09-09 — Animación de entrada al scroll (Reveal) en home y páginas; banners con fade-in
-- [x] 2026-09-09 — Quitar placeholder azul del slider; al recargar solo se ven los banners reales
+- [x] 2026-09-09 — Encabezados sticker en Catálogo, Nosotros, Ofertas (azul/oro) y Contacto
 - [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
 - [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
@@ -48,6 +48,7 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-09 — Encabezados sticker Catálogo / Nosotros / Ofertas / Contacto
 - [x] 2026-09-09 — Slider sin recuadro de ejemplo; fade-in al scroll en banners y bloques
 - [x] 2026-09-09 — Banner Nosotros + misión/visión + animaciones de scroll en el sitio
 - [x] 2026-09-09 — Banner de detalle de categoría (imagen + título centrado)

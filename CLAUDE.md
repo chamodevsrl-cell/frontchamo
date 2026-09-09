@@ -87,6 +87,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `CatalogFilters.tsx` | Filtros de `/catalogo` (query string) |
 | `CategoryBanner.tsx` | Detalle de categoría: reutiliza `PageBanner` (imagen + título centrado) |
 | `PageBanner.tsx` | Banner ancho compartido (categorías y `/nosotros`) |
+| `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
@@ -167,8 +168,8 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-09): slider del home **sin recuadro de ejemplo** (solo
-`baner-1.png` … `baner-3.png`) y fade-in al scroll (`Reveal`) en banners y bloques.
+Último avance (2026-09-09): encabezados tipo etiqueta en Catálogo, Nosotros,
+Ofertas (azul + borde oro, “DESCUENTOS”) y Contacto.
 
 ## 10. Pendientes conocidos
 

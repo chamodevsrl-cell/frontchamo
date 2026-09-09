@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Reveal from "@/components/Reveal";
+import StampHeading, { StampBand } from "@/components/StampHeading";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import {
   COMPANY_NAME,
@@ -17,21 +18,19 @@ export const metadata: Metadata = {
 
 export default function ContactoPage() {
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-white dark:bg-brand-dark">
+    <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-        <p className="text-sm font-semibold tracking-wide text-brand-primary uppercase">
-          Empresa
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
-          Contacto
-        </h1>
-        <p className="mt-4 max-w-2xl text-base text-brand-dark/75 dark:text-white/75">
-          Escríbenos o visítanos. Atención mayorista y distribuidores.
-        </p>
-
-        <ul className="mt-8 max-w-md space-y-4 text-sm text-brand-dark dark:text-white">
+          <StampBand>
+            <StampHeading lead="NUESTRO" accent="CONTACTO" />
+            <p className="mt-6 max-w-2xl text-sm text-brand-dark/75 sm:text-base dark:text-white/75">
+              Escríbenos o visítanos. Atención mayorista y distribuidores.
+            </p>
+          </StampBand>
+        </Reveal>
+        <Reveal delayMs={80}>
+        <ul className="mt-2 max-w-md space-y-4 text-sm text-brand-dark dark:text-white">
           <li className="flex items-center gap-3">
             <Phone className="h-5 w-5 text-brand-primary" strokeWidth={2} />
             <a href={`tel:${PHONE_TEL}`} className="hover:underline">

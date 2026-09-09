@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
+import StampHeading, { StampBand } from "@/components/StampHeading";
 import { featuredProducts } from "@/data/products";
 
 export const metadata: Metadata = {
@@ -17,19 +18,20 @@ export default function OfertasPage() {
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-          <span className="inline-flex rounded-full bg-brand-gold px-2.5 py-1 text-xs font-extrabold text-brand-dark uppercase">
-            Oferta
-          </span>
-          <h1 className="mt-3 font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
-            Ofertas
-          </h1>
-          <p className="mt-3 max-w-xl text-brand-dark/70 dark:text-white/70">
-            Selección con descuento referencial para mayoristas. Stock y precios de
-            ejemplo.
-          </p>
+          <StampBand>
+            <StampHeading
+              lead="OFERTAS"
+              accent="DESCUENTOS"
+              variant="offer"
+            />
+            <p className="mt-6 max-w-xl text-sm text-brand-dark/70 sm:text-base dark:text-white/70">
+              Selección con descuento referencial para mayoristas. Stock y precios de
+              ejemplo.
+            </p>
+          </StampBand>
         </Reveal>
         <Reveal delayMs={80}>
-          <div className="mt-8">
+          <div>
             <ProductCatalog products={offers} />
           </div>
         </Reveal>

@@ -43,6 +43,7 @@ components/
   CatalogFilters.tsx      # Filtros de /catalogo
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
   PageBanner.tsx          # Banner ancho (categorías + /nosotros)
+  StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
   Reveal.tsx              # Fade/slide al entrar en viewport
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   QuoteForm.tsx
@@ -82,7 +83,7 @@ Detalle `/categorias/[slug]`: banner ancho (`PageBanner` vía `CategoryBanner`) 
 línea, título centrado en mayúsculas (`bannerTitle`, p. ej. **ELÉCTRICOS**) y
 chips de marcas de esa categoría. Los productos van debajo, a todo el ancho.
 
-`/nosotros` reutiliza el mismo `PageBanner` con título **NOSOTROS**. Textos de
+`/nosotros` reutiliza el mismo `PageBanner` con el encabezado sticker **SOBRE NOSOTROS**. Textos de
 empresa (historia, misión, visión, valores) viven en `data/company.ts` y son
 placeholder hasta ficha oficial del cliente.
 
@@ -201,12 +202,12 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 | Ruta | Uso |
 | --- | --- |
-| `/catalogo` | Búsqueda y filtros (categoría / marca) contra la API |
+| `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
-| `/nosotros` | Banner **NOSOTROS**, historia de Chamo Import, misión, visión y valores (textos de ejemplo) |
-| `/contacto` | Datos de contacto y Maps |
-| `/ofertas` | Productos con badge de oferta |
+| `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
+| `/contacto` | Encabezado sticker **NUESTRO CONTACTO**, datos y Maps |
+| `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
 | Login (modal / cuenta) | Iniciar sesión o registrarse |

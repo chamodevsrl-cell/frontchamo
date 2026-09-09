@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import StampHeading from "@/components/StampHeading";
 
 export type PageBannerCrumb = {
   href?: string;
@@ -16,6 +17,7 @@ type PageBannerProps = {
   crumbs?: PageBannerCrumb[];
   brands?: readonly string[];
   cta?: { href: string; label: string };
+  stamp?: { lead?: string; accent: string; variant?: "default" | "offer" };
 };
 
 export default function PageBanner({
@@ -27,6 +29,7 @@ export default function PageBanner({
   crumbs,
   brands = [],
   cta,
+  stamp,
 }: PageBannerProps) {
   return (
     <Reveal>
@@ -66,17 +69,28 @@ export default function PageBanner({
               ))}
             </p>
           ) : null}
-          {eyebrow ? (
+          {eyebrow && !stamp ? (
             <span className="mt-3 inline-flex rounded-md bg-brand-gold px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-brand-dark uppercase">
               {eyebrow}
             </span>
           ) : null}
-          <h1
-            id="page-banner-title"
-            className="mt-4 bg-white px-5 py-2.5 font-display text-3xl font-extrabold tracking-tight text-brand-dark uppercase shadow-[8px_8px_0_0_#0B3554] sm:px-10 sm:py-4 sm:text-5xl lg:text-6xl"
-          >
-            {title}
-          </h1>
+          {stamp ? (
+            <div className="mt-4">
+              <StampHeading
+                id="page-banner-title"
+                lead={stamp.lead}
+                accent={stamp.accent}
+                variant={stamp.variant}
+              />
+            </div>
+          ) : (
+            <h1
+              id="page-banner-title"
+              className="mt-4 bg-white px-5 py-2.5 font-display text-3xl font-extrabold tracking-tight text-brand-dark uppercase shadow-[8px_8px_0_0_#0B3554] sm:px-10 sm:py-4 sm:text-5xl lg:text-6xl"
+            >
+              {title}
+            </h1>
+          )}
           {subtitle ? (
             <p className="mt-5 max-w-xl text-sm text-white/90 sm:text-base">
               {subtitle}

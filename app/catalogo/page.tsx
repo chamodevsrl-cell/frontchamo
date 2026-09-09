@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import CatalogFilters from "@/components/CatalogFilters";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
+import StampHeading, { StampBand } from "@/components/StampHeading";
 import { searchCatalog } from "@/data/products";
 
 export const metadata: Metadata = {
@@ -31,17 +32,17 @@ export default async function CatalogoPage({
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-        <h1 className="font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
-          Catálogo
-        </h1>
-        <p className="mt-2 max-w-2xl text-brand-dark/70 dark:text-white/70">
-          Busca por nombre, SKU, marca o categoría. La misma lógica alimenta
-          {" "}
-          <code className="text-xs">GET /api/productos</code>.
-        </p>
+          <StampBand>
+            <StampHeading lead="NUESTRO" accent="CATÁLOGO" />
+            <p className="mt-6 max-w-2xl text-sm text-brand-dark/70 sm:text-base dark:text-white/70">
+              Busca por nombre, SKU, marca o categoría. La misma lógica alimenta
+              {" "}
+              <code className="text-xs">GET /api/productos</code>.
+            </p>
+          </StampBand>
         </Reveal>
         <Reveal delayMs={80}>
-        <div className="mt-8 space-y-6">
+        <div className="space-y-6">
           <Suspense
             fallback={
               <p className="text-sm text-brand-dark/60 dark:text-white/60">

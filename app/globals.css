@@ -109,6 +109,17 @@ body {
   display: none;
 }
 
+.stamp-dots {
+  background-color: #eef2f5;
+  background-image: radial-gradient(#0b355433 1.15px, transparent 1.15px);
+  background-size: 14px 14px;
+}
+
+.dark .stamp-dots {
+  background-color: #0a283c;
+  background-image: radial-gradient(#ffffff26 1.15px, transparent 1.15px);
+}
+
 h1,
 h2,
 h3,
