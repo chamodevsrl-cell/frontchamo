@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-09 | Slider: quitar placeholder azul; solo banners + fade-in | [2026-09-09-slider-sin-placeholder.md](./2026-09-09-slider-sin-placeholder.md) |
 | 2026-09-09 | Banner Nosotros + misión/visión + animaciones de scroll | [2026-09-09-nosotros-banner-animaciones.md](./2026-09-09-nosotros-banner-animaciones.md) |
 | 2026-09-09 | Banner de categoría: imagen ancha + título centrado | [2026-09-09-banner-categoria.md](./2026-09-09-banner-categoria.md) |
 | 2026-09-09 | Ejecutar SUGERENCIAS.md en orden (páginas, catálogo, WhatsApp, tests) | [2026-09-09-sugerencias-prioridad.md](./2026-09-09-sugerencias-prioridad.md) |

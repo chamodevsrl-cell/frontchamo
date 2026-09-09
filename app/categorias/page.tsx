@@ -28,10 +28,10 @@ export default function CategoriasPage() {
         </p>
         </Reveal>
 
-        <Reveal delayMs={80}>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {mainCategories.map((category) => (
+          {mainCategories.map((category, index) => (
             <li key={category.slug}>
+              <Reveal delayMs={Math.min(index, 6) * 70}>
               <Link
                 href={category.href}
                 className="group flex h-full overflow-hidden rounded-2xl border border-brand-primary/30 bg-white shadow-[0_0_18px_rgba(18,126,201,0.2)] transition hover:-translate-y-0.5 dark:bg-[#102a40]"
@@ -60,10 +60,10 @@ export default function CategoriasPage() {
                   </span>
                 </div>
               </Link>
+              </Reveal>
             </li>
           ))}
         </ul>
-        </Reveal>
       </main>
     </div>
   );

@@ -1,8 +1,7 @@
-Banners del hero slider.
+Banners del hero slider (solo estos archivos; no hay placeholder).
 
-Nombres de archivo (sin espacios):
   baner-1.png
   baner-2.png
   baner-3.png
 
-Colócalos en esta carpeta. Las rutas viven en `data/media.ts`.
+Rutas y medidas en `data/media.ts`.

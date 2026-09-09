@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
+import Reveal from "@/components/Reveal";
 
 const shinyCard =
   "border border-brand-primary/35 shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_18px_rgba(18,126,201,0.35)] hover:shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_28px_rgba(18,126,201,0.55)]";
@@ -145,12 +146,14 @@ export default function CategoriesGrid() {
           ref={scrollerRef}
           className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 scrollbar-none sm:gap-4 sm:px-6 lg:gap-5 lg:px-0"
         >
-          {mainCategories.map((category) => (
+          {mainCategories.map((category, index) => (
             <li
               key={category.href}
               className="w-[min(78vw,18rem)] shrink-0 snap-start sm:w-[min(48vw,20rem)] lg:w-[17.5rem] xl:w-[18.75rem]"
             >
-              <CategoryCard category={category} />
+              <Reveal delayMs={Math.min(index, 6) * 70}>
+                <CategoryCard category={category} />
+              </Reveal>
             </li>
           ))}
         </ul>

@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { homeFeaturedProducts, type FeaturedProduct } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
+import Reveal from "@/components/Reveal";
 import { useCart } from "@/components/CartProvider";
 
 export default function FeaturedOffers() {
@@ -41,16 +42,18 @@ export default function FeaturedOffers() {
 
       <div className="-mx-4 sm:-mx-6 lg:mx-0">
         <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 scrollbar-none sm:gap-4 sm:px-6 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0 lg:pb-0 xl:grid-cols-4">
-          {homeFeaturedProducts.map((product) => (
+          {homeFeaturedProducts.map((product, index) => (
             <li
               key={product.id}
               className="w-[min(46vw,11.5rem)] shrink-0 snap-start sm:w-[min(42vw,14rem)] lg:w-auto lg:shrink"
             >
-              <ProductCard
-                product={product}
-                onOpen={() => setSelected(product)}
-                onAddToCart={() => addItem(product.id, 1)}
-              />
+              <Reveal delayMs={Math.min(index, 6) * 70}>
+                <ProductCard
+                  product={product}
+                  onOpen={() => setSelected(product)}
+                  onAddToCart={() => addItem(product.id, 1)}
+                />
+              </Reveal>
             </li>
           ))}
         </ul>

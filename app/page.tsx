@@ -10,7 +10,9 @@ export default function Home() {
   return (
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb]">
       <Navbar />
-      <HeroSlider />
+      <Reveal>
+        <HeroSlider />
+      </Reveal>
       <Reveal>
         <BrandsCarousel />
       </Reveal>

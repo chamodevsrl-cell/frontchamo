@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
 
 export type PageBannerCrumb = {
   href?: string;
@@ -28,16 +29,17 @@ export default function PageBanner({
   cta,
 }: PageBannerProps) {
   return (
+    <Reveal>
     <section
       aria-labelledby="page-banner-title"
-      className="animate-hero-enter relative isolate overflow-hidden rounded-2xl border border-brand-dark/20 shadow-[0_12px_32px_rgba(11,53,84,0.18)]"
+      className="relative isolate overflow-hidden rounded-2xl border border-brand-dark/20 shadow-[0_12px_32px_rgba(11,53,84,0.18)]"
     >
       <div className="relative min-h-[220px] sm:min-h-[300px] lg:min-h-[360px]">
         <Image
           src={image}
           alt={imageAlt}
           fill
-          priority
+          preload
           className="object-cover"
           sizes="(max-width: 1600px) 100vw, 1600px"
         />
@@ -103,5 +105,6 @@ export default function PageBanner({
         </div>
       </div>
     </section>
+    </Reveal>
   );
 }

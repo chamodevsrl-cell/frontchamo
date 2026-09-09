@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
+import Reveal from "@/components/Reveal";
 import { useCart } from "@/components/CartProvider";
 import type { FeaturedProduct } from "@/data/products";
 
@@ -29,13 +30,15 @@ export default function ProductCatalog({
   return (
     <>
       <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product) => (
+        {products.map((product, index) => (
           <li key={product.id}>
-            <ProductCard
-              product={product}
-              onOpen={() => setSelected(product)}
-              onAddToCart={() => addItem(product.id, 1)}
-            />
+            <Reveal delayMs={Math.min(index, 8) * 55}>
+              <ProductCard
+                product={product}
+                onOpen={() => setSelected(product)}
+                onAddToCart={() => addItem(product.id, 1)}
+              />
+            </Reveal>
           </li>
         ))}
       </ul>

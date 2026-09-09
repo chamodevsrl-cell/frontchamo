@@ -75,7 +75,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | --- | --- |
 | `Navbar.tsx` | Header de 3 niveles (ver §5) |
 | `WhatsAppFloat.tsx` | Burbuja flotante WhatsApp (verde `#25D366`, fija inferior derecha) |
-| `HeroSlider.tsx` | Slider de anuncios del home, animación de entrada, swipe táctil |
+| `HeroSlider.tsx` | Slider de anuncios: solo banners reales (sin placeholder), swipe táctil |
 | `BrandsCarousel.tsx` | Carrusel de marcas distribuidoras (marquee CSS), debajo del slider |
 | `CategoriesGrid.tsx` | Categorías en carrusel horizontal con flechas circulares + borde brillante de marca |
 | `FeaturedOffers.tsx` | Sección de ofertas destacadas, carrusel en móvil / grilla en desktop (usa `ProductModal`) |
@@ -167,9 +167,8 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-09): `/nosotros` con banner **NOSOTROS** (mismo patrón
-que categorías), textos placeholder de empresa + misión/visión, y animaciones de
-entrada al scroll (`Reveal`) en el resto del sitio.
+Último avance (2026-09-09): slider del home **sin recuadro de ejemplo** (solo
+`baner-1.png` … `baner-3.png`) y fade-in al scroll (`Reveal`) en banners y bloques.
 
 ## 10. Pendientes conocidos
 

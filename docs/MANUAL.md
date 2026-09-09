@@ -88,8 +88,8 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5b Animaciones de entrada
 
-- Slider y banners de página: clase `.animate-hero-enter` (fade + slide-up).
-- Resto de bloques: componente `Reveal` (IntersectionObserver → `.reveal-in`).
+- Slider, banners de página, categorías, productos y el resto de bloques: `Reveal`
+  (fade + slide-up al entrar en viewport).
 - Si el usuario pide menos movimiento (`prefers-reduced-motion`), no hay animación.
 
 ### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
@@ -112,9 +112,9 @@ WhatsApp unificado: `data/contact.ts` → `wa.me/51959723602`.
 
 ### A.7 Slider
 
-- Rutas en `data/media.ts`; archivos en `public/images/slider/` (`baner-1.png` … `baner-3.png`, sin espacios).
-- `fullBleed: true` evita overlay de texto sobre el arte (el banner ya trae texto).
-- Imagen `w-full h-auto object-contain` (sin recorte), puntos + swipe táctil, sin flechas.
+- Rutas y tamaño en `data/media.ts`; archivos `public/images/slider/baner-1.png` … `baner-3.png`.
+- El hero **solo** muestra esas fotos (sin recuadro de ejemplo “Imagen del anuncio”, sin overlay de título).
+- Carrusel: puntos + swipe; el bloque entero hace fade-in con `Reveal` igual que el resto del sitio.
 
 ### A.8 Datos oficiales de contacto
 
@@ -165,11 +165,11 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 - **Categorías** (desplegable)
 
 **Slider de anuncios**
-- Banners de campaña (hoy: navideño, herramientas, envíos a la sierra)
+- Solo los banners reales (`baner-1.png` … `baner-3.png`); al recargar no aparece el recuadro azul de ejemplo
 - Cambia automáticamente cada unos segundos; también con swipe en móvil o los puntos
 - El banner se ve completo (sin recortar) y de borde a borde
-- Las secciones debajo (marcas, beneficios, categorías, ofertas, pie) **aparecen al
-  hacer scroll** (fade + subida), igual que la entrada del slider
+- El slider y las secciones debajo (marcas, beneficios, categorías, ofertas, pie)
+  **aparecen con fade-in** al cargar o al hacer scroll
 
 **Marcas distribuidoras**
 - Carrusel justo debajo del slider, para marcas que se comercializan/auspician

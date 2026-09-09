@@ -72,6 +72,7 @@ describe("home HTTP (si el dev server está arriba)", () => {
       const html = await response.text();
       expect(html).toContain("Chamo Import");
       expect(html).toContain("baner-1.png");
+      expect(html).not.toContain("Imagen del anuncio");
     } catch (error) {
       if (error instanceof Error && error.message.includes("expected")) {
         throw error;
