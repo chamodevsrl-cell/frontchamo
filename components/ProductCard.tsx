@@ -49,7 +49,7 @@ export default function ProductCard({
           alt={product.name}
           fill
           className="object-cover transition duration-500 group-hover:scale-[1.03]"
-          sizes="(max-width: 1024px) 46vw, 25vw"
+          sizes="(max-width: 1024px) 72vw, 18.5rem"
         />
 
         <span

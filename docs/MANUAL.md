@@ -187,7 +187,9 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 - Enlace "Ver todas" → `/categorias` (listado) y **Explorar** → `/categorias/[slug]`
 
 **Productos destacados / ofertas**
-- Tarjetas con precio, stock y "Añadir al carrito" (suma al carrito); clic abre el detalle (modal)
+- **Carrusel de una sola fila** (igual que categorías): flechas circulares ← →
+  arriba a la derecha en PC y móvil; también se puede deslizar
+- Tarjetas con precio, stock y "Añadir al carrito"; clic abre el detalle (modal)
 - En el modal: precios unitario/mayorista, cantidad, cotización / WhatsApp,
   **ficha técnica** (tabla) y **productos relacionados** de la misma categoría
   (al tocar uno se abre ese producto en el mismo modal)

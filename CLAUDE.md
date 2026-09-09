@@ -78,7 +78,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `HeroSlider.tsx` | Slider de anuncios: solo banners reales (sin placeholder), swipe táctil |
 | `BrandsCarousel.tsx` | Carrusel de marcas distribuidoras (marquee CSS), debajo del slider |
 | `CategoriesGrid.tsx` | Categorías en carrusel horizontal con flechas circulares + borde brillante de marca |
-| `FeaturedOffers.tsx` | Sección de ofertas destacadas, carrusel en móvil / grilla en desktop (usa `ProductModal`) |
+| `FeaturedOffers.tsx` | Ofertas destacadas: carrusel de una fila (igual que categorías) + `ProductModal` |
 | `ProductModal.tsx` | Modal de producto: galería, precios, ficha técnica (tabla) y relacionados por categoría |
 | `TrustInfoBar.tsx` | Barra de confianza (envíos, garantía, atención, etc.) |
 | `CartProvider.tsx` | Carrito / cotización en `localStorage` |
@@ -168,8 +168,8 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-09): encabezados tipo etiqueta en Catálogo, Nosotros,
-Ofertas (azul + borde oro, “DESCUENTOS”) y Contacto.
+Último avance (2026-09-09): productos destacados del home en **una sola fila**
+(carrusel con flechas, igual que categorías).
 
 ## 10. Pendientes conocidos
 
