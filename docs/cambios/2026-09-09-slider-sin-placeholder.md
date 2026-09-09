@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-09
 - **Solicitud:** Al recargar, el hero mostraba un bloque azul de ejemplo (“Imagen del anuncio”). Dejar solo los banners reales y aplicar fade-in al scroll en los elementos.
 - **Archivos:** `components/HeroSlider.tsx`, `data/media.ts`, `components/PageBanner.tsx`, `components/Reveal.tsx`, `components/ProductCatalog.tsx`, `components/FeaturedOffers.tsx`, `components/CategoriesGrid.tsx`, `app/page.tsx`
-- **Commit:** (se registra al subir)
+- **Commit:** `0fa344a` — fix: show real hero banners on reload and fade-in blocks
 
 ## Qué había antes
 
