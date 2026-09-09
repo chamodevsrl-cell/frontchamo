@@ -261,10 +261,14 @@ export default function Navbar() {
             <Link
               href="/carrito"
               className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              aria-label={`Carrito, ${count} productos`}
             >
               <ShoppingCart className="h-5 w-5" strokeWidth={2} />
               <span className="text-[11px] font-semibold">Carrito</span>
-              <span className="absolute top-0.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
+              <span
+                suppressHydrationWarning
+                className="absolute -top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
                 {count}
               </span>
             </Link>
@@ -280,10 +284,13 @@ export default function Navbar() {
             <Link
               href="/carrito"
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
-              aria-label="Carrito"
+              aria-label={`Carrito, ${count} productos`}
             >
               <ShoppingCart className="h-5 w-5" strokeWidth={2} />
-              <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
+              <span
+                suppressHydrationWarning
+                className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
                 {count}
               </span>
             </Link>

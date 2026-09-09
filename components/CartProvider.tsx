@@ -4,8 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
-  useSyncExternalStore,
+  useState,
   type ReactNode,
 } from "react";
 import { getProductById, type FeaturedProduct } from "@/data/products";
@@ -33,14 +34,6 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const listeners = new Set<() => void>();
-let memoryCart: CartLine[] = [];
-let didRead = false;
-
-function emit() {
-  listeners.forEach((listener) => listener());
-}
-
 function parseCart(raw: string | null): CartLine[] {
   if (!raw) return [];
   try {
@@ -58,72 +51,52 @@ function parseCart(raw: string | null): CartLine[] {
   }
 }
 
-function readCart(): CartLine[] {
-  if (typeof window === "undefined") return [];
-  if (!didRead) {
-    memoryCart = parseCart(window.localStorage.getItem(STORAGE_KEY));
-    didRead = true;
-  }
-  return memoryCart;
-}
-
-function writeCart(next: CartLine[]) {
-  memoryCart = next;
-  didRead = true;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  emit();
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
-function getServerSnapshot(): CartLine[] {
-  return [];
-}
-
 export function CartProvider({ children }: { children: ReactNode }) {
-  const items = useSyncExternalStore(subscribe, readCart, getServerSnapshot);
+  const [items, setItems] = useState<CartLine[]>([]);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    // Hidratar después del mount para coincidir con el HTML del servidor (badge 0).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
+    setItems(parseCart(window.localStorage.getItem(STORAGE_KEY)));
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }, [items, ready]);
 
   const addItem = useCallback((productId: string, qty = 1) => {
     const amount = Math.max(1, Math.floor(qty));
-    const current = readCart();
-    const existing = current.find((line) => line.productId === productId);
-    if (!existing) {
-      writeCart([...current, { productId, qty: amount }]);
-      return;
-    }
-    writeCart(
-      current.map((line) =>
+    setItems((current) => {
+      const existing = current.find((line) => line.productId === productId);
+      if (!existing) return [...current, { productId, qty: amount }];
+      return current.map((line) =>
         line.productId === productId
           ? { ...line, qty: line.qty + amount }
           : line,
-      ),
-    );
+      );
+    });
   }, []);
 
   const setQty = useCallback((productId: string, qty: number) => {
     const amount = Math.floor(qty);
-    const current = readCart();
-    if (amount < 1) {
-      writeCart(current.filter((line) => line.productId !== productId));
-      return;
-    }
-    writeCart(
-      current.map((line) =>
+    setItems((current) => {
+      if (amount < 1) {
+        return current.filter((line) => line.productId !== productId);
+      }
+      return current.map((line) =>
         line.productId === productId ? { ...line, qty: amount } : line,
-      ),
-    );
+      );
+    });
   }, []);
 
   const removeItem = useCallback((productId: string) => {
-    writeCart(readCart().filter((line) => line.productId !== productId));
+    setItems((current) => current.filter((line) => line.productId !== productId));
   }, []);
 
-  const clear = useCallback(() => writeCart([]), []);
+  const clear = useCallback(() => setItems([]), []);
 
   const lines = useMemo(
     () =>

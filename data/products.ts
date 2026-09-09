@@ -42,7 +42,7 @@ const TOOL_IMAGES = [
   "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=800&q=80",
   "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
   "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80",
-  "https://images.unsplash.com/photo-1426927308491-6380b6a58064?w=800&q=80",
+  "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
   "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
   "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&q=80",
   "https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=800&q=80",
