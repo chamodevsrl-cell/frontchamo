@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-09
 - **Solicitud:** En `/nosotros` usar el mismo tipo de banner que las categorías (título **NOSOTROS**), una historia de empresa con el nombre Chamo Import, misión y visión, y animar la entrada del contenido en todo el sitio al cargar o al hacer scroll. Sin video; subir código y docs a Git.
 - **Archivos:** `app/nosotros/page.tsx`, `data/company.ts`, `components/PageBanner.tsx`, `components/CategoryBanner.tsx`, `components/Reveal.tsx`, `app/globals.css`, `app/page.tsx`, páginas de catálogo/ofertas/cotizar/carrito/contacto/políticas, `components/Footer.tsx`
-- **Commit:** (se registra al subir)
+- **Commit:** `b875fca` — feat: Nosotros banner, company story, and scroll-in animations
 
 ## Qué había antes
 
