@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-09
 - **Solicitud:** En Catálogo un encabezado estilo sticker (“NUESTROS PRODUCTOS”: caja blanca, borde grueso, sombra dura). Igual en Nosotros, Ofertas y Contacto. En Ofertas, diseño de descuentos con azul de marca y borde amarillo.
 - **Archivos:** `components/StampHeading.tsx`, `app/catalogo/page.tsx`, `app/nosotros/page.tsx`, `app/ofertas/page.tsx`, `app/contacto/page.tsx`, `components/PageBanner.tsx`, `app/globals.css`
-- **Commit:** (se registra al subir)
+- **Commit:** `3b79358` — feat: sticker headings on catalog, about, offers, and contact
 
 ## Qué había antes
 
