@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import CategoryBanner from "@/components/CategoryBanner";
 import ProductCatalog from "@/components/ProductCatalog";
+import Reveal from "@/components/Reveal";
 import { getCategoryBySlug, mainCategories } from "@/data/home";
 import { getProductsByCategory } from "@/data/products";
 
@@ -41,6 +42,7 @@ export default async function CategoriaDetallePage({
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 space-y-8 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 xl:px-10">
         <CategoryBanner category={category} brands={brands} />
+        <Reveal>
         <section id="productos-categoria" aria-labelledby="productos-categoria-heading">
           <h2
             id="productos-categoria-heading"
@@ -53,6 +55,7 @@ export default async function CategoriaDetallePage({
             emptyMessage="Aún no hay productos de ejemplo en esta categoría. Cotiza por WhatsApp y te armamos la lista."
           />
         </section>
+        </Reveal>
       </main>
     </div>
   );

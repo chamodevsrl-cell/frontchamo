@@ -41,11 +41,14 @@ components/
   Navbar.tsx              # Header 3 niveles (categorías = mainCategories)
   CartProvider.tsx        # Carrito en localStorage
   CatalogFilters.tsx      # Filtros de /catalogo
-  CategoryBanner.tsx      # Banner de /categorias/[slug]
+  CategoryBanner.tsx      # Detalle de categoría → PageBanner
+  PageBanner.tsx          # Banner ancho (categorías + /nosotros)
+  Reveal.tsx              # Fade/slide al entrar en viewport
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   QuoteForm.tsx
 data/
   contact.ts               # Teléfono, WhatsApp, correo, Maps
+  company.ts               # Historia / misión / visión (placeholder)
   media.ts                 # Slides / logo / icon
   home.ts                   # trustItems, mainCategories, distributorBrands
   products.ts               # Catálogo de ejemplo + searchCatalog
@@ -75,9 +78,19 @@ UI en `CategoriesGrid.tsx`: **carrusel horizontal en todos los breakpoints**
 que desplazan una tarjeta; también se puede deslizar. En modo oscuro las tarjetas
 usan fondo `#102a40` y texto claro para contraste.
 
-Detalle `/categorias/[slug]`: banner ancho (`CategoryBanner`) con la foto de la
+Detalle `/categorias/[slug]`: banner ancho (`PageBanner` vía `CategoryBanner`) con la foto de la
 línea, título centrado en mayúsculas (`bannerTitle`, p. ej. **ELÉCTRICOS**) y
 chips de marcas de esa categoría. Los productos van debajo, a todo el ancho.
+
+`/nosotros` reutiliza el mismo `PageBanner` con título **NOSOTROS**. Textos de
+empresa (historia, misión, visión, valores) viven en `data/company.ts` y son
+placeholder hasta ficha oficial del cliente.
+
+### A.5b Animaciones de entrada
+
+- Slider y banners de página: clase `.animate-hero-enter` (fade + slide-up).
+- Resto de bloques: componente `Reveal` (IntersectionObserver → `.reveal-in`).
+- Si el usuario pide menos movimiento (`prefers-reduced-motion`), no hay animación.
 
 ### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
 
@@ -155,6 +168,8 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 - Banners de campaña (hoy: navideño, herramientas, envíos a la sierra)
 - Cambia automáticamente cada unos segundos; también con swipe en móvil o los puntos
 - El banner se ve completo (sin recortar) y de borde a borde
+- Las secciones debajo (marcas, beneficios, categorías, ofertas, pie) **aparecen al
+  hacer scroll** (fade + subida), igual que la entrada del slider
 
 **Marcas distribuidoras**
 - Carrusel justo debajo del slider, para marcas que se comercializan/auspician
@@ -189,7 +204,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/catalogo` | Búsqueda y filtros (categoría / marca) contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
-| `/nosotros` | Información de la empresa |
+| `/nosotros` | Banner **NOSOTROS**, historia de Chamo Import, misión, visión y valores (textos de ejemplo) |
 | `/contacto` | Datos de contacto y Maps |
 | `/ofertas` | Productos con badge de oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
@@ -206,3 +221,4 @@ Más adelante conviene un panel admin; por ahora:
 - Logos de marcas → `public/images/marcas/`
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
 - Teléfono / WhatsApp / correo → `data/contact.ts`
+- Historia, misión y visión de `/nosotros` → `data/company.ts` (hoy placeholder)

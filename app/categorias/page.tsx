@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Reveal from "@/components/Reveal";
 import { mainCategories } from "@/data/home";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default function CategoriasPage() {
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
+        <Reveal>
         <p className="text-sm font-semibold tracking-wide text-brand-primary uppercase">
           Catálogo
         </p>
@@ -24,7 +26,9 @@ export default function CategoriasPage() {
           Elige una línea para ver productos de ejemplo, fichas técnicas y cotizar
           por WhatsApp.
         </p>
+        </Reveal>
 
+        <Reveal delayMs={80}>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {mainCategories.map((category) => (
             <li key={category.slug}>
@@ -59,6 +63,7 @@ export default function CategoriasPage() {
             </li>
           ))}
         </ul>
+        </Reveal>
       </main>
     </div>
   );

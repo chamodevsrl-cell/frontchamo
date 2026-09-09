@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import Reveal from "@/components/Reveal";
 import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/format";
 import { whatsappUrl } from "@/data/contact";
@@ -36,6 +37,7 @@ export default function CarritoPage() {
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
+        <Reveal>
         <h1 className="font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
           Carrito / cotización
         </h1>
@@ -158,6 +160,7 @@ export default function CarritoPage() {
             </aside>
           </div>
         )}
+        </Reveal>
       </main>
     </div>
   );

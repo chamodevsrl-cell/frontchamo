@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import CatalogFilters from "@/components/CatalogFilters";
 import ProductCatalog from "@/components/ProductCatalog";
+import Reveal from "@/components/Reveal";
 import { searchCatalog } from "@/data/products";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default async function CatalogoPage({
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
+        <Reveal>
         <h1 className="font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
           Catálogo
         </h1>
@@ -37,6 +39,8 @@ export default async function CatalogoPage({
           {" "}
           <code className="text-xs">GET /api/productos</code>.
         </p>
+        </Reveal>
+        <Reveal delayMs={80}>
         <div className="mt-8 space-y-6">
           <Suspense
             fallback={
@@ -52,6 +56,7 @@ export default async function CatalogoPage({
             emptyMessage="No encontramos productos con esa búsqueda. Prueba otra categoría o marca."
           />
         </div>
+        </Reveal>
       </main>
     </div>
   );

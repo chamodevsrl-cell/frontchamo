@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import Reveal from "@/components/Reveal";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import {
   COMPANY_NAME,
@@ -19,6 +20,7 @@ export default function ContactoPage() {
     <div className="flex min-h-full flex-1 flex-col bg-white dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
+        <Reveal>
         <p className="text-sm font-semibold tracking-wide text-brand-primary uppercase">
           Empresa
         </p>
@@ -58,6 +60,7 @@ export default function ContactoPage() {
             </a>
           </li>
         </ul>
+        </Reveal>
       </main>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Reveal from "@/components/Reveal";
 import { COMPANY_NAME, EMAIL } from "@/data/contact";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function PrivacidadPage() {
     <div className="flex min-h-full flex-1 flex-col bg-white dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6">
+        <Reveal>
         <h1 className="font-display text-3xl font-bold text-brand-dark dark:text-white">
           Política de privacidad
         </h1>
@@ -38,6 +40,7 @@ export default function PrivacidadPage() {
             describen el uso del catálogo.
           </p>
         </div>
+        </Reveal>
       </main>
     </div>
   );

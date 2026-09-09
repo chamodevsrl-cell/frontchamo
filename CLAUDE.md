@@ -85,7 +85,9 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `ProductCard.tsx` | Tarjeta de producto reutilizable (home, catálogo, ofertas) |
 | `ProductCatalog.tsx` | Grilla + modal |
 | `CatalogFilters.tsx` | Filtros de `/catalogo` (query string) |
-| `CategoryBanner.tsx` | Banner de detalle de categoría (imagen + título centrado) |
+| `CategoryBanner.tsx` | Detalle de categoría: reutiliza `PageBanner` (imagen + título centrado) |
+| `PageBanner.tsx` | Banner ancho compartido (categorías y `/nosotros`) |
+| `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
@@ -100,7 +102,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 app/                  # App Router (páginas y layout)
   layout.tsx           # Fuentes, metadata, AuthProvider, Footer, WhatsApp float, cursor
   page.tsx              # Home (Navbar + HeroSlider + Brands + Categorías + Ofertas + TrustBar)
-  globals.css           # Tokens de marca + Tailwind v4 + animaciones (hero, marquee)
+  globals.css           # Tokens de marca + Tailwind v4 + animaciones (hero, reveal, marquee)
   login/                # Auth (/login)
   nosotros/             # Empresa (/nosotros)
   contacto/             # Contacto + enlace a Maps (/contacto)
@@ -114,6 +116,7 @@ app/                  # App Router (páginas y layout)
 components/            # UI reutilizable (ver §6)
 data/
   contact.ts            # Teléfono / WhatsApp / correo / Maps
+  company.ts            # Historia / misión / visión de /nosotros (placeholder)
   media.ts              # Rutas de slider, logo e icono (LOGO_SRC, ICON_SRC, slides)
   home.ts                # Datos de secciones del home (marcas, categorías, trust bar…)
   products.ts            # Catálogo de productos de ejemplo
@@ -164,13 +167,14 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-09): ejecución de `docs/SUGERENCIAS.md` en orden
-(categorías locales, logos, banners, páginas `/categorias` `/carrito` `/catalogo`,
-API, cotizar, teléfono oficial, políticas y smoke tests).
+Último avance (2026-09-09): `/nosotros` con banner **NOSOTROS** (mismo patrón
+que categorías), textos placeholder de empresa + misión/visión, y animaciones de
+entrada al scroll (`Reveal`) en el resto del sitio.
 
 ## 10. Pendientes conocidos
 
 - Confirmar correo de contacto oficial (footer y `/contacto`).
+- Reemplazar textos placeholder de `/nosotros` (`data/company.ts`) por ficha oficial.
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).
 - Página `/favoritos` (el Navbar sigue enlazándola).
 - Fotos reales de tienda/almacén y logos oficiales de marca (hoy JPEG localizados y wordmarks SVG).

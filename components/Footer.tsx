@@ -17,6 +17,7 @@ import {
   YoutubeIcon,
 } from "@/components/SocialIcons";
 import { LOGO_SRC } from "@/data/media";
+import Reveal from "@/components/Reveal";
 import {
   COMPANY_NAME,
   EMAIL,
@@ -90,6 +91,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-auto bg-brand-dark text-white">
+      <Reveal>
       <div className="mx-auto grid max-w-[1600px] gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-12 lg:gap-8 lg:px-8 xl:px-10">
         {/* Marca */}
         <div className="lg:col-span-3">
@@ -288,6 +290,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      </Reveal>
     </footer>
   );
 }
