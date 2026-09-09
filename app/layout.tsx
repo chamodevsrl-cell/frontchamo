@@ -6,6 +6,7 @@ import AuthModal from "@/components/AuthModal";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import WrenchCursor from "@/components/WrenchCursor";
+import IntroSplash from "@/components/IntroSplash";
 import { ICON_SRC } from "@/data/media";
 import "./globals.css";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <WrenchCursor />
+            <IntroSplash />
             <div className="flex min-h-full flex-1 flex-col">{children}</div>
             <Footer />
             <WhatsAppFloat />

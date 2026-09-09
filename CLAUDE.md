@@ -90,6 +90,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
 | `CategoryIcon.tsx` | Icono Lucide por categoría (menú, home, `/categorias`) |
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
+| `IntroSplash.tsx` | Intro al cargar: puertas azules + engranaje Lucide |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
@@ -104,7 +105,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 app/                  # App Router (páginas y layout)
   layout.tsx           # Fuentes, metadata, AuthProvider, Footer, WhatsApp float, cursor
   page.tsx              # Home (Navbar + HeroSlider + Brands + Categorías + Ofertas + TrustBar)
-  globals.css           # Tokens de marca + Tailwind v4 + animaciones (hero, reveal, marquee)
+  globals.css           # Tokens de marca + Tailwind v4 + animaciones (hero, reveal, intro, marquee)
   login/                # Auth (/login)
   nosotros/             # Empresa (/nosotros)
   contacto/             # Contacto + enlace a Maps (/contacto)
@@ -169,8 +170,7 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-09): iconos **Lucide** en carrito, categorías y productos
-(sin emoji).
+Último avance (2026-09-09): intro al entrar (puertas azules + engranaje que gira).
 
 ## 10. Pendientes conocidos
 

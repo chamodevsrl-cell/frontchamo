@@ -75,7 +75,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-enter,
   .reveal,
-  .reveal-in {
+  .reveal-in,
+  .intro-panel-left,
+  .intro-panel-right,
+  .intro-gear,
+  .intro-gear-main,
+  .intro-gear-small {
     animation: none;
     opacity: 1;
     transform: none;
@@ -118,6 +123,121 @@ body {
 .dark .stamp-dots {
   background-color: #0a283c;
   background-image: radial-gradient(#ffffff26 1.15px, transparent 1.15px);
+}
+
+/* Intro: puertas azules + engranaje */
+.intro-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.intro-panel {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50.2%;
+  background:
+    linear-gradient(180deg, #127ec9 0%, #0b3554 55%, #082a43 100%);
+}
+
+.intro-panel-left {
+  left: 0;
+  box-shadow: 8px 0 0 #e4b714;
+  animation: intro-door-left 2.7s cubic-bezier(0.77, 0, 0.175, 1) both;
+}
+
+.intro-panel-right {
+  right: 0;
+  box-shadow: -8px 0 0 #e4b714;
+  animation: intro-door-right 2.7s cubic-bezier(0.77, 0, 0.175, 1) both;
+}
+
+.intro-gear {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: intro-gear 2.7s ease-in-out both;
+}
+
+.intro-gear-main {
+  animation: intro-spin 1.1s linear infinite;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+}
+
+.intro-gear-small {
+  animation: intro-spin-rev 0.85s linear infinite;
+}
+
+@keyframes intro-door-left {
+  0% {
+    transform: translateX(-100%);
+  }
+  20% {
+    transform: translateX(0);
+  }
+  68% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-105%);
+  }
+}
+
+@keyframes intro-door-right {
+  0% {
+    transform: translateX(100%);
+  }
+  20% {
+    transform: translateX(0);
+  }
+  68% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(105%);
+  }
+}
+
+@keyframes intro-gear {
+  0%,
+  12% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.45);
+  }
+  22%,
+  66% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+}
+
+@keyframes intro-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes intro-spin-rev {
+  to {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-splash {
+    display: none;
+  }
 }
 
 h1,

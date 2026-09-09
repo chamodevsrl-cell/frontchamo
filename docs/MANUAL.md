@@ -46,6 +46,7 @@ components/
   StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
   CategoryIcon.tsx        # Iconos Lucide por categoría
   Reveal.tsx              # Fade/slide al entrar en viewport
+  IntroSplash.tsx         # Intro: puertas azules + engranaje
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   QuoteForm.tsx
 data/
@@ -91,6 +92,9 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5b Animaciones de entrada
 
+- Al cargar la web: `IntroSplash` — puertas azules se cierran, gira un engranaje Lucide
+  (`Cog`) y se abren para mostrar el sitio (~2.7s). No se repite al navegar entre páginas
+  (vive en `layout.tsx`).
 - Slider, banners de página, categorías, productos y el resto de bloques: `Reveal`
   (fade + slide-up al entrar en viewport).
 - Si el usuario pide menos movimiento (`prefers-reduced-motion`), no hay animación.
@@ -157,6 +161,8 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
+3. Al entrar, dos paneles azules se cierran, gira un engranaje al centro y se abren
+   para mostrar el sitio (solo al cargar; no al cambiar de página).
 
 ### B.2 Inicio (home)
 
