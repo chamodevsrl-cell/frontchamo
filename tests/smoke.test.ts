@@ -18,13 +18,24 @@ describe("smoke de catálogo y home", () => {
     ]);
   });
 
-  it("hay 7 categorías con fotos locales", () => {
+  it("hay 7 categorías con fotos locales y título de banner", () => {
     expect(mainCategories).toHaveLength(7);
     expect(
       mainCategories.every((category) =>
         category.image.startsWith("/images/categorias/"),
       ),
     ).toBe(true);
+    expect(
+      mainCategories.every(
+        (category) =>
+          category.bannerTitle.length > 0 &&
+          category.bannerTitle === category.bannerTitle.toLocaleUpperCase("es"),
+      ),
+    ).toBe(true);
+    expect(
+      mainCategories.find((category) => category.slug === "electricos")
+        ?.bannerTitle,
+    ).toBe("ELÉCTRICOS");
   });
 
   it("cada categoría tiene al menos 2 productos relacionados posibles", () => {

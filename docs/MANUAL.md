@@ -41,6 +41,7 @@ components/
   Navbar.tsx              # Header 3 niveles (categorías = mainCategories)
   CartProvider.tsx        # Carrito en localStorage
   CatalogFilters.tsx      # Filtros de /catalogo
+  CategoryBanner.tsx      # Banner de /categorias/[slug]
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   QuoteForm.tsx
 data/
@@ -63,7 +64,7 @@ public/images/marcas/       # Wordmarks SVG
 
 ### A.5 Categorías (`data/home.ts` → `mainCategories`)
 
-Cada ítem: `slug`, `href`, `label`, `eyebrow`, `bullets` (3), `image` (local), `imageAlt`, `tint`.
+Cada ítem: `slug`, `href`, `label`, `bannerTitle`, `eyebrow`, `bullets` (3), `image` (local), `imageAlt`, `tint`. Opcional: `bannerImage` (fondo del detalle).
 
 Fuente única también del dropdown **Categorías** del Navbar.
 
@@ -73,6 +74,10 @@ UI en `CategoriesGrid.tsx`: **carrusel horizontal en todos los breakpoints**
 (`snap-x` + scroll). En PC/móvil hay **flechas circulares** (arriba a la derecha)
 que desplazan una tarjeta; también se puede deslizar. En modo oscuro las tarjetas
 usan fondo `#102a40` y texto claro para contraste.
+
+Detalle `/categorias/[slug]`: banner ancho (`CategoryBanner`) con la foto de la
+línea, título centrado en mayúsculas (`bannerTitle`, p. ej. **ELÉCTRICOS**) y
+chips de marcas de esa categoría. Los productos van debajo, a todo el ancho.
 
 ### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
 
@@ -182,7 +187,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | Ruta | Uso |
 | --- | --- |
 | `/catalogo` | Búsqueda y filtros (categoría / marca) contra la API |
-| `/categorias` | Todas las líneas; detalle en `/categorias/[slug]` |
+| `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
 | `/nosotros` | Información de la empresa |
 | `/contacto` | Datos de contacto y Maps |

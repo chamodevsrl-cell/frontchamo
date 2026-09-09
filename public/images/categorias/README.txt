@@ -1,4 +1,5 @@
-Fotos locales de las tarjetas de categoría (home, /categorias y detalle).
+Fotos locales de las tarjetas de categoría (home, /categorias) y del
+banner de detalle (`/categorias/[slug]`).
 
 Nombres:
   ferreteria.jpg
@@ -9,4 +10,6 @@ Nombres:
   construccion.jpg
   pinturas.jpg
 
-Reemplazar por fotos propias de tienda/almacén cuando el cliente las envíe.
+El detalle usa la misma foto como fondo del banner (título centrado, p. ej.
+ELÉCTRICOS). Para mostrar marcas o productos de la línea, reemplazar el JPEG
+por un collage horizontal (~1600×500) o definir `bannerImage` en `data/home.ts`.

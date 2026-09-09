@@ -36,13 +36,15 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 
 ## Ideas nuevas de este bloque
 
-- [ ] Sustituir los JPEG de `public/images/categorias/` por fotos reales de tienda/almacén del cliente
+- [x] 2026-09-09 — Banner de detalle de categoría: imagen ancha + título centrado (ELÉCTRICOS, FERRETERÍA, …)
+- [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
 - [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
 - [ ] Página `/favoritos` (el Navbar sigue enlazándola)
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-09 — Banner de detalle de categoría (imagen + título centrado)
 - [x] 2026-09-09 — Bloque SUGERENCIAS.md en orden (categorías, carrito, catálogo, cotizar, teléfono, tests)
 - [x] 2026-09-08 — Slider full-bleed y sin recorte
 - [x] 2026-09-08 — Marcas debajo del slider

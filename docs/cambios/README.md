@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-09 | Banner de categoría: imagen ancha + título centrado | [2026-09-09-banner-categoria.md](./2026-09-09-banner-categoria.md) |
 | 2026-09-09 | Ejecutar SUGERENCIAS.md en orden (páginas, catálogo, WhatsApp, tests) | [2026-09-09-sugerencias-prioridad.md](./2026-09-09-sugerencias-prioridad.md) |
 | 2026-09-08 | Auditoría: sincronizar CLAUDE.md/MANUAL.md con el código real | [2026-09-08-auditoria-sync-docs.md](./2026-09-08-auditoria-sync-docs.md) |
 | 2026-09-08 | Navbar hover: solo texto, sin bloque | [2026-09-08-navbar-hover-solo-texto.md](./2026-09-08-navbar-hover-solo-texto.md) |

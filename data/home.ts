@@ -29,10 +29,17 @@ export type MainCategory = {
   slug: string;
   href: string;
   label: string;
+  /** Título en el banner de `/categorias/[slug]` (mayúsculas, p. ej. ELÉCTRICOS) */
+  bannerTitle: string;
   eyebrow: string;
   bullets: readonly [string, string, string];
   image: string;
   imageAlt: string;
+  /**
+   * Foto ancha del banner de detalle. Hoy reutiliza `image`; reemplazar por un
+   * collage de marcas/productos de la línea cuando el cliente lo envíe.
+   */
+  bannerImage?: string;
   /** Fondo pastel suave de la tarjeta */
   tint: string;
 };
@@ -43,6 +50,7 @@ export const mainCategories: MainCategory[] = [
     slug: "ferreteria",
     href: "/categorias/ferreteria",
     label: "Ferretería",
+    bannerTitle: "FERRETERÍA",
     eyebrow: "Insumos al por mayor",
     bullets: ["Precio por volumen", "MOQ flexible", "Despacho nacional"],
     image: "/images/categorias/ferreteria.jpg",
@@ -53,6 +61,7 @@ export const mainCategories: MainCategory[] = [
     slug: "electricos",
     href: "/categorias/electricos",
     label: "Electricidad",
+    bannerTitle: "ELÉCTRICOS",
     eyebrow: "Material eléctrico",
     bullets: ["Cableado y protección", "Marcas confiables", "Soporte técnico"],
     image: "/images/categorias/electricidad.jpg",
@@ -63,6 +72,7 @@ export const mainCategories: MainCategory[] = [
     slug: "seguridad",
     href: "/categorias/seguridad",
     label: "Seguridad",
+    bannerTitle: "SEGURIDAD",
     eyebrow: "EPP e industrial",
     bullets: ["Normas aplicables", "Stock continuo", "Asesoría de uso"],
     image: "/images/categorias/seguridad.jpg",
@@ -73,6 +83,7 @@ export const mainCategories: MainCategory[] = [
     slug: "hogar",
     href: "/categorias/hogar",
     label: "Hogar",
+    bannerTitle: "HOGAR",
     eyebrow: "Para el día a día",
     bullets: ["Importación directa", "Stock listo", "Asesoría comercial"],
     image: "/images/categorias/hogar.jpg",
@@ -83,6 +94,7 @@ export const mainCategories: MainCategory[] = [
     slug: "herramientas",
     href: "/categorias/herramientas",
     label: "Herramientas",
+    bannerTitle: "HERRAMIENTAS",
     eyebrow: "Eléctricas y manuales",
     bullets: ["Marcas líderes", "Garantía mayorista", "Stock rotativo"],
     image: "/images/categorias/herramientas.jpg",
@@ -93,6 +105,7 @@ export const mainCategories: MainCategory[] = [
     slug: "construccion",
     href: "/categorias/construccion",
     label: "Construcción",
+    bannerTitle: "CONSTRUCCIÓN",
     eyebrow: "Obra y acabados",
     bullets: ["Materiales de obra", "Despacho a obra", "Cotización rápida"],
     image: "/images/categorias/construccion.jpg",
@@ -103,6 +116,7 @@ export const mainCategories: MainCategory[] = [
     slug: "pinturas",
     href: "/categorias/pinturas",
     label: "Pinturas",
+    bannerTitle: "PINTURAS",
     eyebrow: "Acabados y color",
     bullets: ["Línea profesional", "Volúmenes mayoristas", "Asesoría de color"],
     image: "/images/categorias/pinturas.jpg",

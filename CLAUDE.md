@@ -62,7 +62,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) con el número oficial; `/cotizar` arma el mensaje con formulario + carrito.
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers).
-- **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; fotos locales en `public/images/categorias/`. Páginas `/categorias` y `/categorias/[slug]`.
+- **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; fotos locales en `public/images/categorias/`. Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
 - Autenticación: `AuthProvider` + `AuthModal` + `AuthForm`. Carrito: `CartProvider` (localStorage).
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
@@ -85,6 +85,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `ProductCard.tsx` | Tarjeta de producto reutilizable (home, catálogo, ofertas) |
 | `ProductCatalog.tsx` | Grilla + modal |
 | `CatalogFilters.tsx` | Filtros de `/catalogo` (query string) |
+| `CategoryBanner.tsx` | Banner de detalle de categoría (imagen + título centrado) |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
