@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-09
 - **Solicitud:** En logos/íconos de carrito, categorías y productos no usar emojis; usar una librería de iconos.
 - **Archivos:** `components/CategoryIcon.tsx`, `components/Navbar.tsx`, `components/CategoriesGrid.tsx`, `app/categorias/page.tsx`, `app/carrito/page.tsx`, `components/ProductCard.tsx`, `components/ProductModal.tsx`, `components/FeaturedOffers.tsx`, `components/StampHeading.tsx`
-- **Commit:** (se registra al subir)
+- **Commit:** `219d16c` — feat: replace emoji-style marks with Lucide icons
 
 ## Qué había antes
 
