@@ -4,10 +4,27 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Cog } from "lucide-react";
 
+function isInternalPageLink(anchor: HTMLAnchorElement) {
+  if (anchor.target && anchor.target !== "_self") return false;
+  const href = anchor.getAttribute("href");
+  if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+    return false;
+  }
+  let url: URL;
+  try {
+    url = new URL(href, window.location.href);
+  } catch {
+    return false;
+  }
+  if (url.origin !== window.location.origin) return false;
+  return url.pathname !== window.location.pathname;
+}
+
 export default function IntroSplash() {
   const pathname = usePathname();
   const prevPath = useRef<string | null>(null);
   const overflowRef = useRef("");
+  const lastPlay = useRef(0);
   const [visible, setVisible] = useState(true);
   const [variant, setVariant] = useState<"boot" | "nav">("boot");
   const [cycle, setCycle] = useState(0);
@@ -17,6 +34,35 @@ export default function IntroSplash() {
     setVisible(false);
   }, []);
 
+  const playNav = useCallback(() => {
+    const now = Date.now();
+    if (now - lastPlay.current < 450) return;
+    lastPlay.current = now;
+    setVariant("nav");
+    setCycle((n) => n + 1);
+    setVisible(true);
+  }, []);
+
+  useEffect(() => {
+    function onClick(event: MouseEvent) {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (!isInternalPageLink(anchor)) return;
+      playNav();
+    }
+
+    document.addEventListener("click", onClick, true);
+    window.addEventListener("popstate", playNav);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      window.removeEventListener("popstate", playNav);
+    };
+  }, [playNav]);
+
   useEffect(() => {
     if (prevPath.current === null) {
       prevPath.current = pathname;
@@ -24,11 +70,8 @@ export default function IntroSplash() {
     }
     if (prevPath.current === pathname) return;
     prevPath.current = pathname;
-    // El router de Next es un sistema externo: hay que sincronizar la transición.
-    setVariant("nav");
-    setCycle((n) => n + 1);
-    setVisible(true);
-  }, [pathname]);
+    playNav();
+  }, [pathname, playNav]);
 
   useEffect(() => {
     if (!visible) return;

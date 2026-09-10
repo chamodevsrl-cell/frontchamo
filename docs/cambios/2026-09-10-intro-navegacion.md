@@ -12,7 +12,9 @@
 ## Código nuevo
 
 - Primera carga: igual, puertas que cierran desde los lados + engranaje.
-- Navegación interna (`usePathname`): cubre al instante (para no mostrar un flash de la página nueva) y se abre (~1.1–1.3s, más corto que la intro).
+- Navegación interna: se dispara al **clic de un enlace** (cubre la página actual
+  antes de pintar la nueva), al **atrás/adelante** del navegador y si cambia
+  `usePathname`. Dura ~1.1–1.3s.
 - Responsivo: `100dvh`, engranajes con `vmin`/`clamp`, franja dorada más fina en móvil, tiempos más cortos en pantallas chicas y landscape.
 - `prefers-reduced-motion` sigue omitiendo todo.
 
