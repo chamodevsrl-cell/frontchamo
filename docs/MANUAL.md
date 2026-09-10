@@ -112,7 +112,7 @@ Hay **al menos 3 productos por categoría** (22 SKUs de ejemplo).
 El listado público pasa por `GET /api/productos?q=&category=&brand=`.
 `CartProvider` guarda líneas `{ productId, qty }` en `localStorage` (`chamo-cart-v1`).
 `FavoritesProvider` guarda IDs en `chamo-favorites-v1`; el corazón de la tarjeta y del
-modal persiste, muestra confirmación **Guardado** y el Navbar lleva el contador.
+modal persiste, muestra el aviso fijo **Guardado en favoritos** y el Navbar lleva el contador.
 
 Modal (diseño ficha):
 1. Galería + thumbs  

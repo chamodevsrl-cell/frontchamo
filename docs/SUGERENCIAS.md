@@ -34,7 +34,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 - [x] 2026-09-09 — **Estado vacío** cuando búsqueda o filtro no encuentra nada
 - [x] 2026-09-10 — **WhatsApp prellenado por categoría** (home, listado y banner de detalle)
 - [x] 2026-09-10 — **Reseñas / testimonios** de ejemplo en la home (`data/testimonials.ts`) — sustituir por casos reales del cliente
-- [x] 2026-09-10 — **Indicador de guardado** al marcar favoritos
+- [x] 2026-09-10 — **Indicador de guardado** al marcar favoritos (aviso fijo «Guardado en favoritos»)
 - [x] 2026-09-10 — **Breadcrumbs** en páginas internas (Inicio / sección)
 
 ## Prioridad alta

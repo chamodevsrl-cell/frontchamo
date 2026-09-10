@@ -6,9 +6,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+import { Heart } from "lucide-react";
 import { getProductById, type FeaturedProduct } from "@/data/products";
 
 const STORAGE_KEY = "chamo-favorites-v1";
@@ -41,6 +43,14 @@ function parseIds(raw: string | null): string[] {
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [ids, setIds] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const noticeTimer = useRef<number>(0);
+
+  const flash = useCallback((text: string) => {
+    window.clearTimeout(noticeTimer.current);
+    setNotice(text);
+    noticeTimer.current = window.setTimeout(() => setNotice(null), 1800);
+  }, []);
 
   useEffect(() => {
     // Hidratar después del mount para coincidir con el HTML del servidor (badge 0).
@@ -54,6 +64,10 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
   }, [ids, ready]);
 
+  useEffect(() => {
+    return () => window.clearTimeout(noticeTimer.current);
+  }, []);
+
   const has = useCallback((productId: string) => ids.includes(productId), [ids]);
 
   const toggle = useCallback((productId: string) => {
@@ -64,8 +78,9 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       }
       return [...current, productId];
     });
+    flash(nextActive ? "Guardado en favoritos" : "Quitado de favoritos");
     return nextActive;
-  }, [ids]);
+  }, [flash, ids]);
 
   const remove = useCallback((productId: string) => {
     setIds((current) => current.filter((id) => id !== productId));
@@ -96,7 +111,18 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <FavoritesContext.Provider value={value}>{children}</FavoritesContext.Provider>
+    <FavoritesContext.Provider value={value}>
+      {children}
+      {notice ? (
+        <p
+          role="status"
+          className="pointer-events-none fixed right-4 bottom-24 z-[80] inline-flex items-center gap-2 rounded-lg bg-brand-dark px-3 py-2 text-xs font-semibold text-white shadow-lg sm:bottom-8"
+        >
+          <Heart className="h-3.5 w-3.5" strokeWidth={2.25} fill="currentColor" aria-hidden />
+          {notice}
+        </p>
+      ) : null}
+    </FavoritesContext.Provider>
   );
 }
 
