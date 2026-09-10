@@ -8,10 +8,12 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 
 Revisión con el sitio corriendo (`npm run dev`), en desktop y móvil (375px), más lectura
 de código. Ampliada con una segunda pasada centrada en los cambios recientes de Navbar,
-CategoriesGrid y ProductModal, verificando cada bug con clics/mediciones reales en el
-DOM (no solo lectura). Detalle completo en las notas de auditoría:
-[`cambios/2026-09-10-auditoria-ux-funcional.md`](./cambios/2026-09-10-auditoria-ux-funcional.md) y
-[`cambios/2026-09-10-bugs-cambios-recientes.md`](./cambios/2026-09-10-bugs-cambios-recientes.md).
+CategoriesGrid y ProductModal, y una tercera barriendo el resto del proyecto
+(HeroSlider, `/login`, Footer, WrenchCursor) — cada bug verificado con clics/mediciones
+reales en el DOM, no solo lectura. Detalle completo en las notas de auditoría:
+[`cambios/2026-09-10-auditoria-ux-funcional.md`](./cambios/2026-09-10-auditoria-ux-funcional.md),
+[`cambios/2026-09-10-bugs-cambios-recientes.md`](./cambios/2026-09-10-bugs-cambios-recientes.md) y
+[`cambios/2026-09-10-bugs-resto-proyecto.md`](./cambios/2026-09-10-bugs-resto-proyecto.md).
 
 **Lo que funciona bien:**
 - Navbar de 3 niveles con jerarquía clara; hover e ítem activo con indicador dorado animado — se siente pulido.
@@ -36,6 +38,22 @@ DOM (no solo lectura). Detalle completo en las notas de auditoría:
 - [ ] **4. 4 rutas enlazadas devuelven 404 real.**
   - **Problema:** confirmado con `fetch()` (no solo "podría"): `/catalogo` (nav principal), `/categorias` ("Ver todas" en categorías), `/carrito` (ícono con badge), `/favoritos` (ícono con corazón). Son 4 de los puntos de navegación más visibles del sitio.
   - **Solución:** ver plan en "Recomendaciones de cosas nuevas a agregar" abajo (catálogo real, carrito/favoritos con `localStorage`, página `/categorias`) — mientras se construyen, considerar ocultar o deshabilitar visualmente el enlace en vez de dejarlo romperse.
+
+- [ ] **5. `/login` nunca vuelve a la página anterior, aunque su propio comentario lo promete.**
+  - **Problema (confirmado navegando en vivo):** `app/login/page.tsx` trae el comentario `/login abre el modal global y vuelve a la home (o página previa)`, pero el código hace siempre `router.replace("/")`. Probado en vivo: estando en `/contacto` y navegando a `/login`, termina en `/` con el modal abierto — nunca vuelve a `/contacto`. No es grave (es una ruta poco usada, ya que "Mi cuenta" abre el modal sin navegar), pero el comentario miente sobre el comportamiento real.
+  - **Solución:** o se implementa de verdad ("volver a la página previa" con `document.referrer` del mismo origen o un query param `?from=`), o se corrige el comentario para que diga solo "vuelve a la home" y no prometa algo que no hace.
+
+- [ ] **6. El boletín del footer no confirma ni falla — solo intenta limpiar el campo.**
+  - **Problema:** `handleNewsletter` en `components/Footer.tsx` solo hace `event.preventDefault(); setEmail("")` — no hay ningún mensaje de éxito/error en el JSX (a diferencia de `AuthForm.tsx`, que sí tiene un `role="status"` para sus mensajes). El usuario no tiene forma de saber si "se suscribió" o no.
+  - **Solución:** agregar el mismo patrón `role="status"` que ya usa `AuthForm.tsx` con un mensaje tipo "¡Gracias! Te avisaremos de nuestras ofertas" — aunque sea local mientras no hay backend de newsletter.
+
+- [ ] **7. Favoritos/Comparar en las tarjetas de producto no dan ningún feedback al hacer clic.**
+  - **Problema:** en `FeaturedOffers.tsx`, los botones de corazón (favoritos) y `GitCompareArrows` (comparar) solo hacen `event.stopPropagation()` — ningún cambio visual, ni siquiera un toggle local del ícono (relleno/vacío). El usuario no sabe si el clic "hizo algo".
+  - **Solución:** aunque no haya persistencia real todavía, agregar un `useState` local que rellene el ícono (`fill="currentColor"` en el corazón) al hacer clic — da sensación de interfaz viva mientras se conecta backend real.
+
+- [ ] **8. El cursor personalizado (llave inglesa) no distingue los campos de texto.**
+  - **Problema:** `WrenchCursor.tsx` marca como "interactivo" (mismo ícono de llave rotado/agrandado) cualquier `a, button, input, textarea, select, label, [role='button']` — como el cursor nativo está oculto (`cursor: none !important` en `globals.css`), al pasar sobre el buscador, el email del boletín o los campos de login, el usuario ve una llave inglesa en vez del cursor de texto (I-beam) que indica "aquí se puede escribir". La función no se rompe (el clic sigue poniendo el cursor de texto real), pero se pierde una afordancia visual estándar.
+  - **Solución:** distinguir `input`/`textarea`/`[contenteditable]` con un estado de cursor propio (por ejemplo, una barra vertical delgada en vez de la llave) en lugar de tratarlos igual que un botón.
 
 **Funciones que existen visualmente pero no cumplen su función (decorativas):**
 - [ ] El **buscador** (desktop y móvil) no busca nada: `handleSearch` en `Navbar.tsx` solo hace `preventDefault()`. El usuario escribe, da enter, y no pasa nada — sin resultados, sin mensaje de "no hay resultados". Para un catálogo mayorista esto es una promesa incumplida grande.
@@ -95,3 +113,5 @@ DOM (no solo lectura). Detalle completo en las notas de auditoría:
 - [x] 2026-09-08 — Navbar: hover solo en texto + barra dorada animada bajo el ítem activo
 - [x] 2026-09-08 — Auditoría de docs: sincronizar CLAUDE.md/MANUAL.md con el código real (carrusel, modal, navbar)
 - [x] 2026-09-10 — Auditoría UX/UI y funcional con el sitio corriendo (bugs confirmados + recomendaciones nuevas)
+- [x] 2026-09-10 — Auditoría de bugs en Navbar/CategoriesGrid/ProductModal (2 bugs + 1 descartado)
+- [x] 2026-09-10 — Barrido del resto del proyecto: 4 bugs/mejoras nuevos (`/login`, boletín, favoritos/comparar, cursor)

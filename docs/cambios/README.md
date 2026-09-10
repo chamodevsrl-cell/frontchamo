@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-10 | Bugs/mejoras en el resto del proyecto: /login, boletín, favoritos/comparar, cursor | [2026-09-10-bugs-resto-proyecto.md](./2026-09-10-bugs-resto-proyecto.md) |
 | 2026-09-10 | Bugs en cambios recientes: modal sin scroll-to-top + paso de flechas de categorías | [2026-09-10-bugs-cambios-recientes.md](./2026-09-10-bugs-cambios-recientes.md) |
 | 2026-09-10 | Auditoría UX/UI y funcional (sitio corriendo, bugs confirmados) | [2026-09-10-auditoria-ux-funcional.md](./2026-09-10-auditoria-ux-funcional.md) |
 | 2026-09-08 | Auditoría: sincronizar CLAUDE.md/MANUAL.md con el código real | [2026-09-08-auditoria-sync-docs.md](./2026-09-08-auditoria-sync-docs.md) |
