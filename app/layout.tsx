@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import WrenchCursor from "@/components/WrenchCursor";
 import IntroSplash from "@/components/IntroSplash";
+import Preloader from "@/components/Preloader";
 import { ICON_SRC } from "@/data/media";
 import "./globals.css";
 
@@ -44,6 +45,7 @@ export default function RootLayout({
       className={`${barlow.variable} ${barlowSemiCondensed.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
+        <Preloader />
         <AuthProvider>
           <CartProvider>
             <FavoritesProvider>

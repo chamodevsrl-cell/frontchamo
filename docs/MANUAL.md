@@ -48,7 +48,8 @@ components/
   StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
   CategoryIcon.tsx        # Iconos Lucide por categoría
   Reveal.tsx              # Fade/slide al entrar en viewport
-  IntroSplash.tsx         # Intro: puertas azules + engranaje
+  IntroSplash.tsx         # Puertas: logo y /carrito
+  Preloader.tsx           # Carga inicial (Framer Motion)
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   FavoriteButton.tsx / Testimonials.tsx / Breadcrumbs.tsx
   QuoteForm.tsx
@@ -97,14 +98,16 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5b Animaciones de entrada
 
-- Al cargar o **refrescar** la web, y al clic en el **logo**: `IntroSplash` — puertas
-  azules se cierran, gira un engranaje Lucide (`Cog`) y se abren (~2.7s en desktop,
-  un poco menos en móvil).
+- Al **cargar o refrescar** la pestaña: `Preloader` (Framer Motion) — fondo `brand-dark`,
+  el nombre **Chamo Import** aparece (opacity/scale), un `Cog` dorado gira y una barra
+  `#127EC9` se llena; a los 2.5s se desvanece hacia arriba y se desmonta.
+- Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
+  Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil).
 - Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
   Lucide (`ShoppingCart`) dorado. Entra desde la izquierda, **se detiene al medio**
   y, al abrirse las puertas, **sigue su camino** hacia la derecha.
-- Mientras corre, `html` lleva la clase `intro-playing` (`overflow: hidden
-  !important`) para que el Navbar no libere el scroll del body.
+- Mientras corre cualquiera de las dos, `html` lleva la clase `intro-playing`
+  (`overflow: hidden !important`) para que el Navbar no libere el scroll del body.
 - Ir a Nosotros, Catálogo, Categorías, Contacto, etc. **no** dispara esa intro.
 - Tamaños con `clamp`/`vmin` y `100dvh` para que el engranaje y las puertas entren en
   móvil y en landscape.
@@ -197,9 +200,10 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
-3. Al entrar o refrescar, dos paneles azules se cierran, gira un engranaje al centro
-   y se abren. Lo mismo si tocas el **logo** de Chamo Import. Al entrar al **carrito**,
-   las puertas son las mismas pero pasa un carrito dorado: frena al centro y, al
+3. Al entrar o refrescar, una pantalla `brand-dark` muestra **Chamo Import**, un
+   engranaje dorado girando y una barra azul que se llena; luego se desvanece hacia
+   arriba. Si tocas el **logo**, las puertas azules con engranaje. Al entrar al
+   **carrito**, las mismas puertas pero pasa un carrito dorado: frena al centro y, al
    abrirse, sigue de largo. Ir a Nosotros, Catálogo u otras secciones **no** vuelve a
    mostrar esa intro. En el celular el icono se achica para que no se corte.
 

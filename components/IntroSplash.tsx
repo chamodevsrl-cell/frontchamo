@@ -27,7 +27,7 @@ export default function IntroSplash() {
   const pathname = usePathname();
   const lastPlay = useRef(0);
   const lastPath = useRef(pathname);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [cycle, setCycle] = useState(0);
   const [variant, setVariant] = useState<IntroVariant>(
     pathname === "/carrito" ? "cart" : "brand",
