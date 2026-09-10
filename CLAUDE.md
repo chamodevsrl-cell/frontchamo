@@ -94,7 +94,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
 | `CategoryIcon.tsx` | Icono Lucide por categoría (menú, home, `/categorias`) |
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
-| `IntroSplash.tsx` | Intro al cargar: puertas azules + engranaje Lucide |
+| `IntroSplash.tsx` | Puertas + engranaje al cargar y al cambiar de página (responsive) |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
@@ -176,7 +176,7 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-10): cierre de la auditoría UX (favoritos, fallback de marcas, testimonios, WhatsApp por categoría, breadcrumbs).
+Último avance (2026-09-10): intro de puertas también al navegar (p. ej. Categorías), con tamaños responsivos.
 
 ## 10. Pendientes conocidos
 

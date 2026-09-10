@@ -97,8 +97,11 @@ placeholder hasta ficha oficial del cliente.
 ### A.5b Animaciones de entrada
 
 - Al cargar la web: `IntroSplash` — puertas azules se cierran, gira un engranaje Lucide
-  (`Cog`) y se abren para mostrar el sitio (~2.7s). No se repite al navegar entre páginas
-  (vive en `layout.tsx`).
+  (`Cog`) y se abren para mostrar el sitio (~2.7s en desktop, un poco menos en móvil).
+- Al **cambiar de página** (Categorías, Catálogo, etc.): la misma pieza cubre al instante
+  y se abre (~1.1–1.3s) para no dejar ver un flash del destino.
+- Tamaños con `clamp`/`vmin` y `100dvh` para que el engranaje y las puertas entren en
+  móvil y en landscape.
 - Slider, banners de página, categorías, productos y el resto de bloques: `Reveal`
   (fade + slide-up al entrar en viewport).
 - Si el usuario pide menos movimiento (`prefers-reduced-motion`), no hay animación.
@@ -185,7 +188,9 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
 3. Al entrar, dos paneles azules se cierran, gira un engranaje al centro y se abren
-   para mostrar el sitio (solo al cargar; no al cambiar de página).
+   para mostrar el sitio. Al ir a otra página (Categorías, Catálogo, Contacto…) las
+   puertas cubren un momento y se abren de nuevo, más rápido. En el celular el
+   engranaje se achica para que no se corte.
 
 ### B.2 Inicio (home)
 

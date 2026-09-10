@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-10 | Intro también al cambiar de página (Categorías, etc.) + responsive | [2026-09-10-intro-navegacion.md](./2026-09-10-intro-navegacion.md) |
 | 2026-09-10 | Cierre auditoría UX: favoritos, fallback marcas, testimonios, WhatsApp por categoría | [2026-09-10-cierre-auditoria-ux.md](./2026-09-10-cierre-auditoria-ux.md) |
 | 2026-09-10 | Auditoría UX/UI y funcional (sitio corriendo, bugs confirmados) | [2026-09-10-auditoria-ux-funcional.md](./2026-09-10-auditoria-ux-funcional.md) |
 | 2026-09-09 | Intro de entrada: puertas azules + engranaje | [2026-09-09-intro-engranaje.md](./2026-09-09-intro-engranaje.md) |

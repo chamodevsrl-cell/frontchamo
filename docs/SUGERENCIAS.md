@@ -76,6 +76,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 - [x] 2026-09-09 — `/nosotros` con banner **NOSOTROS**, historia Chamo Import, misión y visión
 - [x] 2026-09-09 — Animación de entrada al scroll (Reveal) en home y páginas; banners con fade-in
 - [x] 2026-09-09 — Intro de entrada: puertas azules + engranaje Lucide
+- [x] 2026-09-10 — Misma animación al cambiar de página (más corta) y tamaños responsivos
 - [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
 - [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
@@ -83,6 +84,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-10 — Intro de puertas también al navegar (Categorías, etc.) + responsive
 - [x] 2026-09-10 — Cierre de la auditoría UX: favoritos, fallback de marcas, testimonios, WhatsApp por categoría, breadcrumbs
 - [x] 2026-09-10 — Auditoría UX/UI y funcional con el sitio corriendo (bugs confirmados + recomendaciones)
 - [x] 2026-09-09 — Intro de entrada (puertas azules + engranaje)

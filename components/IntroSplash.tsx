@@ -1,55 +1,77 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Cog } from "lucide-react";
 
-const INTRO_MS = 2700;
-
 export default function IntroSplash() {
+  const pathname = usePathname();
+  const prevPath = useRef<string | null>(null);
+  const overflowRef = useRef("");
   const [visible, setVisible] = useState(true);
+  const [variant, setVariant] = useState<"boot" | "nav">("boot");
+  const [cycle, setCycle] = useState(0);
+
+  const hide = useCallback(() => {
+    document.body.style.overflow = overflowRef.current;
+    setVisible(false);
+  }, []);
 
   useEffect(() => {
+    if (prevPath.current === null) {
+      prevPath.current = pathname;
+      return;
+    }
+    if (prevPath.current === pathname) return;
+    prevPath.current = pathname;
+    // El router de Next es un sistema externo: hay que sincronizar la transición.
+    setVariant("nav");
+    setCycle((n) => n + 1);
+    setVisible(true);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!visible) return;
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const skip = window.setTimeout(() => setVisible(false), 0);
+      const skip = window.setTimeout(hide, 0);
       return () => window.clearTimeout(skip);
     }
 
-    const previous = document.body.style.overflow;
+    overflowRef.current = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const end = window.setTimeout(() => {
-      document.body.style.overflow = previous;
-      setVisible(false);
-    }, INTRO_MS);
+    const safety = window.setTimeout(hide, variant === "boot" ? 3200 : 1800);
 
     return () => {
-      window.clearTimeout(end);
-      document.body.style.overflow = previous;
+      window.clearTimeout(safety);
+      document.body.style.overflow = overflowRef.current;
     };
-  }, []);
+  }, [visible, variant, cycle, hide]);
 
   if (!visible) return null;
 
   return (
     <div
-      className="intro-splash"
+      key={`${variant}-${cycle}`}
+      className={`intro-splash intro-splash--${variant}`}
       role="status"
       aria-live="polite"
-      aria-label="Cargando Chamo Import"
+      aria-label={
+        variant === "boot" ? "Cargando Chamo Import" : "Cambiando de página"
+      }
     >
-      <div className="intro-panel intro-panel-left" />
+      <div
+        className="intro-panel intro-panel-left"
+        onAnimationEnd={(event) => {
+          if (event.target !== event.currentTarget) return;
+          if (event.animationName.includes("intro-door-left")) hide();
+        }}
+      />
       <div className="intro-panel intro-panel-right" />
       <div className="intro-gear" aria-hidden>
-        <Cog
-          className="intro-gear-main h-24 w-24 text-brand-gold sm:h-32 sm:w-32"
-          strokeWidth={1.6}
-        />
-        <Cog
-          className="intro-gear-small absolute top-1/2 left-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 text-white sm:h-12 sm:w-12"
-          strokeWidth={2}
-        />
-        <p className="intro-gear-label mt-5 font-display text-sm font-extrabold tracking-[0.28em] text-white uppercase sm:text-base">
-          Chamo Import
-        </p>
+        <Cog className="intro-gear-main text-brand-gold" strokeWidth={1.6} />
+        <Cog className="intro-gear-small text-white" strokeWidth={2} />
+        <p className="intro-gear-label">Chamo Import</p>
       </div>
     </div>
   );
