@@ -27,7 +27,7 @@ export default function CompareButton({
   const overlayClass =
     "pointer-events-auto inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-dark shadow-sm transition hover:text-brand-primary";
   const boxClass =
-    "inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary";
+    "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-brand-dark/12 bg-white text-brand-dark transition hover:border-brand-primary hover:text-brand-primary";
 
   return (
     <button

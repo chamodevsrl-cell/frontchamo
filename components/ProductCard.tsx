@@ -117,6 +117,11 @@ export default function ProductCard({
             <ShoppingCart className="hidden h-4 w-4 sm:block" strokeWidth={2} />
             {added ? "Agregado" : "Añadir al carrito"}
           </button>
+          <CompareButton
+            productId={product.id}
+            variant="box"
+            className="shrink-0"
+          />
         </div>
       </div>
     </article>
