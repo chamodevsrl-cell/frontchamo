@@ -60,11 +60,11 @@ export default function Preloader() {
             />
           </motion.div>
 
-          <div className="absolute right-0 bottom-0 left-0 h-[3px] overflow-hidden bg-white/10">
+          <div className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden bg-white/10">
             <motion.div
-              className="h-full origin-left bg-[#127EC9]"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
+              className="h-full bg-[#127EC9]"
+              initial={{ width: "0%" }}
+              animate={{ width: "100%" }}
               transition={{ duration: HOLD_MS / 1000, ease: [0.22, 1, 0.36, 1] }}
             />
           </div>
