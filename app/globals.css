@@ -88,7 +88,9 @@ html.intro-playing body {
   .intro-panel-right,
   .intro-gear,
   .intro-gear-main,
-  .intro-gear-small {
+  .intro-gear-small,
+  .intro-cart,
+  .intro-cart-icon {
     animation: none;
     opacity: 1;
     transform: none;
@@ -249,6 +251,27 @@ html.intro-playing body {
   text-transform: uppercase;
 }
 
+/* Carrito: entra, frena al centro y sigue su camino al abrir las puertas. */
+.intro-cart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: intro-cart-path var(--intro-ms) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.intro-cart-icon {
+  width: clamp(4.25rem, 20vmin, 9rem);
+  height: clamp(4.25rem, 20vmin, 9rem);
+  color: #e4b714;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.42));
+  animation: intro-cart-tilt var(--intro-ms) ease-in-out both;
+}
+
 @keyframes intro-door-left {
   0% {
     transform: translateX(-100%);
@@ -343,6 +366,52 @@ html.intro-playing body {
 @keyframes intro-spin-rev {
   to {
     transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+@keyframes intro-cart-path {
+  0% {
+    opacity: 0;
+    transform: translate(calc(-50% - 58vw), -50%);
+  }
+  8% {
+    opacity: 1;
+    transform: translate(calc(-50% - 38vw), -50%);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(calc(-50% + 2.4vw), -50%);
+  }
+  26% {
+    transform: translate(calc(-50% - 0.5vw), -50%);
+  }
+  32%,
+  66% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(calc(-50% + 64vw), -50%);
+  }
+}
+
+@keyframes intro-cart-tilt {
+  0% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(8deg);
+  }
+  30%,
+  64% {
+    transform: rotate(0deg);
+  }
+  72% {
+    transform: rotate(-12deg);
+  }
+  100% {
+    transform: rotate(18deg);
   }
 }
 

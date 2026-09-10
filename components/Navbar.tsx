@@ -276,6 +276,7 @@ export default function Navbar() {
 
             <Link
               href="/carrito"
+              data-cart-intro
               className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
               aria-label={`Carrito, ${count} productos`}
             >
@@ -305,6 +306,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/carrito"
+              data-cart-intro
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
               aria-label={`Carrito, ${count} productos`}
             >

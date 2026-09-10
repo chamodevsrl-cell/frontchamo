@@ -94,7 +94,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
 | `CategoryIcon.tsx` | Icono Lucide por categoría (menú, home, `/categorias`) |
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
-| `IntroSplash.tsx` | Puertas + engranaje al cargar, refrescar o clic en el logo |
+| `IntroSplash.tsx` | Puertas + engranaje al cargar/logo; al entrar al carrito, un carrito que frena y sigue |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |

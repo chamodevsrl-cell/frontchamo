@@ -100,6 +100,9 @@ placeholder hasta ficha oficial del cliente.
 - Al cargar o **refrescar** la web, y al clic en el **logo**: `IntroSplash` — puertas
   azules se cierran, gira un engranaje Lucide (`Cog`) y se abren (~2.7s en desktop,
   un poco menos en móvil).
+- Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
+  Lucide (`ShoppingCart`) dorado. Entra desde la izquierda, **se detiene al medio**
+  y, al abrirse las puertas, **sigue su camino** hacia la derecha.
 - Mientras corre, `html` lleva la clase `intro-playing` (`overflow: hidden
   !important`) para que el Navbar no libere el scroll del body.
 - Ir a Nosotros, Catálogo, Categorías, Contacto, etc. **no** dispara esa intro.
@@ -195,9 +198,10 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
 3. Al entrar o refrescar, dos paneles azules se cierran, gira un engranaje al centro
-   y se abren. Lo mismo si tocas el **logo** de Chamo Import. Ir a Nosotros, Catálogo
-   u otras secciones **no** vuelve a mostrar esa intro. En el celular el engranaje
-   se achica para que no se corte.
+   y se abren. Lo mismo si tocas el **logo** de Chamo Import. Al entrar al **carrito**,
+   las puertas son las mismas pero pasa un carrito dorado: frena al centro y, al
+   abrirse, sigue de largo. Ir a Nosotros, Catálogo u otras secciones **no** vuelve a
+   mostrar esa intro. En el celular el icono se achica para que no se corte.
 
 ### B.2 Inicio (home)
 
@@ -254,7 +258,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | --- | --- |
 | `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
-| `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
+| `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que frena al centro y sigue al abrir |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
 | `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre WhatsApp (sin `window.open`), y mapa |

@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-10 | Intro del carrito: puertas + carrito que frena y sigue | [2026-09-10-intro-carrito.md](./2026-09-10-intro-carrito.md) |
 | 2026-09-10 | Bugs: intro scrolleable, WhatsApp bloqueado, toast de favoritos | [2026-09-10-bugs-cambios-recientes.md](./2026-09-10-bugs-cambios-recientes.md) |
 | 2026-09-10 | Intro solo al entrar, refrescar o clic en el logo | [2026-09-10-intro-logo-refresh.md](./2026-09-10-intro-logo-refresh.md) |
 | 2026-09-10 | Intro solo al cargar el sitio y al entrar a Nosotros | [2026-09-10-intro-solo-nosotros.md](./2026-09-10-intro-solo-nosotros.md) |
