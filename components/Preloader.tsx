@@ -2,7 +2,6 @@
 
 import { useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Cog } from "lucide-react";
 
 const HOLD_MS = 2500;
 
@@ -29,45 +28,39 @@ export default function Preloader() {
     >
       {visible ? (
         <motion.div
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0B3554]"
           key="chamo-preloader"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0B3554]"
           role="status"
           aria-live="polite"
           aria-label="Cargando Chamo Import"
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: "-24%" }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <motion.p
-            className="font-display text-center text-3xl font-extrabold tracking-[0.18em] text-white uppercase sm:text-4xl"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            Chamo Import
-          </motion.p>
+          <motion.img
+            src="/logo.png"
+            alt="Chamo Import S.R.L."
+            className="h-auto w-[min(82vw,24rem)] object-contain"
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          />
 
-          <motion.div
-            className="mt-6"
+          <motion.img
+            src="/engranaje.png"
+            alt=""
+            width={60}
+            height={60}
             aria-hidden
+            className="mt-8 h-[60px] w-[60px] object-contain"
             animate={{ rotate: 360 }}
-            transition={{ duration: 1.35, repeat: Infinity, ease: "linear" }}
-          >
-            <Cog
-              className="h-12 w-12 text-[#E4B714] sm:h-14 sm:w-14"
-              strokeWidth={1.6}
-            />
-          </motion.div>
+            transition={{ duration: 1.15, repeat: Infinity, ease: "linear" }}
+          />
 
-          <div className="absolute inset-x-8 bottom-8 h-1 overflow-hidden rounded-full bg-white/15">
-            <motion.div
-              className="h-full bg-[#127EC9]"
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ duration: HOLD_MS / 1000, ease: [0.22, 1, 0.36, 1] }}
-            />
-          </div>
+          <p className="mt-3 font-display text-sm font-extrabold tracking-[0.32em] text-[#E4B714]">
+            CARGANDO...
+          </p>
         </motion.div>
       ) : null}
     </AnimatePresence>

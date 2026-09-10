@@ -80,6 +80,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 - [x] 2026-09-10 — Intro de puertas al entrar, refrescar o clic en el logo (no en cada sección)
 - [x] 2026-09-10 — Intro del carrito: mismas puertas, carrito que frena al centro y sigue al abrir
 - [x] 2026-09-10 — Preloader Framer Motion en la carga inicial (nombre + engranaje + barra)
+- [x] 2026-09-10 — Preloader con `/logo.png` y `/engranaje.png` oficiales
 - [x] 2026-09-10 — Página `/contacto` completa (canales, formulario WhatsApp, mapa)
 - [x] 2026-09-10 — Corrección de bugs: intro no scrolleable, formularios WhatsApp sin popup blocker, toast de favoritos a tono
 - [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
@@ -89,6 +90,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-10 — Preloader con logo y engranaje oficiales (`/logo.png`, `/engranaje.png`)
 - [x] 2026-09-10 — Preloader Framer Motion (carga inicial)
 - [x] 2026-09-10 — Intro del carrito (puertas + carrito que frena y sigue su camino)
 - [x] 2026-09-10 — Bugs de intro / WhatsApp / favoritos (scroll lock, openWhatsApp, idsRef)

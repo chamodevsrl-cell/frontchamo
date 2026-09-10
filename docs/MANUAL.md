@@ -98,9 +98,10 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5b Animaciones de entrada
 
-- Al **cargar o refrescar** la pestaña: `Preloader` (Framer Motion) — fondo `brand-dark`,
-  el nombre **Chamo Import** aparece (opacity/scale), un `Cog` dorado gira y una barra
-  `#127EC9` se llena; a los 2.5s se desvanece hacia arriba y se desmonta.
+- Al **cargar o refrescar** la pestaña: `Preloader` (Framer Motion) — fondo `#0B3554`,
+  logo oficial (`/logo.png`) entra de izquierda a derecha, `/engranaje.png` gira
+  debajo (60×60) y el texto **CARGANDO...** en `brand-gold`; a los 2.5s hace fade-out
+  y se desmonta.
 - Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
   Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil).
 - Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
@@ -200,12 +201,12 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
-3. Al entrar o refrescar, una pantalla `brand-dark` muestra **Chamo Import**, un
-   engranaje dorado girando y una barra azul que se llena; luego se desvanece hacia
-   arriba. Si tocas el **logo**, las puertas azules con engranaje. Al entrar al
-   **carrito**, las mismas puertas pero pasa un carrito dorado: frena al centro y, al
-   abrirse, sigue de largo. Ir a Nosotros, Catálogo u otras secciones **no** vuelve a
-   mostrar esa intro. En el celular el icono se achica para que no se corte.
+3. Al entrar o refrescar, una pantalla `#0B3554` muestra el **logo oficial** entrando
+   de izquierda a derecha, un engranaje girando y el texto **CARGANDO...**. Luego se
+   desvanece y aparece el sitio. Si tocas el **logo**, las puertas azules con engranaje.
+   Al entrar al **carrito**, las mismas puertas pero pasa un carrito dorado: frena al
+   centro y, al abrirse, sigue de largo. Ir a Nosotros, Catálogo u otras secciones
+   **no** vuelve a mostrar esa intro.
 
 ### B.2 Inicio (home)
 
