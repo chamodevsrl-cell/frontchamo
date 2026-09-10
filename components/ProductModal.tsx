@@ -4,7 +4,6 @@ import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import {
   BadgePercent,
-  GitCompareArrows,
   Minus,
   Plus,
   ShieldCheck,
@@ -20,6 +19,7 @@ import { whatsappUrl } from "@/data/contact";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/components/CartProvider";
 import FavoriteButton from "@/components/FavoriteButton";
+import CompareButton from "@/components/CompareButton";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -228,13 +228,7 @@ export default function ProductModal({
                   </button>
                 </div>
                 <FavoriteButton productId={product.id} variant="box" />
-                <button
-                  type="button"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary"
-                  aria-label="Comparar producto"
-                >
-                  <GitCompareArrows className="h-4 w-4" strokeWidth={2} />
-                </button>
+                <CompareButton productId={product.id} variant="box" />
               </div>
 
               <div className="flex flex-col gap-2 sm:flex-row">

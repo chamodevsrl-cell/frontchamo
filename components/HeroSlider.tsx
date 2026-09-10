@@ -8,26 +8,31 @@ import {
   type TouchEvent,
 } from "react";
 import Image from "next/image";
-import { slides } from "@/data/media";
+import { slides as defaultSlides } from "@/data/media";
+import { useSiteContent } from "@/components/ContentProvider";
 
 const INTERVAL_MS = 5500;
 const SWIPE_THRESHOLD = 45;
 
 export default function HeroSlider() {
+  const { slides } = useSiteContent();
+  const banners = slides.length > 0 ? slides : defaultSlides;
   const [index, setIndex] = useState(0);
+  const safeIndex = banners.length ? index % banners.length : 0;
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef(0);
 
   const goTo = useCallback((next: number) => {
-    setIndex((next + slides.length) % slides.length);
-  }, []);
+    setIndex((next + banners.length) % banners.length);
+  }, [banners.length]);
 
   useEffect(() => {
+    if (banners.length === 0) return;
     const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % slides.length);
+      setIndex((current) => (current + 1) % banners.length);
     }, INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [index]);
+  }, [index, banners.length]);
 
   function onTouchStart(event: TouchEvent) {
     touchStartX.current = event.touches[0]?.clientX ?? null;
@@ -47,8 +52,8 @@ export default function HeroSlider() {
     touchDeltaX.current = 0;
 
     if (Math.abs(delta) >= SWIPE_THRESHOLD) {
-      if (delta < 0) goTo(index + 1);
-      else goTo(index - 1);
+      if (delta < 0) goTo(safeIndex + 1);
+      else goTo(safeIndex - 1);
     }
   }
 
@@ -62,8 +67,8 @@ export default function HeroSlider() {
       onTouchEnd={onTouchEnd}
     >
       <div className="relative w-full">
-        {slides.map((slide, i) => {
-          const active = i === index;
+        {banners.map((slide, i) => {
+          const active = i === safeIndex;
 
           return (
             <div
@@ -95,13 +100,13 @@ export default function HeroSlider() {
         })}
 
         <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-4">
-          {slides.map((slide, i) => (
+          {banners.map((slide, i) => (
             <button
               key={slide.id}
               type="button"
               onClick={() => goTo(i)}
               aria-label={`Ir al anuncio ${i + 1}`}
-              aria-current={i === index}
+              aria-current={i === safeIndex}
               className={`h-2.5 rounded-full transition-all ${
                 i === index
                   ? "w-7 bg-brand-gold"

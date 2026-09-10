@@ -5,8 +5,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronDown,
+  GitCompareArrows,
   Heart,
+  LayoutDashboard,
   LayoutGrid,
+  LogOut,
   Menu,
   Search,
   ShoppingCart,
@@ -22,8 +25,11 @@ import { LOGO_SRC } from "@/data/media";
 import { mainCategories } from "@/data/home";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
+import { useCompare } from "@/components/CompareProvider";
 import { useFavorites } from "@/components/FavoritesProvider";
+import { useSiteContent } from "@/components/ContentProvider";
 import CategoryIcon from "@/components/CategoryIcon";
+import { firstName } from "@/lib/auth-local";
 
 const mainLinks = [
   { href: "/", label: "Inicio" },
@@ -41,15 +47,20 @@ const topLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { openAuth } = useAuth();
+  const { openAuth, user, logout } = useAuth();
   const { count } = useCart();
   const { count: favoritesCount } = useFavorites();
+  const { count: compareCount } = useCompare();
+  const { categories } = useSiteContent();
+  const navCategories = categories.length > 0 ? categories : mainCategories;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [logoFailed, setLogoFailed] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const mainNavRef = useRef<HTMLElement>(null);
   const [navIndicator, setNavIndicator] = useState({
@@ -101,6 +112,12 @@ export default function Navbar() {
         !categoriesRef.current.contains(event.target as Node)
       ) {
         setCategoriesOpen(false);
+      }
+      if (
+        accountRef.current &&
+        !accountRef.current.contains(event.target as Node)
+      ) {
+        setAccountOpen(false);
       }
     }
     document.addEventListener("mousedown", onClickOutside);
@@ -250,14 +267,71 @@ export default function Navbar() {
               )}
             </button>
 
-            <button
-              type="button"
-              onClick={() => openAuth("login")}
-              className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+            {user ? (
+              <div className="relative hidden sm:block" ref={accountRef}>
+                <button
+                  type="button"
+                  onClick={() => setAccountOpen((open) => !open)}
+                  className="inline-flex flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
+                  aria-expanded={accountOpen}
+                >
+                  <User className="h-5 w-5" strokeWidth={2} />
+                  <span className="max-w-[4.5rem] truncate text-[11px] font-semibold">
+                    {firstName(user.name)}
+                  </span>
+                </button>
+                {accountOpen ? (
+                  <div className="absolute top-full right-0 z-50 mt-1 min-w-[12rem] overflow-hidden rounded-lg border border-brand-dark/10 bg-white shadow-xl">
+                    <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
+                      {user.email}
+                    </p>
+                    <Link
+                      href="/admin"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                    >
+                      <LayoutDashboard className="h-4 w-4 text-brand-primary" />
+                      Editar contenido
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout();
+                        setAccountOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                    >
+                      <LogOut className="h-4 w-4 text-brand-primary" />
+                      Cerrar sesión
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuth("login")}
+                className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              >
+                <User className="h-5 w-5" strokeWidth={2} />
+                <span className="text-[11px] font-semibold">Cuenta</span>
+              </button>
+            )}
+
+            <Link
+              href="/comparar"
+              className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              aria-label={`Comparar, ${compareCount} productos`}
             >
-              <User className="h-5 w-5" strokeWidth={2} />
-              <span className="text-[11px] font-semibold">Cuenta</span>
-            </button>
+              <GitCompareArrows className="h-5 w-5" strokeWidth={2} />
+              <span className="text-[11px] font-semibold">Comparar</span>
+              <span
+                suppressHydrationWarning
+                className="absolute -top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {compareCount}
+              </span>
+            </Link>
 
             <Link
               href="/favoritos"
@@ -291,6 +365,19 @@ export default function Navbar() {
             </Link>
 
             {/* Compact icons on very small screens */}
+            <Link
+              href="/comparar"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
+              aria-label={`Comparar, ${compareCount} productos`}
+            >
+              <GitCompareArrows className="h-5 w-5" strokeWidth={2} />
+              <span
+                suppressHydrationWarning
+                className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {compareCount}
+              </span>
+            </Link>
             <Link
               href="/favoritos"
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
@@ -385,7 +472,7 @@ export default function Navbar() {
             {categoriesOpen && (
               <div className="absolute top-full left-0 z-50 mt-0 min-w-[240px] overflow-hidden rounded-b-lg border border-brand-dark/10 bg-white shadow-xl">
                 <ul className="py-2">
-                  {mainCategories.map((category) => (
+                  {navCategories.map((category) => (
                     <li key={category.slug}>
                       <Link
                         href={category.href}
@@ -477,7 +564,7 @@ export default function Navbar() {
               <p className="mb-2 text-xs font-bold tracking-wide text-brand-dark/50 uppercase">
                 Categorías
               </p>
-              {mainCategories.map((category) => (
+              {navCategories.map((category) => (
                 <Link
                   key={category.slug}
                   href={category.href}
@@ -513,20 +600,54 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+              <Link
+                href="/comparar"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2.5 font-display text-base font-semibold text-brand-dark hover:bg-brand-gray"
+              >
+                Comparar
+              </Link>
             </nav>
 
-            <div className="border-t border-brand-dark/10 p-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileOpen(false);
-                  openAuth("login");
-                }}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
-              >
-                <User className="h-5 w-5" strokeWidth={2} />
-                Mi cuenta
-              </button>
+            <div className="border-t border-brand-dark/10 p-4 space-y-2">
+              {user ? (
+                <>
+                  <p className="text-center text-xs text-brand-dark/60">
+                    {user.email}
+                  </p>
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
+                  >
+                    <LayoutDashboard className="h-5 w-5" strokeWidth={2} />
+                    Editar contenido
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setMobileOpen(false);
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
+                  >
+                    <LogOut className="h-5 w-5" strokeWidth={2} />
+                    Cerrar sesión
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    openAuth("login");
+                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
+                >
+                  <User className="h-5 w-5" strokeWidth={2} />
+                  Mi cuenta
+                </button>
+              )}
             </div>
           </aside>
         </div>

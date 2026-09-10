@@ -64,14 +64,40 @@ type ProductDraft = Omit<FeaturedProduct, "image" | "images" | "warning"> & {
   warning?: string;
 };
 
+const EXAMPLE_SPEC_FILL: ProductSpec[] = [
+  { label: "Material", value: "Según ficha de ejemplo del SKU" },
+  { label: "Dimensiones", value: "Según presentación mayorista (ficha de ejemplo)" },
+  { label: "Peso aprox.", value: "Consultar empaque (ficha de ejemplo)" },
+  { label: "País de origen", value: "Importación (ficha de ejemplo)" },
+  { label: "Garantía", value: "Garantía de importador — ficha de ejemplo" },
+];
+
+const DIMENSION_ALIASES = new Set([
+  "dimensiones",
+  "tamaño",
+  "longitud",
+  "diámetro",
+  "presentación",
+  "ancho",
+  "sección",
+]);
+
+export function fillExampleSpecs(specs: ProductSpec[]): ProductSpec[] {
+  const labels = new Set(specs.map((spec) => spec.label.toLowerCase()));
+  const hasDimensions = [...labels].some((label) => DIMENSION_ALIASES.has(label));
+  const extra = EXAMPLE_SPEC_FILL.filter((spec) => {
+    if (labels.has(spec.label.toLowerCase())) return false;
+    if (spec.label === "Dimensiones" && hasDimensions) return false;
+    return true;
+  });
+  return [...specs, ...extra];
+}
+
 function makeProduct(draft: ProductDraft): FeaturedProduct {
   const { imageIndex, warning, ...rest } = draft;
-  const hasOrigin = rest.specs.some((spec) => spec.label === "País de origen");
   return {
     ...rest,
-    specs: hasOrigin
-      ? rest.specs
-      : [...rest.specs, { label: "País de origen", value: "Importación (ficha de ejemplo)" }],
+    specs: fillExampleSpecs(rest.specs),
     image: TOOL_IMAGES[imageIndex % TOOL_IMAGES.length],
     images: gallery(imageIndex),
     warning: warning ?? DEFAULT_WARNING,
@@ -879,6 +905,17 @@ export function getProductById(id: string) {
 
 export function getProductsByCategory(category: string) {
   return featuredProducts.filter((product) => product.category === category);
+}
+
+export function getCategoryCollage(slug: string, limit = 4) {
+  const products = getProductsByCategory(slug);
+  return {
+    images: products.slice(0, limit).map((product) => ({
+      src: product.image,
+      alt: product.name,
+    })),
+    brands: [...new Set(products.map((product) => product.brand))],
+  };
 }
 
 export function getCatalogBrands() {

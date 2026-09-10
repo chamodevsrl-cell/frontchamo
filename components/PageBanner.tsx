@@ -2,6 +2,7 @@ import Image from "next/image";
 import Reveal from "@/components/Reveal";
 import StampHeading from "@/components/StampHeading";
 import Breadcrumbs, { type Crumb } from "@/components/Breadcrumbs";
+import CategoryCollage from "@/components/CategoryCollage";
 
 export type PageBannerCrumb = Crumb;
 
@@ -13,6 +14,7 @@ type PageBannerProps = {
   subtitle?: string;
   image: string;
   imageAlt: string;
+  collageSlug?: string;
   crumbs?: Crumb[];
   brands?: readonly string[];
   cta?: BannerCta;
@@ -40,6 +42,7 @@ export default function PageBanner({
   subtitle,
   image,
   imageAlt,
+  collageSlug,
   crumbs,
   brands = [],
   cta,
@@ -53,14 +56,23 @@ export default function PageBanner({
       className="relative isolate overflow-hidden rounded-2xl border border-brand-dark/20 shadow-[0_12px_32px_rgba(11,53,84,0.18)]"
     >
       <div className="relative min-h-[220px] sm:min-h-[300px] lg:min-h-[360px]">
-        <Image
-          src={image}
-          alt={imageAlt}
-          fill
-          preload
-          className="object-cover"
-          sizes="(max-width: 1600px) 100vw, 1600px"
-        />
+        {collageSlug ? (
+          <CategoryCollage
+            slug={collageSlug}
+            fallback={image}
+            fallbackAlt={imageAlt}
+            sizes="(max-width: 1600px) 100vw, 1600px"
+          />
+        ) : (
+          <Image
+            src={image}
+            alt={imageAlt}
+            fill
+            preload
+            className="object-cover"
+            sizes="(max-width: 1600px) 100vw, 1600px"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/55 via-brand-dark/50 to-brand-dark/70" />
         <div className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-brand-primary sm:w-4" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-3 bg-brand-gold sm:w-4" />

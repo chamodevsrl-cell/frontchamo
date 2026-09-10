@@ -24,7 +24,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 **Funciones que eran solo UI — estado actual:**
 - [x] 2026-09-09 — El **buscador** navega a `/catalogo?q=`
 - [x] 2026-09-09 — **Añadir al carrito** / **Agregar a cotización** persisten en `localStorage` y actualizan el badge
-- [ ] **Login / registro** (`AuthForm.tsx`) sigue siendo un stub honesto — no autentica ni guarda cuentas
+- [x] 2026-09-10 — **Login / registro** en este navegador (`chamo-accounts-v1`): crea cuenta, entra, recupera contraseña y cierra sesión. Pendiente migrar a backend.
 - [x] 2026-09-10 — **Favoritos** persisten (`chamo-favorites-v1`), cuentan en el Navbar y confirman “Guardado”
 
 ## 🐛 Bugs nuevos en la intro/preloader (2026-09-10, revisión de Claude Code)
@@ -69,8 +69,9 @@ en [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intr
 ## Técnico
 
 - [x] 2026-09-09 — API interna de productos (`app/api/productos`) — el catálogo ya no se consulta solo hardcodeado en la UI
-- [ ] Completar specs técnicas reales por SKU (material, voltaje, dimensiones, país de origen, etc.) cuando el cliente envíe fichas oficiales — hoy son de ejemplo
-- [ ] CMS o admin liviano para banners y categorías
+- [x] 2026-09-10 — Completar specs de **ejemplo** por SKU (origen, material/dimensiones, peso, garantía).
+- [ ] Fichas técnicas **oficiales** por SKU cuando el cliente las envíe
+- [x] 2026-09-10 — CMS / admin liviano en `/admin` (banners y categorías en `chamo-cms-v1`, este navegador)
 - [x] 2026-09-09 — `allowedDevOrigins` en `next.config` (LAN vía `ALLOWED_DEV_ORIGINS`)
 - [x] 2026-09-09 — Tests básicos de smoke (slider N slides, categorías, búsqueda, home HTTP si el server está arriba)
 
@@ -94,13 +95,14 @@ en [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intr
 - [x] 2026-09-10 — Preloader con `/logo.png` y `/engranaje.png` oficiales
 - [x] 2026-09-10 — Página `/contacto` completa (canales, formulario WhatsApp, mapa)
 - [x] 2026-09-10 — Corrección de bugs: intro no scrolleable, formularios WhatsApp sin popup blocker, toast de favoritos a tono
-- [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
+- [x] 2026-09-10 — Collages de marcas/productos de cada línea en tarjetas y banners de categoría (`CategoryCollage`). Los JPEG de `public/images/categorias/` quedan de fallback.
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
 - [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
-- [ ] Comparar productos (el botón de dos flechas sigue siendo visual)
+- [x] 2026-09-10 — Comparar productos (hasta 3 SKUs, `/comparar`, badge en Navbar)
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-10 — Login/comparar/admin liviano/collages/specs de ejemplo (`docs/cambios/2026-09-10-sugerencias-login-comparar-admin.md`)
 - [x] 2026-09-10 — Bugs intro/preloader: un solo play al clic de Carrito, ícono a la izquierda de la costura, preloader espera `window.load`
 - [x] 2026-09-10 — Preloader con logo y engranaje oficiales (`/logo.png`, `/engranaje.png`)
 - [x] 2026-09-10 — Preloader Framer Motion (carga inicial)

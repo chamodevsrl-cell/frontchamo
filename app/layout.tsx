@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Barlow, Barlow_Semi_Condensed } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
 import { CartProvider } from "@/components/CartProvider";
+import { CompareProvider } from "@/components/CompareProvider";
+import { ContentProvider } from "@/components/ContentProvider";
 import { FavoritesProvider } from "@/components/FavoritesProvider";
 import AuthModal from "@/components/AuthModal";
 import Footer from "@/components/Footer";
@@ -47,16 +49,20 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col font-sans">
         <Preloader />
         <AuthProvider>
-          <CartProvider>
-            <FavoritesProvider>
-              <WrenchCursor />
-              <IntroSplash />
-              <div className="flex min-h-full flex-1 flex-col">{children}</div>
-              <Footer />
-              <WhatsAppFloat />
-              <AuthModal />
-            </FavoritesProvider>
-          </CartProvider>
+          <ContentProvider>
+            <CartProvider>
+              <FavoritesProvider>
+                <CompareProvider>
+                  <WrenchCursor />
+                  <IntroSplash />
+                  <div className="flex min-h-full flex-1 flex-col">{children}</div>
+                  <Footer />
+                  <WhatsAppFloat />
+                  <AuthModal />
+                </CompareProvider>
+              </FavoritesProvider>
+            </CartProvider>
+          </ContentProvider>
         </AuthProvider>
       </body>
     </html>

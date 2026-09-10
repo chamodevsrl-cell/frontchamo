@@ -1,28 +1,36 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, KeyRound, LogIn, UserPlus } from "lucide-react";
 import { useAuth, type AuthMode } from "@/components/AuthProvider";
 
 export default function AuthForm() {
-  const { mode, setMode, closeAuth } = useAuth();
+  const {
+    mode,
+    setMode,
+    closeAuth,
+    login,
+    register,
+    resetPassword,
+  } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
 
   function switchMode(next: AuthMode) {
     setMode(next);
     setMessage("");
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
 
-    if (mode === "register" && password !== confirmPassword) {
+    if (mode !== "login" && password !== confirmPassword) {
       setMessage("Las contraseñas no coinciden.");
       return;
     }
@@ -32,59 +40,72 @@ export default function AuthForm() {
       return;
     }
 
-    setMessage(
+    setBusy(true);
+    const error =
       mode === "login"
-        ? "Formulario listo. Conectaremos el inicio de sesión más adelante."
-        : "Registro listo. Conectaremos la cuenta más adelante.",
-    );
+        ? await login(email, password)
+        : mode === "register"
+          ? await register(name, email, password)
+          : await resetPassword(email, password);
+    setBusy(false);
+    if (error) setMessage(error);
   }
 
   const isLogin = mode === "login";
+  const isReset = mode === "reset";
   const fieldClass =
     "w-full rounded-xl border-2 border-brand-primary/35 bg-white px-3.5 py-2.5 text-sm text-brand-dark outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/25 dark:border-brand-primary/40 dark:bg-brand-dark/40 dark:text-white";
 
   return (
     <div className="w-full">
-      <div className="mb-5 flex rounded-xl border-2 border-brand-primary/25 bg-brand-primary/5 p-1 dark:bg-brand-primary/10">
-        <button
-          type="button"
-          onClick={() => switchMode("login")}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
-            isLogin
-              ? "bg-brand-primary text-white shadow-sm"
-              : "text-brand-dark/70 hover:text-brand-primary dark:text-white/70 dark:hover:text-white"
-          }`}
-        >
-          <LogIn className="h-4 w-4" strokeWidth={2} />
-          Iniciar sesión
-        </button>
-        <button
-          type="button"
-          onClick={() => switchMode("register")}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
-            !isLogin
-              ? "bg-brand-primary text-white shadow-sm"
-              : "text-brand-dark/70 hover:text-brand-primary dark:text-white/70 dark:hover:text-white"
-          }`}
-        >
-          <UserPlus className="h-4 w-4" strokeWidth={2} />
-          Registrarse
-        </button>
-      </div>
+      {!isReset ? (
+        <div className="mb-5 flex rounded-xl border-2 border-brand-primary/25 bg-brand-primary/5 p-1 dark:bg-brand-primary/10">
+          <button
+            type="button"
+            onClick={() => switchMode("login")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+              isLogin
+                ? "bg-brand-primary text-white shadow-sm"
+                : "text-brand-dark/70 hover:text-brand-primary dark:text-white/70 dark:hover:text-white"
+            }`}
+          >
+            <LogIn className="h-4 w-4" strokeWidth={2} />
+            Iniciar sesión
+          </button>
+          <button
+            type="button"
+            onClick={() => switchMode("register")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+              !isLogin
+                ? "bg-brand-primary text-white shadow-sm"
+                : "text-brand-dark/70 hover:text-brand-primary dark:text-white/70 dark:hover:text-white"
+            }`}
+          >
+            <UserPlus className="h-4 w-4" strokeWidth={2} />
+            Registrarse
+          </button>
+        </div>
+      ) : null}
 
       <div className="mb-5">
         <h2 className="font-display text-2xl font-bold text-brand-dark dark:text-white">
-          {isLogin ? "Bienvenido de nuevo" : "Crea tu cuenta"}
+          {isReset
+            ? "Nueva contraseña"
+            : isLogin
+              ? "Bienvenido de nuevo"
+              : "Crea tu cuenta"}
         </h2>
         <p className="mt-1 text-sm text-brand-dark/65 dark:text-white/65">
-          {isLogin
-            ? "Ingresa para cotizar y guardar favoritos."
-            : "Regístrate para acceder a precios y pedidos mayoristas."}
+          {isReset
+            ? "La cuenta vive en este navegador. Si el correo ya está registrado aquí, puedes cambiar la contraseña."
+            : isLogin
+              ? "Ingresa para cotizar, guardar favoritos y editar el contenido local."
+              : "Regístrate en este navegador. Cuando haya backend, estas cuentas se migrarán."}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {!isLogin && (
+        {mode === "register" && (
           <div>
             <label
               htmlFor="auth-name"
@@ -96,7 +117,7 @@ export default function AuthForm() {
               id="auth-name"
               name="name"
               type="text"
-              required={!isLogin}
+              required
               value={name}
               onChange={(event) => setName(event.target.value)}
               autoComplete="name"
@@ -131,7 +152,7 @@ export default function AuthForm() {
             htmlFor="auth-password"
             className="mb-1.5 block text-sm font-medium text-brand-dark dark:text-white"
           >
-            Contraseña
+            {isReset ? "Nueva contraseña" : "Contraseña"}
           </label>
           <div className="relative">
             <input
@@ -162,7 +183,7 @@ export default function AuthForm() {
           </div>
         </div>
 
-        {!isLogin && (
+        {mode !== "login" && (
           <div>
             <label
               htmlFor="auth-confirm"
@@ -174,7 +195,7 @@ export default function AuthForm() {
               id="auth-confirm"
               name="confirmPassword"
               type={showPassword ? "text" : "password"}
-              required={!isLogin}
+              required
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               autoComplete="new-password"
@@ -189,15 +210,21 @@ export default function AuthForm() {
             <button
               type="button"
               className="text-sm font-medium text-brand-primary hover:underline"
-              onClick={() =>
-                setMessage(
-                  "La recuperación de contraseña se conectará más adelante.",
-                )
-              }
+              onClick={() => switchMode("reset")}
             >
               ¿Olvidaste tu contraseña?
             </button>
           </div>
+        )}
+
+        {isReset && (
+          <button
+            type="button"
+            className="text-sm font-medium text-brand-primary hover:underline"
+            onClick={() => switchMode("login")}
+          >
+            Volver a iniciar sesión
+          </button>
         )}
 
         {message && (
@@ -211,17 +238,23 @@ export default function AuthForm() {
 
         <button
           type="submit"
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand-primary bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(18,126,201,0.35)] transition hover:border-brand-dark hover:bg-brand-dark"
+          disabled={busy}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand-primary bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(18,126,201,0.35)] transition hover:border-brand-dark hover:bg-brand-dark disabled:opacity-60"
         >
-          {isLogin ? (
+          {isReset ? (
+            <>
+              <KeyRound className="h-4 w-4" strokeWidth={2} />
+              {busy ? "Guardando…" : "Guardar contraseña"}
+            </>
+          ) : isLogin ? (
             <>
               <LogIn className="h-4 w-4" strokeWidth={2} />
-              Entrar
+              {busy ? "Entrando…" : "Entrar"}
             </>
           ) : (
             <>
               <UserPlus className="h-4 w-4" strokeWidth={2} />
-              Crear cuenta
+              {busy ? "Creando…" : "Crear cuenta"}
             </>
           )}
         </button>

@@ -3,6 +3,7 @@ import { slides } from "@/data/media";
 import { mainCategories } from "@/data/home";
 import {
   featuredProducts,
+  getCategoryCollage,
   getRelatedProducts,
   searchCatalog,
 } from "@/data/products";
@@ -85,6 +86,45 @@ describe("smoke de catálogo y home", () => {
     expect(testimonials.length).toBeGreaterThanOrEqual(3);
   });
 
+  it("cada SKU tiene ficha de ejemplo con origen y garantía", () => {
+    for (const product of featuredProducts) {
+      const labels = product.specs.map((spec) => spec.label.toLowerCase());
+      expect(labels.some((label) => label.includes("origen"))).toBe(true);
+      expect(labels.some((label) => label.includes("garantía"))).toBe(true);
+    }
+  });
+
+  it("el collage de categoría usa productos y marcas de esa línea", () => {
+    const collage = getCategoryCollage("herramientas");
+    expect(collage.images.length).toBeGreaterThanOrEqual(2);
+    expect(collage.brands.length).toBeGreaterThan(0);
+  });
+
+  it("mergeCms oculta banners y pisa textos de categoría", async () => {
+    const { mergeSlides, mergeCategories } = await import("@/lib/cms");
+    const mergedSlides = mergeSlides(undefined, [{ id: 1, hidden: true }]);
+    expect(mergedSlides.every((slide) => slide.id !== 1)).toBe(true);
+    const categories = mergeCategories(undefined, [
+      { slug: "ferreteria", label: "Ferretería VIP" },
+    ]);
+    expect(
+      categories.find((category) => category.slug === "ferreteria")?.label,
+    ).toBe("Ferretería VIP");
+  });
+
+  it("hash de cuenta local es determinista con el mismo salt", async () => {
+    const { hashPassword, createAccount } = await import("@/lib/auth-local");
+    const first = await hashPassword("secret1", "abc");
+    const second = await hashPassword("secret1", "abc");
+    expect(first).toBe(second);
+    const created = await createAccount([], {
+      name: "Chamo",
+      email: "chamo@example.com",
+      password: "secret1",
+    });
+    expect(created.ok).toBe(true);
+  });
+
   it("contacto oficial tiene teléfono, horario y WhatsApp", () => {
     expect(PHONE_DISPLAY).toContain("959 723 602");
     expect(HOURS_DISPLAY.toLowerCase()).toContain("lun");
@@ -115,6 +155,11 @@ describe("home HTTP (si el dev server está arriba)", () => {
         signal: AbortSignal.timeout(4000),
       });
       expect(favoritos.ok).toBe(true);
+
+      const comparar = await fetch("http://127.0.0.1:3000/comparar", {
+        signal: AbortSignal.timeout(4000),
+      });
+      expect(comparar.ok).toBe(true);
 
       const contacto = await fetch("http://127.0.0.1:3000/contacto", {
         signal: AbortSignal.timeout(4000),

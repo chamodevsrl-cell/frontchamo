@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
 import { categoryWhatsappUrl } from "@/data/contact";
 import Reveal from "@/components/Reveal";
 import CategoryIcon from "@/components/CategoryIcon";
+import CategoryCollage from "@/components/CategoryCollage";
+import { useSiteContent } from "@/components/ContentProvider";
 
 const shinyCard =
   "border border-brand-primary/35 shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_18px_rgba(18,126,201,0.35)] hover:shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_28px_rgba(18,126,201,0.55)]";
@@ -64,12 +65,11 @@ function CategoryCard({ category }: { category: MainCategory }) {
 
       <div className="px-3 pb-3 sm:px-4 sm:pb-4 lg:px-5 lg:pb-5">
         <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-brand-primary/15 bg-white/50">
-          <Image
-            src={category.image}
-            alt={category.imageAlt}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width: 1024px) 72vw, 18.5rem"
+          <CategoryCollage
+            slug={category.slug}
+            fallback={category.image}
+            fallbackAlt={category.imageAlt}
+            className="transition duration-500 group-hover:scale-[1.03]"
           />
         </div>
       </div>
@@ -78,6 +78,8 @@ function CategoryCard({ category }: { category: MainCategory }) {
 }
 
 export default function CategoriesGrid() {
+  const { categories } = useSiteContent();
+  const list = categories.length > 0 ? categories : mainCategories;
   const scrollerRef = useRef<HTMLUListElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -160,7 +162,7 @@ export default function CategoriesGrid() {
           ref={scrollerRef}
           className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 scrollbar-none sm:gap-4 sm:px-6 lg:gap-5 lg:px-0"
         >
-          {mainCategories.map((category, index) => (
+          {list.map((category, index) => (
             <li
               key={category.href}
               className="w-[min(78vw,18rem)] shrink-0 snap-start sm:w-[min(48vw,20rem)] lg:w-[17.5rem] xl:w-[18.75rem]"

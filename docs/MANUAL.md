@@ -35,6 +35,8 @@ app/categorias/           # Listado + detalle [slug]
 app/catalogo/             # Búsqueda y filtros (API)
 app/carrito/              # Cotización local
 app/favoritos/            # Lista persistida (localStorage)
+app/comparar/             # Comparación de hasta 3 SKUs
+app/admin/                # Admin liviano de banners/categorías (localStorage)
 app/cotizar/              # Formulario + WhatsApp
 app/api/productos/        # GET catálogo filtrable
 app/terminos/ /privacidad/
@@ -42,6 +44,10 @@ components/
   Navbar.tsx              # Header 3 niveles (categorías = mainCategories)
   CartProvider.tsx        # Carrito en localStorage
   FavoritesProvider.tsx   # Favoritos en localStorage
+  CompareProvider.tsx     # Comparar (máx. 3) en localStorage
+  ContentProvider.tsx     # Overlay CMS local de banners/categorías
+  AuthProvider.tsx        # Cuentas locales + sesión
+  CategoryCollage.tsx     # Grilla 2×2 de productos/marcas de la línea
   CatalogFilters.tsx      # Filtros de /catalogo
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
   PageBanner.tsx          # Banner ancho (categorías, /nosotros, /contacto)
@@ -174,7 +180,8 @@ se tomó contra **`main` antiguo** (antes de catálogo/carrito). En el código a
 - **Cerrado:** buscador del Navbar → `/catalogo?q=`; carrito y cotización persisten; favoritos persisten con badge y confirmación.
 - **Cerrado:** fallback de logos en `BrandsCarousel` también mira `load` + `naturalWidth === 0` (no solo `onError`). Los wordmarks SVG ya están en `public/images/marcas/`.
 - **Cerrado:** intro del carrito una sola vez por clic; ícono a la izquierda de la costura; preloader espera `window.load` (mín. 1.2 s, tope 6 s).
-- **Sigue abierto:** `AuthForm` no autentica (lo dice el propio formulario). Comparar producto sigue siendo visual. Specs/CMS/ERP y logos oficiales dependen del cliente.
+- **Cerrado:** login/registro local, comparar (hasta 3), admin liviano `/admin`, collages de categoría, specs de ejemplo completas.
+- **Sigue abierto (cliente / backend):** correo oficial, ficha de `/nosotros`, testimonios reales, logos oficiales, ERP, fichas técnicas oficiales.
 
 ### A.11 Scripts
 
@@ -193,11 +200,12 @@ npm test         # Vitest smoke (slider, categorías, búsqueda)
 Describe **lo que se ve y se puede hacer hoy** en el sitio. Se actualiza cada vez que
 cambia el comportamiento visible — incluso un cambio pequeño como reemplazar una imagen.
 
-> ⚠️ **Importante para negocio/operación:** el catálogo, las categorías, el carrito y
-> los favoritos ya funcionan en el navegador (`localStorage`). El buscador lleva a
-> `/catalogo`. WhatsApp sale prellenado por producto, carrito y **línea de categoría**.
-> Todavía **no** hay login real (el formulario lo dice) ni inventario/ERP. Los
-> testimonios del home son de ejemplo. Detalle en A.10 y
+> ⚠️ **Importante para negocio/operación:** el catálogo, las categorías, el carrito,
+> los favoritos y la **comparación** ya funcionan en el navegador (`localStorage`).
+> El buscador lleva a `/catalogo`. WhatsApp sale prellenado por producto, carrito y
+> **línea de categoría**. El login guarda cuentas **en este navegador**. Todavía **no**
+> hay inventario/ERP. Correo, textos de `/nosotros` y testimonios reales siguen
+> pendientes del cliente. Detalle en A.10 y
 > [`SUGERENCIAS.md`](./SUGERENCIAS.md).
 
 ### B.1 Entrar al sitio
@@ -269,20 +277,23 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que frena a la izquierda de la costura dorada (una vez por clic) y sigue al abrir |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
+| `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
+| `/admin` | Editar banners y categorías de **este navegador** (requiere cuenta) |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
 | `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre WhatsApp (sin `window.open`), y mapa |
 | `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
-| Login (modal / cuenta) | Iniciar sesión o registrarse |
+| Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña y cerrar sesión (este navegador) |
 
 ### B.4 Contenido que el negocio puede cambiar sin programar
 
-Hoy los textos e imágenes viven en archivos del proyecto (`data/` y `public/images/`).
-Más adelante conviene un panel admin; por ahora:
+Hay un **admin liviano** en `/admin` (con sesión) para banners del slider y textos de
+categorías; guarda en este navegador (`chamo-cms-v1`). El código del repo sigue siendo
+la fuente por defecto:
 
-- Banners → `public/images/slider/` (`baner-1.png` …) + `data/media.ts`
-- Categorías del home → `data/home.ts` + `public/images/categorias/`
+- Banners → `/admin` o `public/images/slider/` + `data/media.ts`
+- Categorías del home → `/admin` o `data/home.ts` + collage de productos de la línea
 - Logos de marcas → `public/images/marcas/`
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
 - Teléfono / WhatsApp / correo → `data/contact.ts`

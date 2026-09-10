@@ -62,8 +62,8 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) con el número oficial; `/cotizar` arma el mensaje con formulario + carrito.
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
-- **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; fotos locales en `public/images/categorias/`. Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (stub). Carrito: `CartProvider`. Favoritos: `FavoritesProvider` (`localStorage`).
+- **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
+- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador). Carrito, favoritos y comparar: providers en `localStorage`. Admin liviano `/admin` para banners y categorías.
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -98,9 +98,13 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `IntroSplash.tsx` | Puertas al clic del logo; al entrar al carrito, un carrito que frena a la izquierda de la costura (un solo play por clic) |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
-| `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
+| `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
-| `AuthForm.tsx` | Formulario iniciar sesión / registrarse |
+| `AuthForm.tsx` | Login / registro / recuperar contraseña (este navegador) |
+| `CompareProvider.tsx` | Comparar hasta 3 SKUs (`chamo-compare-v1`) |
+| `CompareButton.tsx` | Botón de comparar en tarjeta y modal |
+| `ContentProvider.tsx` | Overlay CMS local de banners y categorías |
+| `CategoryCollage.tsx` | Collage 2×2 de productos/marcas de la línea |
 | `Footer.tsx` | Footer corporativo (ver §5) |
 | `WrenchCursor.tsx` | Cursor personalizado (llave inglesa) en desktop |
 | `SocialIcons.tsx` | Iconos SVG de Facebook/Instagram/YouTube reutilizados en Navbar y Footer |
@@ -120,6 +124,8 @@ app/                  # App Router (páginas y layout)
   catalogo/             # Búsqueda y filtros
   categorias/           # Listado + [slug]
   carrito/              # Cotización local
+  comparar/             # Comparación de hasta 3 SKUs
+  admin/                # Admin liviano de banners/categorías
   favoritos/            # Lista persistida
   terminos/ privacidad/ # Políticas
   api/productos/        # GET catálogo
@@ -178,16 +184,15 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-10): intro de puertas solo al entrar, refrescar o clic en el logo.
+Último avance (2026-09-10): login local, comparar, admin liviano, collages de categoría y specs de ejemplo.
 
 ## 10. Pendientes conocidos
 
+- Backend real de autenticación e inventario (hoy cuentas, carrito, comparar y admin viven en este navegador).
 - Confirmar correo de contacto oficial (footer y `/contacto`).
 - Reemplazar textos placeholder de `/nosotros` (`data/company.ts`) por ficha oficial.
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).
-- Login/registro real (`AuthForm` sigue siendo stub).
-- Comparar productos (botón visual, sin lógica).
 - Fotos reales de tienda/almacén y logos oficiales de marca (hoy JPEG localizados y wordmarks SVG).
 - Specs técnicas oficiales por SKU cuando el cliente envíe fichas.
-- CMS/admin y backend de inventario real (hoy `/api/productos` sirve el catálogo de ejemplo).
+- Backend de inventario real (hoy `/api/productos` sirve el catálogo de ejemplo). El admin liviano `/admin` solo cubre banners/categorías en este navegador.
 - Sustituir testimonios de ejemplo por casos reales de distribuidores.
