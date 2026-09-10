@@ -29,7 +29,7 @@ export default function Preloader() {
       {visible ? (
         <motion.div
           key="chamo-preloader"
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0B3554]"
+          className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-[#0B3554]"
           role="status"
           aria-live="polite"
           aria-label="Cargando Chamo Import"

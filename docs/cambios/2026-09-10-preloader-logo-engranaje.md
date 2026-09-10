@@ -11,7 +11,7 @@ El preloader mostraba el texto “Chamo Import”, un `Cog` de Lucide y una barr
 
 ## Código nuevo
 
-- Fondo fijo `#0B3554` con `z-50`.
+- Fondo fijo `#0B3554` a pantalla completa (por encima del navbar y el flotante de WhatsApp).
 - Logo `/logo.png` entra de izquierda a derecha (`x: -100 → 0`, `opacity: 0 → 1`).
 - Debajo, `/engranaje.png` a 60×60 px gira 360° en loop (como una llanta).
 - Texto **CARGANDO...** en `#E4B714`.
