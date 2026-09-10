@@ -4,20 +4,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Cog } from "lucide-react";
 
-function isInternalPageLink(anchor: HTMLAnchorElement) {
-  if (anchor.target && anchor.target !== "_self") return false;
-  const href = anchor.getAttribute("href");
+const NOSOTROS_PATH = "/nosotros";
+
+function isNosotrosHref(href: string | null) {
   if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) {
     return false;
   }
-  let url: URL;
   try {
-    url = new URL(href, window.location.href);
+    const url = new URL(href, window.location.href);
+    return url.origin === window.location.origin && url.pathname === NOSOTROS_PATH;
   } catch {
     return false;
   }
-  if (url.origin !== window.location.origin) return false;
-  return url.pathname !== window.location.pathname;
 }
 
 export default function IntroSplash() {
@@ -34,7 +32,7 @@ export default function IntroSplash() {
     setVisible(false);
   }, []);
 
-  const playNav = useCallback(() => {
+  const playNosotros = useCallback(() => {
     const now = Date.now();
     if (now - lastPlay.current < 450) return;
     lastPlay.current = now;
@@ -51,17 +49,14 @@ export default function IntroSplash() {
       if (!(target instanceof Element)) return;
       const anchor = target.closest("a");
       if (!(anchor instanceof HTMLAnchorElement)) return;
-      if (!isInternalPageLink(anchor)) return;
-      playNav();
+      if (!isNosotrosHref(anchor.getAttribute("href"))) return;
+      if (window.location.pathname === NOSOTROS_PATH) return;
+      playNosotros();
     }
 
     document.addEventListener("click", onClick, true);
-    window.addEventListener("popstate", playNav);
-    return () => {
-      document.removeEventListener("click", onClick, true);
-      window.removeEventListener("popstate", playNav);
-    };
-  }, [playNav]);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [playNosotros]);
 
   useEffect(() => {
     if (prevPath.current === null) {
@@ -70,8 +65,8 @@ export default function IntroSplash() {
     }
     if (prevPath.current === pathname) return;
     prevPath.current = pathname;
-    playNav();
-  }, [pathname, playNav]);
+    if (pathname === NOSOTROS_PATH) playNosotros();
+  }, [pathname, playNosotros]);
 
   useEffect(() => {
     if (!visible) return;
@@ -100,7 +95,7 @@ export default function IntroSplash() {
       role="status"
       aria-live="polite"
       aria-label={
-        variant === "boot" ? "Cargando Chamo Import" : "Cambiando de página"
+        variant === "boot" ? "Cargando Chamo Import" : "Entrando a Nosotros"
       }
     >
       <div

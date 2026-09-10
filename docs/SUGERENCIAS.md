@@ -76,7 +76,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 - [x] 2026-09-09 — `/nosotros` con banner **NOSOTROS**, historia Chamo Import, misión y visión
 - [x] 2026-09-09 — Animación de entrada al scroll (Reveal) en home y páginas; banners con fade-in
 - [x] 2026-09-09 — Intro de entrada: puertas azules + engranaje Lucide
-- [x] 2026-09-10 — Misma animación al cambiar de página (más corta) y tamaños responsivos
+- [x] 2026-09-10 — Intro de puertas al cargar y al entrar a Nosotros (no en cada sección)
 - [x] 2026-09-10 — Página `/contacto` completa (canales, formulario WhatsApp, mapa)
 - [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
@@ -85,6 +85,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-10 — Intro de puertas solo al cargar y en Nosotros
 - [x] 2026-09-10 — Página de contacto completa (formulario WhatsApp + mapa)
 - [x] 2026-09-10 — Intro de puertas también al navegar (Categorías, etc.) + responsive
 - [x] 2026-09-10 — Cierre de la auditoría UX: favoritos, fallback de marcas, testimonios, WhatsApp por categoría, breadcrumbs

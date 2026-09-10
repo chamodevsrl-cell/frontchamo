@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-10 | Intro solo al cargar el sitio y al entrar a Nosotros | [2026-09-10-intro-solo-nosotros.md](./2026-09-10-intro-solo-nosotros.md) |
 | 2026-09-10 | Página de contacto completa (canales, formulario WhatsApp, mapa) | [2026-09-10-seccion-contacto.md](./2026-09-10-seccion-contacto.md) |
 | 2026-09-10 | Intro también al cambiar de página (Categorías, etc.) + responsive | [2026-09-10-intro-navegacion.md](./2026-09-10-intro-navegacion.md) |
 | 2026-09-10 | Cierre auditoría UX: favoritos, fallback marcas, testimonios, WhatsApp por categoría | [2026-09-10-cierre-auditoria-ux.md](./2026-09-10-cierre-auditoria-ux.md) |

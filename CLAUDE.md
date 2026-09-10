@@ -94,7 +94,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
 | `CategoryIcon.tsx` | Icono Lucide por categoría (menú, home, `/categorias`) |
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
-| `IntroSplash.tsx` | Puertas + engranaje al cargar y al cambiar de página (responsive) |
+| `IntroSplash.tsx` | Puertas + engranaje al cargar el sitio y al entrar a Nosotros |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
@@ -177,7 +177,7 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-10): página de contacto completa (canales, formulario WhatsApp y mapa).
+Último avance (2026-09-10): intro de puertas solo al cargar el sitio y al entrar a Nosotros.
 
 ## 10. Pendientes conocidos
 
