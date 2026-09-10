@@ -71,7 +71,7 @@ export default function ProductCard({
             : "DESTACADO"}
         </span>
 
-        <div className="absolute top-2 right-2 flex flex-col gap-2 sm:top-3 sm:right-3">
+        <div className="absolute top-2 right-2 z-10 flex flex-col gap-2 sm:top-3 sm:right-3">
           <FavoriteButton productId={product.id} />
           <CompareButton productId={product.id} />
         </div>
