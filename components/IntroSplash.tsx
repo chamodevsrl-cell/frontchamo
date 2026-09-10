@@ -91,13 +91,13 @@ export default function IntroSplash() {
     }
 
     lockIntroScroll();
-    const safety = window.setTimeout(hide, 3200);
+    const safety = window.setTimeout(hide, variant === "cart" ? 4200 : 3200);
 
     return () => {
       window.clearTimeout(safety);
       unlockIntroScroll();
     };
-  }, [visible, cycle, hide]);
+  }, [visible, cycle, hide, variant]);
 
   if (!visible) return null;
 

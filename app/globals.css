@@ -155,6 +155,10 @@ html.intro-playing body {
     --intro-ms: 2.15s;
     --intro-nav-ms: 1.12s;
   }
+
+  .intro-splash--cart {
+    --intro-ms: 2.85s;
+  }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
@@ -221,6 +225,18 @@ html.intro-playing body {
 .intro-splash--nav .intro-gear {
   animation-name: intro-gear-nav;
   animation-duration: var(--intro-nav-ms);
+}
+
+.intro-splash--cart {
+  --intro-ms: 3.35s;
+}
+
+.intro-splash--cart .intro-panel-left {
+  animation-name: intro-door-left-cart;
+}
+
+.intro-splash--cart .intro-panel-right {
+  animation-name: intro-door-right-cart;
 }
 
 .intro-gear-main {
@@ -323,6 +339,36 @@ html.intro-playing body {
   }
 }
 
+@keyframes intro-door-left-cart {
+  0% {
+    transform: translateX(-100%);
+  }
+  16% {
+    transform: translateX(0);
+  }
+  70% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-105%);
+  }
+}
+
+@keyframes intro-door-right-cart {
+  0% {
+    transform: translateX(100%);
+  }
+  16% {
+    transform: translateX(0);
+  }
+  70% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(105%);
+  }
+}
+
 @keyframes intro-gear {
   0%,
   12% {
@@ -375,17 +421,17 @@ html.intro-playing body {
     transform: translate(calc(-50% - 56vw), -50%);
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  22% {
+  18% {
     opacity: 1;
-    transform: translate(calc(-50% + 1.6vw), -50%);
+    transform: translate(calc(-50% + 1.4vw), -50%);
     animation-timing-function: ease-out;
   }
-  28% {
+  24% {
     opacity: 1;
     transform: translate(-50%, -50%);
     animation-timing-function: linear;
   }
-  68% {
+  70% {
     opacity: 1;
     transform: translate(-50%, -50%);
     animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
@@ -400,14 +446,14 @@ html.intro-playing body {
   0% {
     transform: rotate(-22deg);
   }
-  22% {
+  18% {
     transform: rotate(6deg);
   }
-  28%,
-  68% {
+  24%,
+  70% {
     transform: rotate(0deg);
   }
-  78% {
+  80% {
     transform: rotate(-10deg);
   }
   100% {
