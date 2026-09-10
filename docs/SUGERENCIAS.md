@@ -27,6 +27,25 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 - [ ] **Login / registro** (`AuthForm.tsx`) sigue siendo un stub honesto — no autentica ni guarda cuentas
 - [x] 2026-09-10 — **Favoritos** persisten (`chamo-favorites-v1`), cuentan en el Navbar y confirman “Guardado”
 
+## 🐛 Bugs nuevos en la intro/preloader (2026-09-10, revisión de Claude Code)
+
+El usuario mandó una captura de la intro del carrito (línea dorada atravesando el
+ícono) y describió que la animación se repite dos veces. Verificado en vivo levantando
+esta rama en un servidor propio (puerto 3055) — detalle completo con evidencia medida
+en [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intro-preloader.md).
+
+- [ ] **1. La intro del carrito se dispara dos veces para la misma navegación.**
+  - **Problema (confirmado con `MutationObserver`):** `IntroSplash.tsx` tiene dos disparadores para la intro `cart` — el `onClick` del link y un `useEffect` sobre `pathname` — con un debounce de solo 450ms entre ellos. Medido en vivo: `.intro-splash--cart` se montó dos veces, con **2194.8 ms** de diferencia (muy por encima del debounce), tras un solo clic en el ícono del carrito.
+  - **Solución:** que el `onClick` marque un ref (`cartClaimedByClick`) que el efecto de `pathname` consuma y no repita la llamada a `play("cart")`. Código propuesto en la nota de cambio.
+
+- [ ] **2. La costura dorada de la puerta atraviesa el ícono del carrito al frenar en el centro.**
+  - **Problema (confirmado con la captura del usuario + la matemática de las keyframes):** el carrito se detiene en `translate(-50%, -50%)` — el mismo `x = 50%` donde coincide el `box-shadow` dorado que forma la costura entre `.intro-panel-left` y `.intro-panel-right`. Mientras las puertas siguen cerradas (16%–70% del tiempo), la línea y el centro del ícono comparten coordenada X.
+  - **Solución:** desplazar el punto de reposo del carrito (`translate(calc(-50% - 2.5rem), -50%)`) para que quede a un lado de la costura en vez de centrado sobre ella.
+
+- [ ] **3. La barra de progreso del `Preloader` es decorativa, no sigue la carga real.**
+  - **Problema:** `Preloader.tsx` se oculta a los `HOLD_MS = 2500` fijos, sin relación con si la página realmente terminó de cargar — en una conexión lenta podría ocultarse antes de tiempo. Conecta con el pedido del usuario de "mejor apoyo para renovar/recargar".
+  - **Solución:** usar el evento `load` real (o `document.readyState`) combinado con un mínimo visible y un tope de seguridad, en vez de un timer fijo. Código propuesto en la nota de cambio.
+
 ## 💡 Recomendaciones de cosas nuevas a agregar
 
 - [x] 2026-09-09 — **Carrito real** en `localStorage` + página `/carrito`
