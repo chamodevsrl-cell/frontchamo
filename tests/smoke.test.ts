@@ -6,7 +6,11 @@ import {
   getRelatedProducts,
   searchCatalog,
 } from "@/data/products";
-import { categoryWhatsappUrl } from "@/data/contact";
+import {
+  categoryWhatsappUrl,
+  HOURS_DISPLAY,
+  PHONE_DISPLAY,
+} from "@/data/contact";
 import { testimonials } from "@/data/testimonials";
 import { isBrokenImage } from "@/lib/image";
 
@@ -79,6 +83,12 @@ describe("smoke de catálogo y home", () => {
   it("hay testimonios de ejemplo para la home", () => {
     expect(testimonials.length).toBeGreaterThanOrEqual(3);
   });
+
+  it("contacto oficial tiene teléfono, horario y WhatsApp", () => {
+    expect(PHONE_DISPLAY).toContain("959 723 602");
+    expect(HOURS_DISPLAY.toLowerCase()).toContain("lun");
+    expect(categoryWhatsappUrl("Ferretería")).toContain("wa.me/51959723602");
+  });
 });
 
 describe("home HTTP (si el dev server está arriba)", () => {
@@ -97,6 +107,14 @@ describe("home HTTP (si el dev server está arriba)", () => {
         signal: AbortSignal.timeout(4000),
       });
       expect(favoritos.ok).toBe(true);
+
+      const contacto = await fetch("http://127.0.0.1:3000/contacto", {
+        signal: AbortSignal.timeout(4000),
+      });
+      expect(contacto.ok).toBe(true);
+      const contactHtml = await contacto.text();
+      expect(contactHtml).toContain("CONTACTO");
+      expect(contactHtml).toContain("959 723 602");
     } catch (error) {
       if (error instanceof Error && error.message.includes("expected")) {
         throw error;

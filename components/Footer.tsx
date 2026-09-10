@@ -19,8 +19,10 @@ import {
 import { LOGO_SRC } from "@/data/media";
 import Reveal from "@/components/Reveal";
 import {
+  ADDRESS_DISPLAY,
   COMPANY_NAME,
   EMAIL,
+  HOURS_DISPLAY,
   MAP_EMBED_URL,
   MAP_URL,
   PHONE_DISPLAY,
@@ -147,7 +149,7 @@ export default function Footer() {
                 className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary"
                 strokeWidth={2}
               />
-              {COMPANY_NAME} — Lima, Perú
+              {COMPANY_NAME} — {ADDRESS_DISPLAY}
             </p>
             <a
               href={`tel:${PHONE_TEL}`}
@@ -174,7 +176,7 @@ export default function Footer() {
                 className="h-4 w-4 shrink-0 text-brand-primary"
                 strokeWidth={2}
               />
-              Lun - Sáb 8:00am a 6:00pm
+              {HOURS_DISPLAY}
             </p>
           </div>
         </div>

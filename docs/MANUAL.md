@@ -44,7 +44,7 @@ components/
   FavoritesProvider.tsx   # Favoritos en localStorage
   CatalogFilters.tsx      # Filtros de /catalogo
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
-  PageBanner.tsx          # Banner ancho (categorías + /nosotros)
+  PageBanner.tsx          # Banner ancho (categorías, /nosotros, /contacto)
   StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
   CategoryIcon.tsx        # Iconos Lucide por categoría
   Reveal.tsx              # Fade/slide al entrar en viewport
@@ -52,8 +52,9 @@ components/
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   FavoriteButton.tsx / Testimonials.tsx / Breadcrumbs.tsx
   QuoteForm.tsx
+  ContactForm.tsx           # /contacto → WhatsApp
 data/
-  contact.ts               # Teléfono, WhatsApp, correo, Maps
+  contact.ts               # Teléfono, WhatsApp, correo, horario, Maps
   company.ts               # Historia / misión / visión (placeholder)
   testimonials.ts          # Prueba social B2B de ejemplo
   media.ts                 # Slides / logo / icon
@@ -250,7 +251,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
-| `/contacto` | Encabezado sticker **NUESTRO CONTACTO**, datos y Maps |
+| `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre el chat, y mapa |
 | `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |

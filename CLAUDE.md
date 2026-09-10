@@ -96,6 +96,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
 | `IntroSplash.tsx` | Puertas + engranaje al cargar y al cambiar de página (responsive) |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
+| `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
 | `AuthForm.tsx` | Formulario iniciar sesión / registrarse |
@@ -176,7 +177,7 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-10): intro de puertas también al navegar (p. ej. Categorías), con tamaños responsivos.
+Último avance (2026-09-10): página de contacto completa (canales, formulario WhatsApp y mapa).
 
 ## 10. Pendientes conocidos
 
