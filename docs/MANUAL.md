@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-09**
+Última actualización: **2026-09-10**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -34,12 +34,14 @@ app/page.tsx              # Home: orden de secciones
 app/categorias/           # Listado + detalle [slug]
 app/catalogo/             # Búsqueda y filtros (API)
 app/carrito/              # Cotización local
+app/favoritos/            # Lista persistida (localStorage)
 app/cotizar/              # Formulario + WhatsApp
 app/api/productos/        # GET catálogo filtrable
 app/terminos/ /privacidad/
 components/
   Navbar.tsx              # Header 3 niveles (categorías = mainCategories)
   CartProvider.tsx        # Carrito en localStorage
+  FavoritesProvider.tsx   # Favoritos en localStorage
   CatalogFilters.tsx      # Filtros de /catalogo
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
   PageBanner.tsx          # Banner ancho (categorías + /nosotros)
@@ -48,10 +50,12 @@ components/
   Reveal.tsx              # Fade/slide al entrar en viewport
   IntroSplash.tsx         # Intro: puertas azules + engranaje
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
+  FavoriteButton.tsx / Testimonials.tsx / Breadcrumbs.tsx
   QuoteForm.tsx
 data/
   contact.ts               # Teléfono, WhatsApp, correo, Maps
   company.ts               # Historia / misión / visión (placeholder)
+  testimonials.ts          # Prueba social B2B de ejemplo
   media.ts                 # Slides / logo / icon
   home.ts                   # trustItems, mainCategories, distributorBrands
   products.ts               # Catálogo de ejemplo + searchCatalog
@@ -66,7 +70,7 @@ public/images/marcas/       # Wordmarks SVG
 2. `HeroSlider`
 3. `BrandsCarousel`
 4. `TrustInfoBar`
-5. `main` → `CategoriesGrid` + `FeaturedOffers`
+5. `main` → `CategoriesGrid` + `FeaturedOffers` + `Testimonials`
 
 ### A.5 Categorías (`data/home.ts` → `mainCategories`)
 
@@ -107,6 +111,8 @@ Hay **al menos 3 productos por categoría** (22 SKUs de ejemplo).
 
 El listado público pasa por `GET /api/productos?q=&category=&brand=`.
 `CartProvider` guarda líneas `{ productId, qty }` en `localStorage` (`chamo-cart-v1`).
+`FavoritesProvider` guarda IDs en `chamo-favorites-v1`; el corazón de la tarjeta y del
+modal persiste, muestra confirmación **Guardado** y el Navbar lleva el contador.
 
 Modal (diseño ficha):
 1. Galería + thumbs  
@@ -140,7 +146,17 @@ además lleva una barra dorada animada debajo, calculada con `offsetLeft`/`offse
 del link marcado `data-nav-active="true"` (estado `navIndicator`, se recalcula al
 cambiar `pathname`). Si se agregan ítems a `mainLinks`, el indicador los sigue solo.
 
-### A.10 Scripts
+### A.10 Auditoría UX 2026-09-10 (origen y cierre)
+
+La nota [`cambios/2026-09-10-auditoria-ux-funcional.md`](./cambios/2026-09-10-auditoria-ux-funcional.md)
+se tomó contra **`main` antiguo** (antes de catálogo/carrito). En el código actual:
+
+- **Cerrado:** `/catalogo`, `/categorias`, `/carrito` y `/favoritos` responden (ya no 404).
+- **Cerrado:** buscador del Navbar → `/catalogo?q=`; carrito y cotización persisten; favoritos persisten con badge y confirmación.
+- **Cerrado:** fallback de logos en `BrandsCarousel` también mira `load` + `naturalWidth === 0` (no solo `onError`). Los wordmarks SVG ya están en `public/images/marcas/`.
+- **Sigue abierto:** `AuthForm` no autentica (lo dice el propio formulario). Comparar producto sigue siendo visual. Specs/CMS/ERP y logos oficiales dependen del cliente.
+
+### A.11 Scripts
 
 ```bash
 npm run dev      # http://localhost:3000
@@ -156,6 +172,13 @@ npm test         # Vitest smoke (slider, categorías, búsqueda)
 
 Describe **lo que se ve y se puede hacer hoy** en el sitio. Se actualiza cada vez que
 cambia el comportamiento visible — incluso un cambio pequeño como reemplazar una imagen.
+
+> ⚠️ **Importante para negocio/operación:** el catálogo, las categorías, el carrito y
+> los favoritos ya funcionan en el navegador (`localStorage`). El buscador lleva a
+> `/catalogo`. WhatsApp sale prellenado por producto, carrito y **línea de categoría**.
+> Todavía **no** hay login real (el formulario lo dice) ni inventario/ERP. Los
+> testimonios del home son de ejemplo. Detalle en A.10 y
+> [`SUGERENCIAS.md`](./SUGERENCIAS.md).
 
 ### B.1 Entrar al sitio
 
@@ -182,6 +205,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 **Marcas distribuidoras**
 - Carrusel justo debajo del slider, para marcas que se comercializan/auspician
+- Si un logo no carga, se muestra el nombre de la marca en texto
 
 **Beneficios**
 - Franja con envíos, venta mayorista, pagos (Yape/Plin/tarjetas) y atención a distribuidores
@@ -191,7 +215,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
   Herramientas, Construcción, Pinturas
 - **Carrusel en móvil y PC**: flechas circulares ← → arriba a la derecha; también
   se puede deslizar con el dedo o el trackpad
-- Cada una: icono Lucide, subtítulo, título, 3 beneficios, botón **Explorar** e imagen
+- Cada una: icono Lucide, subtítulo, título, 3 beneficios, **Explorar**, **Cotizar línea** (WhatsApp) e imagen
 - Enlace "Ver todas" → `/categorias` (listado) y **Explorar** → `/categorias/[slug]`
 
 **Productos destacados / ofertas**
@@ -204,6 +228,10 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 **WhatsApp**
 - Botón flotante verde para cotizar / contactar (`+51 959 723 602`)
+- En cada categoría: **Cotizar línea** abre WhatsApp con el nombre de esa línea
+
+**Testimonios**
+- Tres referencias de mayoristas de ejemplo (se reemplazan con casos reales del cliente)
 
 **Pie de página**
 - Enlaces, contacto, mapa, medios de pago, boletín, términos y privacidad
@@ -215,6 +243,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
+| `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
 | `/contacto` | Encabezado sticker **NUESTRO CONTACTO**, datos y Maps |
 | `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
@@ -232,4 +261,5 @@ Más adelante conviene un panel admin; por ahora:
 - Logos de marcas → `public/images/marcas/`
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
 - Teléfono / WhatsApp / correo → `data/contact.ts`
+- Testimonios del home → `data/testimonials.ts` (hoy ejemplo)
 - Historia, misión y visión de `/nosotros` → `data/company.ts` (hoy placeholder)

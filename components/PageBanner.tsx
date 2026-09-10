@@ -1,12 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import StampHeading from "@/components/StampHeading";
+import Breadcrumbs, { type Crumb } from "@/components/Breadcrumbs";
 
-export type PageBannerCrumb = {
-  href?: string;
-  label: string;
-};
+export type PageBannerCrumb = Crumb;
+
+type BannerCta = { href: string; label: string; external?: boolean };
 
 type PageBannerProps = {
   title: string;
@@ -14,11 +13,26 @@ type PageBannerProps = {
   subtitle?: string;
   image: string;
   imageAlt: string;
-  crumbs?: PageBannerCrumb[];
+  crumbs?: Crumb[];
   brands?: readonly string[];
-  cta?: { href: string; label: string };
+  cta?: BannerCta;
+  ctaAlt?: BannerCta;
   stamp?: { lead?: string; accent: string; variant?: "default" | "offer" };
 };
+
+function BannerAction({ href, label, external }: BannerCta) {
+  return (
+    <a
+      href={href}
+      {...(external
+        ? { target: "_blank", rel: "noopener noreferrer" }
+        : undefined)}
+      className="inline-flex items-center gap-2 rounded-md bg-brand-primary px-5 py-2.5 text-sm font-bold tracking-wide text-white uppercase shadow-[4px_4px_0_0_#0B3554] transition hover:bg-brand-dark"
+    >
+      {label}
+    </a>
+  );
+}
 
 export default function PageBanner({
   title,
@@ -29,6 +43,7 @@ export default function PageBanner({
   crumbs,
   brands = [],
   cta,
+  ctaAlt,
   stamp,
 }: PageBannerProps) {
   return (
@@ -52,22 +67,7 @@ export default function PageBanner({
 
         <div className="relative z-10 flex min-h-[220px] flex-col items-center justify-center px-8 py-12 text-center sm:min-h-[300px] lg:min-h-[360px]">
           {crumbs && crumbs.length > 0 ? (
-            <p className="text-xs font-medium text-white/80">
-              {crumbs.map((crumb, index) => (
-                <span key={`${crumb.label}-${index}`}>
-                  {index > 0 ? (
-                    <span className="text-white/45"> / </span>
-                  ) : null}
-                  {crumb.href ? (
-                    <Link href={crumb.href} className="hover:underline">
-                      {crumb.label}
-                    </Link>
-                  ) : (
-                    <span className="text-white/45">{crumb.label}</span>
-                  )}
-                </span>
-              ))}
-            </p>
+            <Breadcrumbs items={crumbs} tone="light" className="justify-center" />
           ) : null}
           {eyebrow && !stamp ? (
             <span className="mt-3 inline-flex rounded-md bg-brand-gold px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-brand-dark uppercase">
@@ -108,13 +108,15 @@ export default function PageBanner({
               ))}
             </ul>
           ) : null}
-          {cta ? (
-            <a
-              href={cta.href}
-              className="mt-6 inline-flex items-center gap-2 rounded-md bg-brand-primary px-5 py-2.5 text-sm font-bold tracking-wide text-white uppercase shadow-[4px_4px_0_0_#0B3554] transition hover:bg-brand-dark"
-            >
-              {cta.label}
-            </a>
+          {cta || ctaAlt ? (
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              {cta ? <BannerAction {...cta} /> : null}
+              {ctaAlt ? (
+                <span className="[&>a]:bg-brand-whatsapp [&>a]:shadow-[4px_4px_0_0_#0B3554] [&>a]:hover:bg-[#1ebe57]">
+                  <BannerAction {...ctaAlt} />
+                </span>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>

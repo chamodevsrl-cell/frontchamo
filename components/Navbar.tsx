@@ -22,6 +22,7 @@ import { LOGO_SRC } from "@/data/media";
 import { mainCategories } from "@/data/home";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
+import { useFavorites } from "@/components/FavoritesProvider";
 import CategoryIcon from "@/components/CategoryIcon";
 
 const mainLinks = [
@@ -42,6 +43,7 @@ export default function Navbar() {
   const router = useRouter();
   const { openAuth } = useAuth();
   const { count } = useCart();
+  const { count: favoritesCount } = useFavorites();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -254,10 +256,17 @@ export default function Navbar() {
 
             <Link
               href="/favoritos"
-              className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              aria-label={`Favoritos, ${favoritesCount} productos`}
             >
               <Heart className="h-5 w-5" strokeWidth={2} />
               <span className="text-[11px] font-semibold">Favoritos</span>
+              <span
+                suppressHydrationWarning
+                className="absolute -top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {favoritesCount}
+              </span>
             </Link>
 
             <Link
@@ -278,10 +287,16 @@ export default function Navbar() {
             {/* Compact icons on very small screens */}
             <Link
               href="/favoritos"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
-              aria-label="Favoritos"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
+              aria-label={`Favoritos, ${favoritesCount} productos`}
             >
               <Heart className="h-5 w-5" strokeWidth={2} />
+              <span
+                suppressHydrationWarning
+                className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {favoritesCount}
+              </span>
             </Link>
             <Link
               href="/carrito"

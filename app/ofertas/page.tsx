@@ -18,7 +18,12 @@ export default function OfertasPage() {
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-          <StampBand>
+          <StampBand
+            crumbs={[
+              { href: "/", label: "Inicio" },
+              { label: "Ofertas" },
+            ]}
+          >
             <StampHeading
               lead="OFERTAS"
               accent="DESCUENTOS"

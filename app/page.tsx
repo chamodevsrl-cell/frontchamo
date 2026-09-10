@@ -4,6 +4,7 @@ import TrustInfoBar from "@/components/TrustInfoBar";
 import CategoriesGrid from "@/components/CategoriesGrid";
 import FeaturedOffers from "@/components/FeaturedOffers";
 import BrandsCarousel from "@/components/BrandsCarousel";
+import Testimonials from "@/components/Testimonials";
 import Reveal from "@/components/Reveal";
 
 export default function Home() {
@@ -25,6 +26,9 @@ export default function Home() {
         </Reveal>
         <Reveal delayMs={80}>
           <FeaturedOffers />
+        </Reveal>
+        <Reveal delayMs={120}>
+          <Testimonials />
         </Reveal>
       </main>
     </div>

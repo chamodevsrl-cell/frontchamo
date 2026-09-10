@@ -16,3 +16,9 @@ export const MAP_EMBED_URL =
 export function whatsappUrl(text: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
+
+export function categoryWhatsappUrl(categoryLabel: string) {
+  return whatsappUrl(
+    `Hola, quiero cotizar productos de la línea ${categoryLabel} al por mayor.`,
+  );
+}

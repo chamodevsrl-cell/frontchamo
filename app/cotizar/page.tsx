@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import QuoteForm from "@/components/QuoteForm";
 import Reveal from "@/components/Reveal";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const metadata: Metadata = {
   title: "Cotizar | Chamo Import",
@@ -15,7 +16,13 @@ export default function CotizarPage() {
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-          <span className="inline-flex rounded-full bg-brand-gold px-2.5 py-1 text-xs font-extrabold text-brand-dark uppercase">
+          <Breadcrumbs
+            items={[
+              { href: "/", label: "Inicio" },
+              { label: "Cotizar" },
+            ]}
+          />
+          <span className="mt-4 inline-flex rounded-full bg-brand-gold px-2.5 py-1 text-xs font-extrabold text-brand-dark uppercase">
             Mayorista
           </span>
           <h1 className="mt-3 font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">

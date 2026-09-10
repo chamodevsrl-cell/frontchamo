@@ -32,6 +32,7 @@ const quickLinks = [
   { href: "/catalogo", label: "Catálogo" },
   { href: "/categorias", label: "Categorías" },
   { href: "/ofertas", label: "Ofertas" },
+  { href: "/favoritos", label: "Favoritos" },
   { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
 ] as const;

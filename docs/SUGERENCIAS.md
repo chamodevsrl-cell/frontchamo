@@ -1,8 +1,41 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-09**
+Última actualización: **2026-09-10**
 
 Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al surgir una idea en un cambio, anótala aquí.
+
+## 🔎 Evaluación UX / UI y funcional (2026-09-10)
+
+Revisión original con el sitio de **`main` antiguo** (`npm run dev`), desktop y móvil.
+Detalle: [`cambios/2026-09-10-auditoria-ux-funcional.md`](./cambios/2026-09-10-auditoria-ux-funcional.md).
+Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./cambios/2026-09-10-cierre-auditoria-ux.md).
+
+**Lo que funciona bien:**
+- Navbar de 3 niveles con jerarquía clara; hover e ítem activo con indicador dorado animado.
+- Hero slider full-bleed, carrusel de categorías con flechas y carrusel de productos.
+- Modal de producto (ficha técnica + relacionados + WhatsApp con número oficial y mensaje prellenado).
+- CTA de WhatsApp visible, coherente con venta B2B en Perú.
+
+**Bugs de la auditoría — estado actual:**
+- [x] 2026-09-10 — **Fallback de logos rotos.** `BrandsCarousel` ahora marca fallo con `onError`, `onLoad` y `naturalWidth === 0` (`lib/image.ts`). Los wordmarks SVG ya están en `public/images/marcas/`.
+- [x] 2026-09-10 — **Rutas que daban 404 en `main`:** `/catalogo`, `/categorias`, `/carrito` (este PR, 2026-09-09) y `/favoritos` (esta pasada).
+
+**Funciones que eran solo UI — estado actual:**
+- [x] 2026-09-09 — El **buscador** navega a `/catalogo?q=`
+- [x] 2026-09-09 — **Añadir al carrito** / **Agregar a cotización** persisten en `localStorage` y actualizan el badge
+- [ ] **Login / registro** (`AuthForm.tsx`) sigue siendo un stub honesto — no autentica ni guarda cuentas
+- [x] 2026-09-10 — **Favoritos** persisten (`chamo-favorites-v1`), cuentan en el Navbar y confirman “Guardado”
+
+## 💡 Recomendaciones de cosas nuevas a agregar
+
+- [x] 2026-09-09 — **Carrito real** en `localStorage` + página `/carrito`
+- [x] 2026-09-09 — **Búsqueda** client-side / API contra `data/products.ts`
+- [x] 2026-09-09 — **Página de catálogo** (`/catalogo`) con filtros
+- [x] 2026-09-09 — **Estado vacío** cuando búsqueda o filtro no encuentra nada
+- [x] 2026-09-10 — **WhatsApp prellenado por categoría** (home, listado y banner de detalle)
+- [x] 2026-09-10 — **Reseñas / testimonios** de ejemplo en la home (`data/testimonials.ts`) — sustituir por casos reales del cliente
+- [x] 2026-09-10 — **Indicador de guardado** al marcar favoritos
+- [x] 2026-09-10 — **Breadcrumbs** en páginas internas (Inicio / sección)
 
 ## Prioridad alta
 
@@ -11,6 +44,7 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [x] 2026-09-09 — Renombrar banners del slider sin espacios (`baner-1.png`)
 - [x] 2026-09-09 — Página `/categorias` (y detalle `/categorias/[slug]`)
 - [x] 2026-09-09 — Página `/carrito` (localStorage + badge del Navbar)
+- [x] 2026-09-10 — Página `/favoritos` (localStorage + badge + corazón funcional)
 
 ## Producto / UX
 
@@ -34,6 +68,7 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [ ] Confirmar correo de contacto oficial (footer y `/contacto` usan `ventas@chamoimport.com` como provisional)
 - [ ] Reemplazar textos placeholder de `/nosotros` (`data/company.ts`: año 2016, misión/visión de ejemplo) por ficha oficial del cliente
 - [x] 2026-09-09 — Políticas (términos, privacidad) enlazadas desde el footer
+- [ ] Sustituir testimonios de ejemplo (`data/testimonials.ts`) por casos reales de distribuidores
 
 ## Ideas nuevas de este bloque
 
@@ -44,10 +79,12 @@ Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al 
 - [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
 - [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
-- [ ] Página `/favoritos` (el Navbar sigue enlazándola)
+- [ ] Comparar productos (el botón de dos flechas sigue siendo visual)
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-10 — Cierre de la auditoría UX: favoritos, fallback de marcas, testimonios, WhatsApp por categoría, breadcrumbs
+- [x] 2026-09-10 — Auditoría UX/UI y funcional con el sitio corriendo (bugs confirmados + recomendaciones)
 - [x] 2026-09-09 — Intro de entrada (puertas azules + engranaje)
 - [x] 2026-09-09 — Iconos Lucide (carrito, categorías, productos)
 - [x] 2026-09-09 — Productos destacados en una fila (carrusel como categorías)

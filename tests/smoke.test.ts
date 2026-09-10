@@ -6,6 +6,9 @@ import {
   getRelatedProducts,
   searchCatalog,
 } from "@/data/products";
+import { categoryWhatsappUrl } from "@/data/contact";
+import { testimonials } from "@/data/testimonials";
+import { isBrokenImage } from "@/lib/image";
 
 describe("smoke de catálogo y home", () => {
   it("el slider tiene 3 banners y rutas sin espacios", () => {
@@ -60,6 +63,22 @@ describe("smoke de catálogo y home", () => {
     );
     expect(seguridad.length).toBeGreaterThanOrEqual(3);
   });
+
+  it("el fallback de marcas detecta imágenes rotas por naturalWidth", () => {
+    expect(isBrokenImage({ complete: true, naturalWidth: 0 })).toBe(true);
+    expect(isBrokenImage({ complete: true, naturalWidth: 80 })).toBe(false);
+    expect(isBrokenImage({ complete: false, naturalWidth: 0 })).toBe(false);
+  });
+
+  it("WhatsApp por categoría lleva el nombre de la línea", () => {
+    const href = categoryWhatsappUrl("Ferretería");
+    expect(href).toContain("wa.me/51959723602");
+    expect(href).toContain(encodeURIComponent("Ferretería"));
+  });
+
+  it("hay testimonios de ejemplo para la home", () => {
+    expect(testimonials.length).toBeGreaterThanOrEqual(3);
+  });
 });
 
 describe("home HTTP (si el dev server está arriba)", () => {
@@ -73,6 +92,11 @@ describe("home HTTP (si el dev server está arriba)", () => {
       expect(html).toContain("Chamo Import");
       expect(html).toContain("baner-1.png");
       expect(html).not.toContain("Imagen del anuncio");
+
+      const favoritos = await fetch("http://127.0.0.1:3000/favoritos", {
+        signal: AbortSignal.timeout(4000),
+      });
+      expect(favoritos.ok).toBe(true);
     } catch (error) {
       if (error instanceof Error && error.message.includes("expected")) {
         throw error;

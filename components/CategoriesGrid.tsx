@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
+import { categoryWhatsappUrl } from "@/data/contact";
 import Reveal from "@/components/Reveal";
 import CategoryIcon from "@/components/CategoryIcon";
 
@@ -41,13 +42,24 @@ function CategoryCard({ category }: { category: MainCategory }) {
           ))}
         </ul>
 
-        <Link
-          href={category.href}
-          className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_0_14px_rgba(18,126,201,0.45)] transition hover:bg-brand-dark sm:mt-5 sm:px-4 sm:py-2 sm:text-sm"
-        >
-          Explorar
-          <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
-        </Link>
+        <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5">
+          <Link
+            href={category.href}
+            className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_0_14px_rgba(18,126,201,0.45)] transition hover:bg-brand-dark sm:px-4 sm:py-2 sm:text-sm"
+          >
+            Explorar
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
+          </Link>
+          <a
+            href={categoryWhatsappUrl(category.label)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-1.5 rounded-full border border-brand-whatsapp/40 bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-dark transition hover:bg-brand-whatsapp hover:text-white sm:px-4 sm:py-2 sm:text-sm"
+          >
+            <MessageCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Cotizar línea
+          </a>
+        </div>
       </div>
 
       <div className="px-3 pb-3 sm:px-4 sm:pb-4 lg:px-5 lg:pb-5">

@@ -2,9 +2,10 @@
 
 import { useState, type MouseEvent } from "react";
 import Image from "next/image";
-import { BadgePercent, GitCompareArrows, Heart, ShoppingCart, Star } from "lucide-react";
+import { BadgePercent, GitCompareArrows, ShoppingCart, Star } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { FeaturedProduct } from "@/data/products";
+import FavoriteButton from "@/components/FavoriteButton";
 
 type ProductCardProps = {
   product: FeaturedProduct;
@@ -69,19 +70,12 @@ export default function ProductCard({
             : "DESTACADO"}
         </span>
 
-        <div className="absolute top-2 right-2 hidden flex-col gap-2 sm:top-3 sm:right-3 sm:flex">
+        <div className="absolute top-2 right-2 flex flex-col gap-2 sm:top-3 sm:right-3">
+          <FavoriteButton productId={product.id} />
           <button
             type="button"
             onClick={(event) => event.stopPropagation()}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-brand-dark shadow-sm transition hover:text-brand-primary"
-            aria-label="Agregar a favoritos"
-          >
-            <Heart className="h-4 w-4" strokeWidth={2} />
-          </button>
-          <button
-            type="button"
-            onClick={(event) => event.stopPropagation()}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-brand-dark shadow-sm transition hover:text-brand-primary"
+            className="hidden h-8 w-8 items-center justify-center rounded-full bg-white text-brand-dark shadow-sm transition hover:text-brand-primary sm:inline-flex"
             aria-label="Comparar producto"
           >
             <GitCompareArrows className="h-4 w-4" strokeWidth={2} />

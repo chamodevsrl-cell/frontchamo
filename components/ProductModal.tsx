@@ -5,7 +5,6 @@ import Image from "next/image";
 import {
   BadgePercent,
   GitCompareArrows,
-  Heart,
   Minus,
   Plus,
   ShieldCheck,
@@ -20,6 +19,7 @@ import {
 import { whatsappUrl } from "@/data/contact";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/components/CartProvider";
+import FavoriteButton from "@/components/FavoriteButton";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -227,13 +227,7 @@ export default function ProductModal({
                     <Plus className="h-4 w-4" strokeWidth={2.25} />
                   </button>
                 </div>
-                <button
-                  type="button"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary"
-                  aria-label="Agregar a favoritos"
-                >
-                  <Heart className="h-4 w-4" strokeWidth={2} />
-                </button>
+                <FavoriteButton productId={product.id} variant="box" />
                 <button
                   type="button"
                   className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary"

@@ -32,7 +32,12 @@ export default async function CatalogoPage({
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-          <StampBand>
+          <StampBand
+            crumbs={[
+              { href: "/", label: "Inicio" },
+              { label: "Catálogo" },
+            ]}
+          >
             <StampHeading lead="NUESTRO" accent="CATÁLOGO" />
             <p className="mt-6 max-w-2xl text-sm text-brand-dark/70 sm:text-base dark:text-white/70">
               Busca por nombre, SKU, marca o categoría. La misma lógica alimenta

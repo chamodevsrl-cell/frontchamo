@@ -51,19 +51,19 @@ es `--brand-whatsapp` / `brand-whatsapp`.
 
 Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 
-## 5. Estado actual del sitio (2026-09-09)
+## 5. Estado actual del sitio (2026-09-10)
 
 - **Navbar de 3 niveles** (`components/Navbar.tsx`), estilo ferretería:
   1. Barra superior `brand-dark`: envíos, atención mayorista, enlaces Nosotros/Contacto, redes sociales.
-  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta, Favoritos, Carrito (badge con `CartProvider`).
+  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta, Favoritos (badge), Carrito (badge con `CartProvider`).
   3. Barra `brand-primary`: botón **Categorías** (fondo `brand-dark`, dropdown desde `mainCategories` + "Ver todas") y menú principal uppercase (Inicio, Catálogo, Ofertas, Nosotros, Contacto). El ítem activo y el hover solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo además lleva una **barra dorada animada** debajo (`navIndicator`, calculada por `offsetLeft`/`offsetWidth` del link con `data-nav-active`).
   - Menú móvil tipo drawer lateral con categorías + navegación + botón "Mi cuenta".
   - Los badges **Oferta/Nuevo** (no el botón de categorías) son los que usan `brand-gold` — ver `FeaturedOffers.tsx` / `CategoriesGrid.tsx`.
 - **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) con el número oficial; `/cotizar` arma el mensaje con formulario + carrito.
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
-- **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers).
+- **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; fotos locales en `public/images/categorias/`. Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm`. Carrito: `CartProvider` (localStorage).
+- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (stub). Carrito: `CartProvider`. Favoritos: `FavoritesProvider` (`localStorage`).
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -82,6 +82,10 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `ProductModal.tsx` | Modal de producto: galería, precios, ficha técnica (tabla) y relacionados por categoría |
 | `TrustInfoBar.tsx` | Barra de confianza (envíos, garantía, atención, etc.) |
 | `CartProvider.tsx` | Carrito / cotización en `localStorage` |
+| `FavoritesProvider.tsx` | Favoritos en `localStorage` (`chamo-favorites-v1`) |
+| `FavoriteButton.tsx` | Corazón con persistencia + confirmación “Guardado” |
+| `Testimonials.tsx` | Prueba social B2B de ejemplo en la home |
+| `Breadcrumbs.tsx` | Miga de pan en páginas internas |
 | `ProductCard.tsx` | Tarjeta de producto reutilizable (home, catálogo, ofertas) |
 | `ProductCatalog.tsx` | Grilla + modal |
 | `CatalogFilters.tsx` | Filtros de `/catalogo` (query string) |
@@ -114,6 +118,7 @@ app/                  # App Router (páginas y layout)
   catalogo/             # Búsqueda y filtros
   categorias/           # Listado + [slug]
   carrito/              # Cotización local
+  favoritos/            # Lista persistida
   terminos/ privacidad/ # Políticas
   api/productos/        # GET catálogo
 components/            # UI reutilizable (ver §6)
@@ -123,6 +128,7 @@ data/
   media.ts              # Rutas de slider, logo e icono (LOGO_SRC, ICON_SRC, slides)
   home.ts                # Datos de secciones del home (marcas, categorías, trust bar…)
   products.ts            # Catálogo de productos de ejemplo
+  testimonials.ts        # Testimonios de ejemplo (home)
 docs/                   # Documentación viva en 3 secciones fijas (ver §9)
   README.md              # Índice + flujo obligatorio
   cambios/               # Sección 1 — nota antes/después por solicitud
@@ -170,14 +176,16 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-09): intro al entrar (puertas azules + engranaje que gira).
+Último avance (2026-09-10): cierre de la auditoría UX (favoritos, fallback de marcas, testimonios, WhatsApp por categoría, breadcrumbs).
 
 ## 10. Pendientes conocidos
 
 - Confirmar correo de contacto oficial (footer y `/contacto`).
 - Reemplazar textos placeholder de `/nosotros` (`data/company.ts`) por ficha oficial.
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).
-- Página `/favoritos` (el Navbar sigue enlazándola).
+- Login/registro real (`AuthForm` sigue siendo stub).
+- Comparar productos (botón visual, sin lógica).
 - Fotos reales de tienda/almacén y logos oficiales de marca (hoy JPEG localizados y wordmarks SVG).
 - Specs técnicas oficiales por SKU cuando el cliente envíe fichas.
 - CMS/admin y backend de inventario real (hoy `/api/productos` sirve el catálogo de ejemplo).
+- Sustituir testimonios de ejemplo por casos reales de distribuidores.

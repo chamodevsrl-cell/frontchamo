@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Reveal from "@/components/Reveal";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/format";
 import { whatsappUrl } from "@/data/contact";
@@ -38,7 +39,13 @@ export default function CarritoPage() {
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
         <Reveal>
-        <h1 className="inline-flex items-center gap-3 font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
+        <Breadcrumbs
+          items={[
+            { href: "/", label: "Inicio" },
+            { label: "Carrito" },
+          ]}
+        />
+        <h1 className="mt-4 inline-flex items-center gap-3 font-display text-3xl font-bold text-brand-dark sm:text-4xl dark:text-white">
           <ShoppingCart className="h-8 w-8 text-brand-primary" strokeWidth={2.25} aria-hidden />
           Carrito / cotización
         </h1>

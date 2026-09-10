@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Percent } from "lucide-react";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 type StampHeadingProps = {
   lead?: string;
@@ -64,9 +65,20 @@ export default function StampHeading({
   );
 }
 
-export function StampBand({ children }: { children: ReactNode }) {
+export function StampBand({
+  children,
+  crumbs,
+}: {
+  children: ReactNode;
+  crumbs?: { href?: string; label: string }[];
+}) {
   return (
     <header className="stamp-dots mb-8 flex flex-col items-center rounded-2xl border border-brand-dark/10 px-4 py-10 text-center sm:py-12 dark:border-white/10">
+      {crumbs && crumbs.length > 0 ? (
+        <div className="mb-6">
+          <Breadcrumbs items={crumbs} className="justify-center" />
+        </div>
+      ) : null}
       {children}
     </header>
   );
