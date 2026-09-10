@@ -261,7 +261,7 @@ html.intro-playing body {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  animation: intro-cart-path var(--intro-ms) cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: intro-cart-path var(--intro-ms) linear both;
 }
 
 .intro-cart-icon {
@@ -372,27 +372,27 @@ html.intro-playing body {
 @keyframes intro-cart-path {
   0% {
     opacity: 0;
-    transform: translate(calc(-50% - 58vw), -50%);
+    transform: translate(calc(-50% - 56vw), -50%);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  8% {
+  22% {
     opacity: 1;
-    transform: translate(calc(-50% - 38vw), -50%);
+    transform: translate(calc(-50% + 1.6vw), -50%);
+    animation-timing-function: ease-out;
   }
-  20% {
-    opacity: 1;
-    transform: translate(calc(-50% + 2.4vw), -50%);
-  }
-  26% {
-    transform: translate(calc(-50% - 0.5vw), -50%);
-  }
-  32%,
-  66% {
+  28% {
     opacity: 1;
     transform: translate(-50%, -50%);
+    animation-timing-function: linear;
+  }
+  68% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
   }
   100% {
     opacity: 1;
-    transform: translate(calc(-50% + 64vw), -50%);
+    transform: translate(calc(-50% + 62vw), -50%);
   }
 }
 
@@ -400,18 +400,18 @@ html.intro-playing body {
   0% {
     transform: rotate(-22deg);
   }
-  20% {
-    transform: rotate(8deg);
+  22% {
+    transform: rotate(6deg);
   }
-  30%,
-  64% {
+  28%,
+  68% {
     transform: rotate(0deg);
   }
-  72% {
-    transform: rotate(-12deg);
+  78% {
+    transform: rotate(-10deg);
   }
   100% {
-    transform: rotate(18deg);
+    transform: rotate(16deg);
   }
 }
 

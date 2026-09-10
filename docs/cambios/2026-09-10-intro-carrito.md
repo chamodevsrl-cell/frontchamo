@@ -23,7 +23,8 @@ play();
 - Clic en el icono **Carrito** del Navbar (`data-cart-intro`) o cualquier enlace a
   `/carrito`: mismas puertas azules.
 - Centro: icono Lucide `ShoppingCart` dorado. Entra desde la izquierda, **frena al
-  medio** mientras las puertas están cerradas y, al abrirse, **sigue a la derecha**.
+  medio** (~1s quieto, a la vez que las puertas siguen cerradas) y, al abrirse,
+  **sigue a la derecha**.
 - Logo / carga inicial: se mantiene el engranaje + “Chamo Import”.
 - Si ya estás en `/carrito`, no se repite.
 
