@@ -94,8 +94,8 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
 | `CategoryIcon.tsx` | Icono Lucide por categoría (menú, home, `/categorias`) |
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
-| `Preloader.tsx` | Carga inicial: logo oficial + engranaje girando + “CARGANDO...” |
-| `IntroSplash.tsx` | Puertas al clic del logo; al entrar al carrito, un carrito que frena y sigue |
+| `Preloader.tsx` | Carga inicial: logo oficial + engranaje girando + “CARGANDO...”; espera `window.load` (mín. 1.2 s, tope 6 s) |
+| `IntroSplash.tsx` | Puertas al clic del logo; al entrar al carrito, un carrito que frena a la izquierda de la costura (un solo play por clic) |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
 | `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |

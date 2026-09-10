@@ -27,6 +27,7 @@ export default function IntroSplash() {
   const pathname = usePathname();
   const lastPlay = useRef(0);
   const lastPath = useRef(pathname);
+  const cartClaimedByClick = useRef(false);
   const [visible, setVisible] = useState(false);
   const [cycle, setCycle] = useState(0);
   const [variant, setVariant] = useState<IntroVariant>(
@@ -40,11 +41,12 @@ export default function IntroSplash() {
 
   const play = useCallback((next: IntroVariant) => {
     const now = Date.now();
-    if (now - lastPlay.current < 450) return;
+    if (now - lastPlay.current < 450) return false;
     lastPlay.current = now;
     setVariant(next);
     setCycle((n) => n + 1);
     setVisible(true);
+    return true;
   }, []);
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export default function IntroSplash() {
         (link.matches("[data-cart-intro]") || isSameOriginPath(link.href, "/carrito")) &&
         window.location.pathname !== "/carrito"
       ) {
-        play("cart");
+        if (play("cart")) cartClaimedByClick.current = true;
       }
     }
 
@@ -76,7 +78,15 @@ export default function IntroSplash() {
   useEffect(() => {
     if (pathname === lastPath.current) return;
     lastPath.current = pathname;
-    if (pathname === "/carrito") play("cart");
+    if (pathname === "/carrito") {
+      if (cartClaimedByClick.current) {
+        cartClaimedByClick.current = false;
+        return;
+      }
+      play("cart");
+    } else {
+      cartClaimedByClick.current = false;
+    }
   }, [pathname, play]);
 
   useLayoutEffect(() => {

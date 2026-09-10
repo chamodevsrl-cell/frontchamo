@@ -267,7 +267,7 @@ html.intro-playing body {
   text-transform: uppercase;
 }
 
-/* Carrito: entra, frena al centro y sigue su camino al abrir las puertas. */
+/* Carrito: entra, frena a la izquierda de la costura y sigue al abrir las puertas. */
 .intro-cart {
   position: absolute;
   top: 50%;
@@ -423,17 +423,17 @@ html.intro-playing body {
   }
   18% {
     opacity: 1;
-    transform: translate(calc(-50% + 1.4vw), -50%);
+    transform: translate(calc(-50% - 2.5rem + 1.4vw), -50%);
     animation-timing-function: ease-out;
   }
   24% {
     opacity: 1;
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% - 2.5rem), -50%);
     animation-timing-function: linear;
   }
   70% {
     opacity: 1;
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% - 2.5rem), -50%);
     animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
   }
   100% {

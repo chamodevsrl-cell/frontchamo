@@ -1,12 +1,15 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const HOLD_MS = 2500;
+const MIN_MS = 1200;
+const MAX_MS = 6000;
 
 export default function Preloader() {
   const [visible, setVisible] = useState(true);
+  const [readyMin, setReadyMin] = useState(false);
+  const [pageLoaded, setPageLoaded] = useState(false);
 
   useLayoutEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -16,9 +19,29 @@ export default function Preloader() {
     }
 
     document.documentElement.classList.add("intro-playing");
-    const timer = window.setTimeout(() => setVisible(false), HOLD_MS);
-    return () => window.clearTimeout(timer);
+
+    const minTimer = window.setTimeout(() => setReadyMin(true), MIN_MS);
+    const onLoad = () => setPageLoaded(true);
+    if (document.readyState === "complete") {
+      setPageLoaded(true);
+    } else {
+      window.addEventListener("load", onLoad, { once: true });
+    }
+    const maxTimer = window.setTimeout(() => setVisible(false), MAX_MS);
+
+    return () => {
+      window.clearTimeout(minTimer);
+      window.clearTimeout(maxTimer);
+      window.removeEventListener("load", onLoad);
+    };
   }, []);
+
+  useEffect(() => {
+    if (readyMin && pageLoaded) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hide once min time and window.load both elapsed
+      setVisible(false);
+    }
+  }, [readyMin, pageLoaded]);
 
   return (
     <AnimatePresence

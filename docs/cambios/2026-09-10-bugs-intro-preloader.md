@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-10
 - **Solicitud:** "Busca nuevos errores y cosas a mejorar" — el usuario mandó una captura de la intro del carrito mostrando la línea dorada atravesando el ícono, y describió que la animación se repite dos veces y pidió mejor soporte al recargar.
 - **Archivos:** `components/IntroSplash.tsx`, `app/globals.css`, `components/Preloader.tsx`
-- **Commit:** (pendiente al momento de escribir esta nota)
+- **Commit:** fix aplicado en esta misma nota (código + docs)
 
 ## Método
 
@@ -158,12 +158,33 @@ useEffect(() => {
 }, [readyMin, pageLoaded]);
 ```
 
+## Qué cambió (fix, 2026-09-10)
+
+Los tres puntos de **Solución propuesta** ya están en código:
+
+1. **`components/IntroSplash.tsx`** — `play()` retorna si arrancó. El clic en Carrito
+   reclama el ingreso (`cartClaimedByClick`); el efecto de `pathname` consume el claim
+   y no vuelve a disparar. Al salir de `/carrito` el claim se limpia, así que
+   back/forward y un segundo ingreso desde otra página sí reproducen. F5 en `/carrito`
+   sigue mostrando el **Preloader** (no las puertas): es la carga inicial, no un
+   cambio de ruta.
+2. **`app/globals.css`** — `intro-cart-path` estaciona el ícono a
+   `translate(calc(-50% - 2.5rem), -50%)` (a la izquierda de la costura dorada).
+3. **`components/Preloader.tsx`** — espera `window.load` (o `document.readyState ===
+   "complete"`) **y** un mínimo visible de 1.2 s. Tope de seguridad 6 s.
+
+## Cómo verificar
+
+1. Clic en **Carrito** del navbar → las puertas se abren **una sola vez**. El carrito
+   rueda, se estaciona a la **izquierda** de la línea dorada y sigue a la derecha.
+2. Recarga (F5): el preloader se queda hasta que la página cargue de verdad (mínimo
+   ~1.2 s). Si hay imágenes pesadas, espera a `window.load`. Tope 6 s.
+3. Ir a Catálogo no dispara intro. Clic en el logo sí dispara la intro de marca.
+
 ## Recomendación
 
-- Los 3 fixes son acotados (1–2 archivos cada uno) y no chocan entre sí — se pueden
-  aplicar en cualquier orden.
-- Antes de aplicar el fix del bug 1, confirmar en `dev` con Turbopack (donde el retraso
-  de compilación de `/carrito` es más notorio) que ya no se repite.
+- Confirmar en `dev` con Turbopack (el retraso de compilación de `/carrito` es más
+  notorio) que un solo clic no vuelve a montar `.intro-splash--cart`.
 - Este archivo vive en esta rama (`cursor/sugerencias-docs-1bc3`) porque `IntroSplash`/
-  `Preloader` no existen todavía en `main` — al mergear, esta nota y las líneas nuevas
-  de `SUGERENCIAS.md` deberían ir con el resto del PR.
+  `Preloader` no existen todavía en `main` — al mergear, esta nota y las líneas
+  resueltas de `SUGERENCIAS.md` van con el resto del PR.

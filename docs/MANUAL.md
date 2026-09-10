@@ -100,13 +100,15 @@ placeholder hasta ficha oficial del cliente.
 
 - Al **cargar o refrescar** la pestaña: `Preloader` (Framer Motion) — fondo `#0B3554`,
   logo oficial (`/logo.png`) entra de izquierda a derecha, `/engranaje.png` gira
-  debajo (60×60) y el texto **CARGANDO...** en `brand-gold`; a los 2.5s hace fade-out
-  y se desmonta.
+  debajo (60×60) y el texto **CARGANDO...** en `brand-gold`. Se oculta cuando la
+  página terminó de cargar (`window.load`) **y** pasaron al menos 1.2 s (tope 6 s).
 - Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
   Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil).
 - Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
-  Lucide (`ShoppingCart`) dorado. Entra desde la izquierda, **se detiene al medio**
-  y, al abrirse las puertas, **sigue su camino** hacia la derecha.
+  Lucide (`ShoppingCart`) dorado. Entra desde la izquierda, **se detiene a la
+  izquierda de la costura dorada** (no encima) y, al abrirse las puertas, **sigue
+  su camino** hacia la derecha. Un clic en el navbar dispara la intro **una sola
+  vez** (el cambio de `pathname` no la repite).
 - Mientras corre cualquiera de las dos, `html` lleva la clase `intro-playing`
   (`overflow: hidden !important`) para que el Navbar no libere el scroll del body.
 - Ir a Nosotros, Catálogo, Categorías, Contacto, etc. **no** dispara esa intro.
@@ -171,6 +173,7 @@ se tomó contra **`main` antiguo** (antes de catálogo/carrito). En el código a
 - **Cerrado:** `/catalogo`, `/categorias`, `/carrito` y `/favoritos` responden (ya no 404).
 - **Cerrado:** buscador del Navbar → `/catalogo?q=`; carrito y cotización persisten; favoritos persisten con badge y confirmación.
 - **Cerrado:** fallback de logos en `BrandsCarousel` también mira `load` + `naturalWidth === 0` (no solo `onError`). Los wordmarks SVG ya están en `public/images/marcas/`.
+- **Cerrado:** intro del carrito una sola vez por clic; ícono a la izquierda de la costura; preloader espera `window.load` (mín. 1.2 s, tope 6 s).
 - **Sigue abierto:** `AuthForm` no autentica (lo dice el propio formulario). Comparar producto sigue siendo visual. Specs/CMS/ERP y logos oficiales dependen del cliente.
 
 ### A.11 Scripts
@@ -202,11 +205,12 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
 3. Al entrar o refrescar, una pantalla `#0B3554` muestra el **logo oficial** entrando
-   de izquierda a derecha, un engranaje girando y el texto **CARGANDO...**. Luego se
-   desvanece y aparece el sitio. Si tocas el **logo**, las puertas azules con engranaje.
-   Al entrar al **carrito**, las mismas puertas pero pasa un carrito dorado: frena al
-   centro y, al abrirse, sigue de largo. Ir a Nosotros, Catálogo u otras secciones
-   **no** vuelve a mostrar esa intro.
+   de izquierda a derecha, un engranaje girando y el texto **CARGANDO...**. Se queda
+   hasta que la página cargue (mínimo ~1.2 s) y luego se desvanece. Si tocas el
+   **logo**, las puertas azules con engranaje. Al entrar al **carrito**, las mismas
+   puertas pero pasa un carrito dorado: frena a la **izquierda** de la línea dorada
+   (una sola vez por clic) y, al abrirse, sigue de largo. Ir a Nosotros, Catálogo u
+   otras secciones **no** vuelve a mostrar esa intro.
 
 ### B.2 Inicio (home)
 
@@ -263,7 +267,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | --- | --- |
 | `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
-| `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que frena al centro y sigue al abrir |
+| `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que frena a la izquierda de la costura dorada (una vez por clic) y sigue al abrir |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
 | `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre WhatsApp (sin `window.open`), y mapa |
