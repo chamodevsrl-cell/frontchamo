@@ -114,8 +114,10 @@ Verificado con el sitio corriendo (no solo lectura de código) — detalle compl
 
 - **Rutas 404 reales:** `/catalogo`, `/categorias`, `/carrito`, `/favoritos` (confirmado con `fetch`).
 - **Bug:** `BrandsCarousel.tsx` — el fallback de texto (`onError` → `setFailed(true)`) no se activa aunque las 10 imágenes de `public/images/marcas/` fallan; los 20 `<img>` (marcas × 2 del loop) quedan en el DOM sin reemplazarse por el `<span>` de texto.
+- **Bug:** `ProductModal.tsx` — al hacer clic en un "producto relacionado", el `useEffect` (dep. `product.id`) resetea `activeImage`/`qty` pero no el `scrollTop` del contenedor; el usuario se queda scrolleado abajo viendo la ficha técnica del producto nuevo sin ver su imagen/precio/WhatsApp. Confirmado midiendo `scrollTop` antes/después de un clic real (714 → 714). Solución y detalle en [`cambios/2026-09-10-bugs-cambios-recientes.md`](./cambios/2026-09-10-bugs-cambios-recientes.md).
+- **Bug menor:** `CategoriesGrid.tsx` — `scrollByCard` asume un gap fijo de 16px; el gap real por breakpoint es 12/16/20px (`gap-3`/`sm:gap-4`/`lg:gap-5`), medido 20px en desktop. El `snap-mandatory` lo disimula pero el scroll da un salto en vez de avanzar una tarjeta exacta.
 - **Sin lógica (solo UI):** `handleSearch` en `Navbar.tsx` (no filtra ni navega), botón "Añadir al carrito" en `FeaturedOffers.tsx` (sin `onClick`), botón "Agregar a cotización" en `ProductModal.tsx` (sin `onClick`), `AuthForm.tsx` (no autentica, lo dice su propio mensaje), favoritos (sin estado ni persistencia).
-- **Confirmado funcionando:** dropdown de categorías, carrusel de categorías con flechas, `ProductModal` completo (specs + relacionados + WhatsApp con número y mensaje correctos).
+- **Confirmado funcionando:** dropdown de categorías, carrusel de categorías con flechas, `ProductModal` completo (specs + relacionados + WhatsApp con número y mensaje correctos), e indicador dorado animado del Navbar (se descartó una posible condición de carrera con la carga de la fuente — Next.js ya la compensa con un fallback de métricas ajustadas).
 
 ### A.11 Scripts
 
