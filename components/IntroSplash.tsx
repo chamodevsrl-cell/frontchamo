@@ -1,16 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Cog } from "lucide-react";
 
+function lockIntroScroll() {
+  document.documentElement.classList.add("intro-playing");
+}
+
+function unlockIntroScroll() {
+  document.documentElement.classList.remove("intro-playing");
+}
+
 export default function IntroSplash() {
-  const overflowRef = useRef("");
   const lastPlay = useRef(0);
   const [visible, setVisible] = useState(true);
   const [cycle, setCycle] = useState(0);
 
   const hide = useCallback(() => {
-    document.body.style.overflow = overflowRef.current;
+    unlockIntroScroll();
     setVisible(false);
   }, []);
 
@@ -36,21 +43,23 @@ export default function IntroSplash() {
     return () => document.removeEventListener("click", onClick, true);
   }, [play]);
 
-  useEffect(() => {
-    if (!visible) return;
+  useLayoutEffect(() => {
+    if (!visible) {
+      unlockIntroScroll();
+      return;
+    }
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       const skip = window.setTimeout(hide, 0);
       return () => window.clearTimeout(skip);
     }
 
-    overflowRef.current = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    lockIntroScroll();
     const safety = window.setTimeout(hide, 3200);
 
     return () => {
       window.clearTimeout(safety);
-      document.body.style.overflow = overflowRef.current;
+      unlockIntroScroll();
     };
   }, [visible, cycle, hide]);
 

@@ -34,6 +34,14 @@ body {
   font-family: var(--font-sans);
 }
 
+/* El Navbar (y otros overlays) escriben overflow en body; esta clase
+   gana con !important para que las puertas no se puedan scrollear. */
+html.intro-playing,
+html.intro-playing body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
 /* Cursor llave inglesa — solo mouse/trackpad (no touch) */
 @media (hover: hover) and (pointer: fine) {
   html,

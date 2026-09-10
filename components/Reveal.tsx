@@ -17,6 +17,8 @@ export default function Reveal({ children, className, delayMs = 0 }: RevealProps
     if (!el) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reduced-motion: mostrar ya
+      setVisible(true);
       return;
     }
 

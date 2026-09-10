@@ -34,6 +34,21 @@ export function whatsappUrl(text: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
+/** Abre WhatsApp con gesto de usuario (evita que el popup blocker trague window.open). */
+export function openWhatsApp(text: string) {
+  const href = whatsappUrl(text);
+  if (typeof document === "undefined") return;
+
+  const anchor = document.createElement("a");
+  anchor.href = href;
+  anchor.target = "_blank";
+  anchor.rel = "noopener noreferrer";
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+}
+
 export function categoryWhatsappUrl(categoryLabel: string) {
   return whatsappUrl(
     `Hola, quiero cotizar productos de la línea ${categoryLabel} al por mayor.`,

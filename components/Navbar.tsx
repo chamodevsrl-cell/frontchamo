@@ -84,8 +84,12 @@ export default function Navbar() {
   }, [pathname]);
 
   useEffect(() => {
+    if (document.documentElement.classList.contains("intro-playing")) {
+      return;
+    }
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => {
+      if (document.documentElement.classList.contains("intro-playing")) return;
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);

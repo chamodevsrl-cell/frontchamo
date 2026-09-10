@@ -10,6 +10,7 @@ import {
   categoryWhatsappUrl,
   HOURS_DISPLAY,
   PHONE_DISPLAY,
+  whatsappUrl,
 } from "@/data/contact";
 import { testimonials } from "@/data/testimonials";
 import { isBrokenImage } from "@/lib/image";
@@ -88,6 +89,13 @@ describe("smoke de catálogo y home", () => {
     expect(PHONE_DISPLAY).toContain("959 723 602");
     expect(HOURS_DISPLAY.toLowerCase()).toContain("lun");
     expect(categoryWhatsappUrl("Ferretería")).toContain("wa.me/51959723602");
+  });
+
+  it("whatsappUrl arma el enlace con el mensaje encodeado", () => {
+    const href = whatsappUrl("Hola, soy Chamo");
+    expect(href).toBe(
+      `https://wa.me/51959723602?text=${encodeURIComponent("Hola, soy Chamo")}`,
+    );
   });
 });
 

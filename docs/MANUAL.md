@@ -100,6 +100,8 @@ placeholder hasta ficha oficial del cliente.
 - Al cargar o **refrescar** la web, y al clic en el **logo**: `IntroSplash` — puertas
   azules se cierran, gira un engranaje Lucide (`Cog`) y se abren (~2.7s en desktop,
   un poco menos en móvil).
+- Mientras corre, `html` lleva la clase `intro-playing` (`overflow: hidden
+  !important`) para que el Navbar no libere el scroll del body.
 - Ir a Nosotros, Catálogo, Categorías, Contacto, etc. **no** dispara esa intro.
 - Tamaños con `clamp`/`vmin` y `100dvh` para que el engranaje y las puertas entren en
   móvil y en landscape.
@@ -125,7 +127,11 @@ Modal (diseño ficha):
    “Especificación / Detalle”, filas blancas / `#eef6fc`, esquinas redondeadas + borde brillante  
 4. **Productos relacionados de la misma categoría** (clic cambia el producto del modal)
 
-WhatsApp unificado: `data/contact.ts` → `wa.me/51959723602`.
+WhatsApp unificado: `data/contact.ts` → `wa.me/51959723602`. Los formularios de
+`/contacto` y `/cotizar` abren el chat con `openWhatsApp()` (enlace `<a>`, no
+`window.open`, para no perder el envío por el bloqueador de popups).
+`FavoritesProvider` sincroniza el toast con un `idsRef` para que clics rápidos
+no desfasen “Guardado” / “Quitado”.
 
 ### A.7 Slider
 
@@ -251,7 +257,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
-| `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre el chat, y mapa |
+| `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre WhatsApp (sin `window.open`), y mapa |
 | `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |

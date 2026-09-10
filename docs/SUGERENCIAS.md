@@ -19,6 +19,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 **Bugs de la auditoría — estado actual:**
 - [x] 2026-09-10 — **Fallback de logos rotos.** `BrandsCarousel` ahora marca fallo con `onError`, `onLoad` y `naturalWidth === 0` (`lib/image.ts`). Los wordmarks SVG ya están en `public/images/marcas/`.
 - [x] 2026-09-10 — **Rutas que daban 404 en `main`:** `/catalogo`, `/categorias`, `/carrito` (este PR, 2026-09-09) y `/favoritos` (esta pasada).
+- [x] 2026-09-10 — **Intro scrolleable / WhatsApp bloqueado / toast de favoritos.** Clase `intro-playing`, `openWhatsApp()` y `idsRef` en favoritos. Detalle: [`cambios/2026-09-10-bugs-cambios-recientes.md`](./cambios/2026-09-10-bugs-cambios-recientes.md).
 
 **Funciones que eran solo UI — estado actual:**
 - [x] 2026-09-09 — El **buscador** navega a `/catalogo?q=`
@@ -78,6 +79,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 - [x] 2026-09-09 — Intro de entrada: puertas azules + engranaje Lucide
 - [x] 2026-09-10 — Intro de puertas al entrar, refrescar o clic en el logo (no en cada sección)
 - [x] 2026-09-10 — Página `/contacto` completa (canales, formulario WhatsApp, mapa)
+- [x] 2026-09-10 — Corrección de bugs: intro no scrolleable, formularios WhatsApp sin popup blocker, toast de favoritos a tono
 - [ ] Sustituir los JPEG de `public/images/categorias/` por collages de marcas/productos de cada línea
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
 - [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
@@ -85,6 +87,7 @@ Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./c
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-10 — Bugs de intro / WhatsApp / favoritos (scroll lock, openWhatsApp, idsRef)
 - [x] 2026-09-10 — Intro de puertas solo al entrar, refrescar o clic en el logo
 - [x] 2026-09-10 — Página de contacto completa (formulario WhatsApp + mapa)
 - [x] 2026-09-10 — Intro de puertas también al navegar (Categorías, etc.) + responsive

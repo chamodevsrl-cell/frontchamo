@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { MessageCircle } from "lucide-react";
-import { whatsappUrl } from "@/data/contact";
+import { openWhatsApp } from "@/data/contact";
 
 const topics = [
   { value: "cotizacion", label: "Cotización mayorista" },
@@ -37,7 +37,7 @@ export default function ContactForm() {
       .filter((line) => line !== null)
       .join("\n");
 
-    window.open(whatsappUrl(text), "_blank", "noopener,noreferrer");
+    openWhatsApp(text);
   }
 
   return (

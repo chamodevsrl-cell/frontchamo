@@ -45,6 +45,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const noticeTimer = useRef<number>(0);
+  const idsRef = useRef<string[]>([]);
 
   const flash = useCallback((text: string) => {
     window.clearTimeout(noticeTimer.current);
@@ -60,6 +61,10 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    idsRef.current = ids;
+  }, [ids]);
+
+  useEffect(() => {
     if (!ready) return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
   }, [ids, ready]);
@@ -71,22 +76,29 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const has = useCallback((productId: string) => ids.includes(productId), [ids]);
 
   const toggle = useCallback((productId: string) => {
-    const nextActive = !ids.includes(productId);
-    setIds((current) => {
-      if (current.includes(productId)) {
-        return current.filter((id) => id !== productId);
-      }
-      return [...current, productId];
-    });
+    const currentlyActive = idsRef.current.includes(productId);
+    const nextActive = !currentlyActive;
+    const next = currentlyActive
+      ? idsRef.current.filter((id) => id !== productId)
+      : [...idsRef.current, productId];
+    idsRef.current = next;
+    setIds(next);
     flash(nextActive ? "Guardado en favoritos" : "Quitado de favoritos");
     return nextActive;
-  }, [flash, ids]);
+  }, [flash]);
 
   const remove = useCallback((productId: string) => {
-    setIds((current) => current.filter((id) => id !== productId));
+    setIds((current) => {
+      const next = current.filter((id) => id !== productId);
+      idsRef.current = next;
+      return next;
+    });
   }, []);
 
-  const clear = useCallback(() => setIds([]), []);
+  const clear = useCallback(() => {
+    idsRef.current = [];
+    setIds([]);
+  }, []);
 
   const products = useMemo(
     () =>

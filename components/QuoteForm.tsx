@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import { featuredProducts, getProductById } from "@/data/products";
-import { whatsappUrl } from "@/data/contact";
+import { openWhatsApp } from "@/data/contact";
 import { formatPrice } from "@/lib/format";
 
 const DEFAULT_SKU_PARAM = "sku";
@@ -68,7 +68,7 @@ export default function QuoteForm() {
       .filter((line) => line !== null)
       .join("\n");
 
-    window.open(whatsappUrl(message), "_blank", "noopener,noreferrer");
+    openWhatsApp(message);
   }
 
   return (
