@@ -60,7 +60,7 @@ export default function Preloader() {
             />
           </motion.div>
 
-          <div className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden bg-white/10">
+          <div className="absolute inset-x-8 bottom-8 h-1 overflow-hidden rounded-full bg-white/15">
             <motion.div
               className="h-full bg-[#127EC9]"
               initial={{ width: "0%" }}
