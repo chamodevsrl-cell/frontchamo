@@ -97,10 +97,10 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5b Animaciones de entrada
 
-- Al cargar la web: `IntroSplash` — puertas azules se cierran, gira un engranaje Lucide
-  (`Cog`) y se abren para mostrar el sitio (~2.7s en desktop, un poco menos en móvil).
-- Al entrar a **`/nosotros`**: la misma pieza cubre un momento y se abre (~1.1–1.3s).
-  El resto de secciones (Catálogo, Categorías, Contacto, etc.) **no** llevan overlay.
+- Al cargar o **refrescar** la web, y al clic en el **logo**: `IntroSplash` — puertas
+  azules se cierran, gira un engranaje Lucide (`Cog`) y se abren (~2.7s en desktop,
+  un poco menos en móvil).
+- Ir a Nosotros, Catálogo, Categorías, Contacto, etc. **no** dispara esa intro.
 - Tamaños con `clamp`/`vmin` y `100dvh` para que el engranaje y las puertas entren en
   móvil y en landscape.
 - Slider, banners de página, categorías, productos y el resto de bloques: `Reveal`
@@ -188,9 +188,9 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
-3. Al entrar, dos paneles azules se cierran, gira un engranaje al centro y se abren
-   para mostrar el sitio. Esa intro **no** se repite al ir a Catálogo, Categorías o
-   Contacto. Sí se vuelve a ver al entrar a **Nosotros**. En el celular el engranaje
+3. Al entrar o refrescar, dos paneles azules se cierran, gira un engranaje al centro
+   y se abren. Lo mismo si tocas el **logo** de Chamo Import. Ir a Nosotros, Catálogo
+   u otras secciones **no** vuelve a mostrar esa intro. En el celular el engranaje
    se achica para que no se corte.
 
 ### B.2 Inicio (home)

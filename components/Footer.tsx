@@ -98,7 +98,11 @@ export default function Footer() {
       <div className="mx-auto grid max-w-[1600px] gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-12 lg:gap-8 lg:px-8 xl:px-10">
         {/* Marca */}
         <div className="lg:col-span-3">
-          <Link href="/" className="mb-4 inline-flex items-center gap-3">
+          <Link
+            href="/"
+            data-site-intro
+            className="mb-4 inline-flex items-center gap-3"
+          >
             {!logoFailed ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img

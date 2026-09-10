@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-10 | Intro solo al entrar, refrescar o clic en el logo | [2026-09-10-intro-logo-refresh.md](./2026-09-10-intro-logo-refresh.md) |
 | 2026-09-10 | Intro solo al cargar el sitio y al entrar a Nosotros | [2026-09-10-intro-solo-nosotros.md](./2026-09-10-intro-solo-nosotros.md) |
 | 2026-09-10 | Página de contacto completa (canales, formulario WhatsApp, mapa) | [2026-09-10-seccion-contacto.md](./2026-09-10-seccion-contacto.md) |
 | 2026-09-10 | Intro también al cambiar de página (Categorías, etc.) + responsive | [2026-09-10-intro-navegacion.md](./2026-09-10-intro-navegacion.md) |

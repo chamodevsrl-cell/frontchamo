@@ -1,30 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { Cog } from "lucide-react";
 
-const NOSOTROS_PATH = "/nosotros";
-
-function isNosotrosHref(href: string | null) {
-  if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) {
-    return false;
-  }
-  try {
-    const url = new URL(href, window.location.href);
-    return url.origin === window.location.origin && url.pathname === NOSOTROS_PATH;
-  } catch {
-    return false;
-  }
-}
-
 export default function IntroSplash() {
-  const pathname = usePathname();
-  const prevPath = useRef<string | null>(null);
   const overflowRef = useRef("");
   const lastPlay = useRef(0);
   const [visible, setVisible] = useState(true);
-  const [variant, setVariant] = useState<"boot" | "nav">("boot");
   const [cycle, setCycle] = useState(0);
 
   const hide = useCallback(() => {
@@ -32,11 +14,10 @@ export default function IntroSplash() {
     setVisible(false);
   }, []);
 
-  const playNosotros = useCallback(() => {
+  const play = useCallback(() => {
     const now = Date.now();
     if (now - lastPlay.current < 450) return;
     lastPlay.current = now;
-    setVariant("nav");
     setCycle((n) => n + 1);
     setVisible(true);
   }, []);
@@ -47,26 +28,13 @@ export default function IntroSplash() {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
-      const anchor = target.closest("a");
-      if (!(anchor instanceof HTMLAnchorElement)) return;
-      if (!isNosotrosHref(anchor.getAttribute("href"))) return;
-      if (window.location.pathname === NOSOTROS_PATH) return;
-      playNosotros();
+      if (!target.closest("a[data-site-intro]")) return;
+      play();
     }
 
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, [playNosotros]);
-
-  useEffect(() => {
-    if (prevPath.current === null) {
-      prevPath.current = pathname;
-      return;
-    }
-    if (prevPath.current === pathname) return;
-    prevPath.current = pathname;
-    if (pathname === NOSOTROS_PATH) playNosotros();
-  }, [pathname, playNosotros]);
+  }, [play]);
 
   useEffect(() => {
     if (!visible) return;
@@ -78,25 +46,23 @@ export default function IntroSplash() {
 
     overflowRef.current = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const safety = window.setTimeout(hide, variant === "boot" ? 3200 : 1800);
+    const safety = window.setTimeout(hide, 3200);
 
     return () => {
       window.clearTimeout(safety);
       document.body.style.overflow = overflowRef.current;
     };
-  }, [visible, variant, cycle, hide]);
+  }, [visible, cycle, hide]);
 
   if (!visible) return null;
 
   return (
     <div
-      key={`${variant}-${cycle}`}
-      className={`intro-splash intro-splash--${variant}`}
+      key={cycle}
+      className="intro-splash"
       role="status"
       aria-live="polite"
-      aria-label={
-        variant === "boot" ? "Cargando Chamo Import" : "Entrando a Nosotros"
-      }
+      aria-label="Cargando Chamo Import"
     >
       <div
         className="intro-panel intro-panel-left"
