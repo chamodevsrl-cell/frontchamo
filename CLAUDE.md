@@ -166,6 +166,9 @@ relacionados).
 
 ## 10. Pendientes conocidos
 
+- **Bug confirmado (2026-09-10):** el fallback de texto de `BrandsCarousel.tsx` no se activa — las 10 imágenes de `public/images/marcas/` fallan (404) pero el `onError`/`setFailed(true)` no reemplaza el `<img>` por el `<span>` de texto; el usuario ve el ícono nativo de "imagen rota". Ver [`docs/cambios/2026-09-10-auditoria-ux-funcional.md`](docs/cambios/2026-09-10-auditoria-ux-funcional.md).
+- **4 rutas 404 reales confirmadas:** `/catalogo`, `/categorias`, `/carrito`, `/favoritos` (enlazadas desde nav principal, "Ver todas" de categorías, e íconos de carrito/favoritos).
+- **Funciones sin lógica real (solo UI):** buscador del navbar (`handleSearch` solo hace `preventDefault`), "Añadir al carrito" (`FeaturedOffers.tsx`), "Agregar a cotización" (`ProductModal.tsx`), login/registro (`AuthForm.tsx`, lo admite su propio mensaje), favoritos. Plan de cierre priorizado en `docs/SUGERENCIAS.md`.
 - Sincronizar el teléfono/WhatsApp oficial (+51 959 723 602) en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx` (ver §3) — `ProductModal.tsx` ya lo tiene correcto, usarlo de referencia.
 - Confirmar correo de contacto oficial (footer y `/contacto`).
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).

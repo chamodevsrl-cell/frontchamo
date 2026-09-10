@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-08**
+Última actualización: **2026-09-10**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -107,7 +107,17 @@ además lleva una barra dorada animada debajo, calculada con `offsetLeft`/`offse
 del link marcado `data-nav-active="true"` (estado `navIndicator`, se recalcula al
 cambiar `pathname`). Si se agregan ítems a `mainLinks`, el indicador los sigue solo.
 
-### A.10 Scripts
+### A.10 Estado funcional confirmado (auditoría 2026-09-10)
+
+Verificado con el sitio corriendo (no solo lectura de código) — detalle completo en
+[`cambios/2026-09-10-auditoria-ux-funcional.md`](./cambios/2026-09-10-auditoria-ux-funcional.md):
+
+- **Rutas 404 reales:** `/catalogo`, `/categorias`, `/carrito`, `/favoritos` (confirmado con `fetch`).
+- **Bug:** `BrandsCarousel.tsx` — el fallback de texto (`onError` → `setFailed(true)`) no se activa aunque las 10 imágenes de `public/images/marcas/` fallan; los 20 `<img>` (marcas × 2 del loop) quedan en el DOM sin reemplazarse por el `<span>` de texto.
+- **Sin lógica (solo UI):** `handleSearch` en `Navbar.tsx` (no filtra ni navega), botón "Añadir al carrito" en `FeaturedOffers.tsx` (sin `onClick`), botón "Agregar a cotización" en `ProductModal.tsx` (sin `onClick`), `AuthForm.tsx` (no autentica, lo dice su propio mensaje), favoritos (sin estado ni persistencia).
+- **Confirmado funcionando:** dropdown de categorías, carrusel de categorías con flechas, `ProductModal` completo (specs + relacionados + WhatsApp con número y mensaje correctos).
+
+### A.11 Scripts
 
 ```bash
 npm run dev      # http://localhost:3000
@@ -122,6 +132,16 @@ npm run lint
 
 Describe **lo que se ve y se puede hacer hoy** en el sitio. Se actualiza cada vez que
 cambia el comportamiento visible — incluso un cambio pequeño como reemplazar una imagen.
+
+> ⚠️ **Importante para negocio/operación:** varias piezas de la interfaz todavía son
+> visuales sin funcionar por dentro. Hoy **no funcionan de verdad**: el buscador (no
+> filtra nada), "Añadir al carrito" y "Agregar a cotización" (no guardan nada, el carrito
+> siempre marca "0"), favoritos (no persiste), e iniciar sesión / registrarse (no crea
+> cuentas). Tampoco existen aún las páginas de Catálogo, Categorías, Carrito ni Favoritos
+> (dan error 404 al hacer clic). Lo que **sí funciona** hoy de punta a punta es el flujo
+> de WhatsApp: botón flotante, modal de producto y `/cotizar`. Detalle técnico en
+> A.10, y el plan para cerrar estos huecos en
+> [`SUGERENCIAS.md`](./SUGERENCIAS.md).
 
 ### B.1 Entrar al sitio
 
