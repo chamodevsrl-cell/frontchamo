@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-11
 - **Solicitud:** Estructurar y documentar el Panel Admin para que el backend conecte las APIs (tipos, mock, auth, `API_CONTRACT.md`)
 - **Archivos:** `types/admin.ts`, `services/adminApi.ts`, `lib/auth.ts`, `app/admin/**`, `API_CONTRACT.md`, `components/admin/AdminShell.tsx`
-- **Commit:** (se completa al subir)
+- **Commit:** `f847730` — `feat: structure admin panel for backend API handover`
 
 ## Qué había antes
 
