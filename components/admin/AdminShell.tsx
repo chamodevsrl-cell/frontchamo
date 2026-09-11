@@ -104,7 +104,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   if (!user) {
     return (
       <div className="fixed inset-0 z-[75] flex flex-col items-center justify-center bg-[#0B3554] px-4 text-center">
-        <Image src="/logo.png" alt="Chamo Import S.R.L." width={192} height={64} className="h-auto w-48 object-contain" />
+        <Image src="/logo.png" alt="Chamo Import S.R.L." width={192} height={64} className="w-48 object-contain" />
         <h1 className="mt-6 font-display text-2xl font-bold text-white">
           Panel de administración
         </h1>
@@ -128,7 +128,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   if (!isAdminUser(user)) {
     return (
       <div className="fixed inset-0 z-[75] flex flex-col items-center justify-center bg-[#0B3554] px-4 text-center">
-        <Image src="/logo.png" alt="Chamo Import S.R.L." width={192} height={64} className="h-auto w-48 object-contain" />
+        <Image src="/logo.png" alt="Chamo Import S.R.L." width={192} height={64} className="w-48 object-contain" />
         <h1 className="mt-6 font-display text-2xl font-bold text-white">
           Sin permiso de admin
         </h1>
@@ -169,7 +169,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               alt="Chamo Import S.R.L."
               width={176}
               height={40}
-              className="h-10 w-auto max-w-[11rem] object-contain"
+              className="h-10 object-contain"
             />
           </Link>
           <button
