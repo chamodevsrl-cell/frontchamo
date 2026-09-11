@@ -24,8 +24,9 @@ import {
   Warehouse,
   X,
 } from "lucide-react";
-import { useAuth } from "@/components/AuthProvider";
-import { firstName, isAdminUser } from "@/lib/auth-local";
+import { firstName } from "@/lib/auth-local";
+import { logoutAdmin } from "@/lib/auth";
+import type { AuthSession } from "@/types/admin";
 
 type NavChild = { href: string; label: string };
 type NavItem = {
@@ -62,14 +63,20 @@ function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function AdminShell({ children }: { children: ReactNode }) {
+export default function AdminShell({
+  children,
+  session,
+}: {
+  children: ReactNode;
+  session: AuthSession;
+}) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, ready, openAuth, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [loggingOut, setLoggingOut] = useState(false);
   const onProductos = pathname.startsWith("/admin/productos");
   const showProductosSub = onProductos || productsOpen;
 
@@ -79,70 +86,17 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   }, []);
 
   const initials = useMemo(() => {
-    const name = user?.name?.trim() || "Admin";
+    const name = session.name?.trim() || "Admin";
     const parts = name.split(/\s+/).filter(Boolean);
     const letters = (parts[0]?.[0] || "A") + (parts[1]?.[0] || "");
     return letters.toUpperCase();
-  }, [user?.name]);
+  }, [session.name]);
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const q = query.trim();
     router.push(
       q ? `/admin/productos?q=${encodeURIComponent(q)}` : "/admin/productos",
-    );
-  }
-
-  if (!ready) {
-    return (
-      <div className="fixed inset-0 z-[75] flex items-center justify-center bg-[#F4F4F4] text-sm text-brand-dark/70">
-        Cargando panel…
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="fixed inset-0 z-[75] flex flex-col items-center justify-center bg-[#0B3554] px-4 text-center">
-        <Image src="/logo.png" alt="Chamo Import S.R.L." width={192} height={64} className="w-48 object-contain" />
-        <h1 className="mt-6 font-display text-2xl font-bold text-white">
-          Panel de administración
-        </h1>
-        <p className="mt-2 max-w-sm text-sm text-white/70">
-          Inicia sesión con una cuenta de administrador para entrar.
-        </p>
-        <button
-          type="button"
-          onClick={() => openAuth("login")}
-          className="mt-6 rounded-lg bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0e6aad]"
-        >
-          Iniciar sesión
-        </button>
-        <Link href="/" className="mt-4 text-sm font-medium text-brand-gold hover:underline">
-          Volver al sitio
-        </Link>
-      </div>
-    );
-  }
-
-  if (!isAdminUser(user)) {
-    return (
-      <div className="fixed inset-0 z-[75] flex flex-col items-center justify-center bg-[#0B3554] px-4 text-center">
-        <Image src="/logo.png" alt="Chamo Import S.R.L." width={192} height={64} className="w-48 object-contain" />
-        <h1 className="mt-6 font-display text-2xl font-bold text-white">
-          Sin permiso de admin
-        </h1>
-        <p className="mt-2 max-w-md text-sm text-white/70">
-          Esta cuenta no puede entrar al panel. En este navegador, la primera
-          cuenta registrada queda como admin; las siguientes son clientes.
-        </p>
-        <Link
-          href="/"
-          className="mt-6 rounded-lg bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white"
-        >
-          Volver al inicio
-        </Link>
-      </div>
     );
   }
 
@@ -293,13 +247,13 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 {initials}
               </span>
               <span className="hidden max-w-[8rem] truncate text-left text-sm font-semibold sm:block">
-                {firstName(user.name)}
+                {firstName(session.name)}
               </span>
             </button>
             {accountOpen ? (
               <div className="absolute top-full right-0 z-20 mt-1 min-w-[12rem] overflow-hidden rounded-lg border border-brand-dark/10 bg-white shadow-xl">
                 <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
-                  {user.email}
+                  {session.email}
                 </p>
                 <Link
                   href="/"
@@ -310,14 +264,19 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 </Link>
                 <button
                   type="button"
+                  disabled={loggingOut}
                   onClick={() => {
-                    logout();
+                    setLoggingOut(true);
                     setAccountOpen(false);
+                    void logoutAdmin().then(() => {
+                      router.replace("/admin/login");
+                      router.refresh();
+                    });
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-brand-dark hover:bg-brand-gray disabled:opacity-60"
                 >
                   <LogOut className="h-4 w-4 text-brand-primary" />
-                  Cerrar sesión
+                  {loggingOut ? "Saliendo…" : "Cerrar sesión"}
                 </button>
               </div>
             ) : null}

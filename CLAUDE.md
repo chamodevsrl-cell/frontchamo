@@ -63,7 +63,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Carrito, favoritos y comparar: providers en `localStorage`. Panel `/admin` (sidebar + dashboard de ejemplo); CMS de banners/categorías en `/admin/banners` y `/admin/categorias`.
+- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS banners/categorías en `/admin/banners` y `/admin/categorias`.
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -104,7 +104,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `AuthForm.tsx` | Login / registro / recuperar contraseña (este navegador) |
 | `CompareProvider.tsx` | Comparar hasta 3 SKUs (`chamo-compare-v1`) |
 | `CompareButton.tsx` | Botón de comparar en tarjeta y modal |
-| `AdminShell.tsx` | Sidebar `#0B3554` + header blanco del panel `/admin` |
+| `AdminShell.tsx` | Sidebar `#0B3554` + header; sesión `AuthSession` (no `AuthProvider`) |
 | `ContentProvider.tsx` | Overlay CMS local de banners y categorías |
 | `CategoryCollage.tsx` | Collage 2×2 de productos/marcas de la línea |
 | `Footer.tsx` | Footer corporativo (ver §5) |
@@ -127,10 +127,14 @@ app/                  # App Router (páginas y layout)
   categorias/           # Listado + [slug]
   carrito/              # Cotización local
   comparar/             # Comparación de hasta 3 SKUs
-  admin/                # Panel (dashboard + CMS banners/categorías)
+  admin/                # login + (panel) protegido
   favoritos/            # Lista persistida
   terminos/ privacidad/ # Políticas
-  api/productos/        # GET catálogo
+  api/productos/        # GET catálogo (tienda)
+types/admin.ts         # Contrato del panel
+services/adminApi.ts   # Mock `/api/v1`
+lib/auth.ts            # Sesión del panel
+API_CONTRACT.md        # Handover HTTP para backend
 components/            # UI reutilizable (ver §6)
 data/
   contact.ts            # Teléfono / WhatsApp / correo / Maps
@@ -186,16 +190,15 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-11): panel de administración con sidebar `#0B3554`, header y
-dashboard KPI de ejemplo. Antes: `npm run build` estaba roto (2 errores de TS) → arreglado;
-`CartLine` ahora guarda `quantity`/`unitPrice`/`wholesaleUnitPrice` (con migración del
-formato viejo) en vez de recalcular el precio en vivo; cuentas con `id`; productos con
-`discountPercent` y sin el campo `image` redundante. Detalle:
-[`docs/cambios/2026-09-11-backend-ready-fixes.md`](docs/cambios/2026-09-11-backend-ready-fixes.md).
+Último avance (2026-09-11): contrato del Panel Admin para el backend —
+`types/admin.ts`, mock `services/adminApi.ts` (300 ms), sesión en `lib/auth.ts`,
+login `/admin/login`, layout `(panel)` protegido y [`API_CONTRACT.md`](API_CONTRACT.md).
+Credenciales mock: `admin@local.test` / `admin123`. Detalle:
+[`docs/cambios/2026-09-11-admin-api-contract.md`](docs/cambios/2026-09-11-admin-api-contract.md).
 
 ## 10. Pendientes conocidos
 
-- Backend real de autenticación e inventario (hoy cuentas, carrito, comparar y admin viven en este navegador; los nombres ya están pensados para esa migración — ver la nota de arriba).
+- Backend real: sustituir el mock de `services/adminApi.ts` por `fetch('/api/v1/...')` según `API_CONTRACT.md`. Cuentas/carrito/comparar de la tienda siguen en este navegador.
 - `FavoritesProvider` sigue en `ids: string[]` (sin `addedAt`) — cambiar a `{productId, addedAt}[]` si se necesita ordenar u sincronizar con cuenta real.
 - `categoryLabel` sigue denormalizado en cada producto (documentado, no corregido).
 - Confirmar correo de contacto oficial (footer y `/contacto`).
@@ -203,5 +206,5 @@ formato viejo) en vez de recalcular el precio en vivo; cuentas con `id`; product
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).
 - Fotos reales de tienda/almacén y logos oficiales de marca (hoy JPEG localizados y wordmarks SVG).
 - Specs técnicas oficiales por SKU cuando el cliente envíe fichas.
-- Backend de inventario real (hoy `/api/productos` sirve el catálogo de ejemplo). El admin liviano `/admin` solo cubre banners/categorías en este navegador.
+- Unificar sesión del panel (`chamo_admin_session`) con `role: "admin"` de la tienda cuando exista un único backend de usuarios.
 - Sustituir testimonios de ejemplo por casos reales de distribuidores.

@@ -1,21 +1,63 @@
 import {
   AlertTriangle,
-  Package,
   ShoppingCart,
   TrendingUp,
+  UserPlus,
   Wallet,
+  Warehouse,
 } from "lucide-react";
 import Image from "next/image";
-import { adminKpis, adminSalesLast7Days, adminTopProducts } from "@/data/admin";
+import { adminSalesLast7Days, adminTopProducts } from "@/data/admin";
+import { getDashboardKPIs } from "@/services/adminApi";
+import type { DashboardKPIs } from "@/types/admin";
 
-const KPI_ICONS = {
-  products: Package,
-  orders: ShoppingCart,
-  sales: Wallet,
-  "low-stock": AlertTriangle,
-} as const;
+function soles(value: number) {
+  return `S/ ${value.toLocaleString("es-PE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
 
-export default function AdminDashboardPage() {
+function kpiCards(kpis: DashboardKPIs) {
+  return [
+    {
+      key: "totalSales",
+      label: "Ventas totales",
+      value: soles(kpis.totalSales),
+      hint: "Pedidos confirmados, enviados o entregados",
+      icon: Wallet,
+      tone: "up" as const,
+    },
+    {
+      key: "pendingOrders",
+      label: "Pedidos pendientes",
+      value: String(kpis.pendingOrders),
+      hint: "Estado pending",
+      icon: ShoppingCart,
+      tone: "up" as const,
+    },
+    {
+      key: "lowStockCount",
+      label: "Stock bajo",
+      value: String(kpis.lowStockCount),
+      hint: "stock ≤ minStock",
+      icon: Warehouse,
+      tone: "alert" as const,
+    },
+    {
+      key: "newClientsCount",
+      label: "Clientes nuevos",
+      value: String(kpis.newClientsCount),
+      hint: "Altas del periodo (mock)",
+      icon: UserPlus,
+      tone: "up" as const,
+    },
+  ];
+}
+
+export default async function AdminDashboardPage() {
+  const kpis = await getDashboardKPIs();
+  const cards = kpiCards(kpis);
   const maxSale = Math.max(...adminSalesLast7Days.map((day) => day.amount));
 
   return (
@@ -25,18 +67,19 @@ export default function AdminDashboardPage() {
           Dashboard
         </h1>
         <p className="mt-1 text-sm text-brand-dark/65">
-          Resumen operativo de Chamo Import S.R.L. Cifras de ejemplo para el
-          diseño del panel.
+          KPIs desde <code>getDashboardKPIs()</code> (mock 300 ms). La gráfica y
+          el ranking siguen en <code>data/admin.ts</code> hasta que el backend
+          los exponga.
         </p>
       </div>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {adminKpis.map((kpi) => {
-          const Icon = KPI_ICONS[kpi.id];
+        {cards.map((kpi) => {
+          const Icon = kpi.icon;
           const alert = kpi.tone === "alert";
           return (
             <article
-              key={kpi.id}
+              key={kpi.key}
               className="rounded-2xl border border-brand-dark/10 bg-white p-5 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
@@ -55,12 +98,12 @@ export default function AdminDashboardPage() {
               {alert ? (
                 <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold tracking-wide text-red-700 uppercase">
                   <AlertTriangle className="h-3.5 w-3.5" strokeWidth={2.4} />
-                  {kpi.delta}
+                  {kpi.hint}
                 </span>
               ) : (
                 <p className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-emerald-600">
                   <TrendingUp className="h-4 w-4" strokeWidth={2} />
-                  {kpi.delta}
+                  {kpi.hint}
                 </p>
               )}
             </article>
@@ -73,7 +116,7 @@ export default function AdminDashboardPage() {
           <h2 className="font-display text-lg font-bold text-brand-dark">
             Ventas de los últimos 7 días
           </h2>
-          <p className="mt-1 text-xs text-brand-dark/50">Montos de ejemplo (S/)</p>
+          <p className="mt-1 text-xs text-brand-dark/50">Demo local (S/) — no viene del mock API</p>
           <div
             className="mt-6 flex h-52 items-end gap-2 sm:gap-3"
             role="img"
@@ -103,7 +146,7 @@ export default function AdminDashboardPage() {
           <h2 className="font-display text-lg font-bold text-brand-dark">
             Productos más vendidos
           </h2>
-          <p className="mt-1 text-xs text-brand-dark/50">Unidades de ejemplo</p>
+          <p className="mt-1 text-xs text-brand-dark/50">Unidades de ejemplo — demo local</p>
           <ul className="mt-4 divide-y divide-brand-dark/8">
             {adminTopProducts.map((product) => (
               <li key={product.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">

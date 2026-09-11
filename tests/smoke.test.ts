@@ -190,22 +190,100 @@ describe("smoke de catálogo y home", () => {
     );
   });
 
-  it("el dashboard admin tiene 4 KPI y 7 días de ventas de ejemplo", async () => {
-    const { adminKpis, adminSalesLast7Days, adminTopProducts } = await import(
-      "@/data/admin"
-    );
-    expect(adminKpis).toHaveLength(4);
-    expect(adminKpis.map((kpi) => kpi.label)).toEqual([
-      "Total productos",
-      "Pedidos hoy",
-      "Ventas del mes",
-      "Stock bajo",
-    ]);
+  it("el dashboard admin tiene gráfica de 7 días y ranking demo", async () => {
+    const { adminSalesLast7Days, adminTopProducts } = await import("@/data/admin");
     expect(adminSalesLast7Days).toHaveLength(7);
     expect(adminTopProducts.length).toBe(5);
     expect(adminTopProducts.every((item) => item.image && item.unitsSold > 0)).toBe(
       true,
     );
+  });
+});
+
+describe("contrato admin (tipos + mock API + sesión)", () => {
+  it("parseAdminSession acepta JSON plano y encodeURIComponent", async () => {
+    const { parseAdminSession, serializeAdminSession, encodeAdminSessionCookie } =
+      await import("@/lib/auth");
+    const session = {
+      id: "usr_1",
+      name: "Admin Demo",
+      email: "admin@local.test",
+      role: "admin" as const,
+      token: "tok_test",
+    };
+    expect(parseAdminSession(serializeAdminSession(session))).toEqual(session);
+    expect(parseAdminSession(encodeAdminSessionCookie(session))).toEqual(session);
+    expect(parseAdminSession("no-json")).toBeNull();
+    expect(parseAdminSession(null)).toBeNull();
+  });
+
+  it("loginAdmin solo acepta las credenciales mock", async () => {
+    const { loginAdmin, AdminApiError, MOCK_ADMIN_EMAIL, MOCK_ADMIN_PASSWORD } =
+      await import("@/services/adminApi");
+    const session = await loginAdmin({
+      email: MOCK_ADMIN_EMAIL,
+      password: MOCK_ADMIN_PASSWORD,
+    });
+    expect(session.email).toBe(MOCK_ADMIN_EMAIL);
+    expect(session.role).toBe("admin");
+    expect(session.token.length).toBeGreaterThan(0);
+    await expect(
+      loginAdmin({ email: MOCK_ADMIN_EMAIL, password: "wrong-password" }),
+    ).rejects.toBeInstanceOf(AdminApiError);
+  });
+
+  it("getDashboardKPIs expone las 4 cifras del contrato", async () => {
+    const { getDashboardKPIs } = await import("@/services/adminApi");
+    const kpis = await getDashboardKPIs();
+    expect(Object.keys(kpis).sort()).toEqual(
+      ["lowStockCount", "newClientsCount", "pendingOrders", "totalSales"].sort(),
+    );
+    expect(kpis.totalSales).toBeGreaterThan(0);
+    expect(kpis.pendingOrders).toBeGreaterThanOrEqual(0);
+    expect(kpis.lowStockCount).toBeGreaterThanOrEqual(0);
+    expect(kpis.newClientsCount).toBeGreaterThanOrEqual(0);
+  });
+
+  it("getProducts filtra por q y createProduct agrega un SKU", async () => {
+    const { getProducts, createProduct } = await import("@/services/adminApi");
+    const bySku = await getProducts({ q: "TRU-7821" });
+    expect(bySku).toHaveLength(1);
+    expect(bySku[0]?.sku).toBe("TRU-7821");
+    expect(bySku[0]?.categoryId).toBeTruthy();
+    expect(Array.isArray(bySku[0]?.images)).toBe(true);
+
+    const created = await createProduct({
+      sku: "TST-ADMIN-0001",
+      name: "SKU de prueba admin",
+      brand: "DEMO",
+      categoryId: "ferreteria",
+      subcategoryId: "ferreteria-general",
+      price: 10,
+      stock: 5,
+      minStock: 2,
+      status: "active",
+      images: ["/logo.png"],
+      descriptionShort: "Corto",
+      descriptionFull: "Largo",
+      isFeatured: false,
+    });
+    expect(created.id).toMatch(/^prd_/);
+    expect(created.createdAt).toMatch(/T/);
+    const found = await getProducts({ q: "TST-ADMIN-0001" });
+    expect(found.some((item) => item.sku === "TST-ADMIN-0001")).toBe(true);
+  });
+
+  it("getOrders y updateOrderStatus cambian el estado", async () => {
+    const { getOrders, updateOrderStatus } = await import("@/services/adminApi");
+    const pending = await getOrders("pending");
+    expect(pending.length).toBeGreaterThan(0);
+    const first = pending[0];
+    if (!first) throw new Error("se esperaba un pedido pending");
+    const updated = await updateOrderStatus(first.id, "confirmed");
+    expect(updated.status).toBe("confirmed");
+    const confirmed = await getOrders("confirmed");
+    expect(confirmed.some((order) => order.id === first.id)).toBe(true);
+    await updateOrderStatus(first.id, "pending");
   });
 });
 
@@ -241,10 +319,17 @@ describe("home HTTP (si el dev server está arriba)", () => {
 
       const admin = await fetch("http://127.0.0.1:3000/admin", {
         signal: AbortSignal.timeout(4000),
+        redirect: "manual",
       });
-      expect(admin.ok).toBe(true);
-      const adminHtml = await admin.text();
-      expect(adminHtml).toMatch(/Admin \| Chamo Import|Cargando panel|Panel de administración/);
+      expect([307, 302, 303, 308]).toContain(admin.status);
+      expect(admin.headers.get("location") ?? "").toContain("/admin/login");
+
+      const login = await fetch("http://127.0.0.1:3000/admin/login", {
+        signal: AbortSignal.timeout(4000),
+      });
+      expect(login.ok).toBe(true);
+      const loginHtml = await login.text();
+      expect(loginHtml).toMatch(/Panel de administración|admin@local.test/);
     } catch (error) {
       if (error instanceof Error && error.message.includes("expected")) {
         throw error;

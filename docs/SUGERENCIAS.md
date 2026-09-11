@@ -128,7 +128,8 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 - [x] 2026-09-09 — API interna de productos (`app/api/productos`) — el catálogo ya no se consulta solo hardcodeado en la UI
 - [x] 2026-09-10 — Completar specs de **ejemplo** por SKU (origen, material/dimensiones, peso, garantía).
 - [ ] Fichas técnicas **oficiales** por SKU cuando el cliente las envíe
-- [x] 2026-09-11 — CMS / admin liviano en `/admin` (banners y categorías en `chamo-cms-v1`, este navegador). El panel ahora tiene sidebar + dashboard; el CMS vive en `/admin/banners` y `/admin/categorias`.
+- [x] 2026-09-11 — CMS / admin liviano en `/admin` (banners y categorías en `chamo-cms-v1`). El panel tiene sidebar, login propio y mock API (`types/admin.ts`, `services/adminApi.ts`, `API_CONTRACT.md`).
+- [ ] Conectar `services/adminApi.ts` al backend real (`/api/v1/...` según `API_CONTRACT.md`) y pasar la cookie a httpOnly.
 - [x] 2026-09-09 — `allowedDevOrigins` en `next.config` (LAN vía `ALLOWED_DEV_ORIGINS`)
 - [x] 2026-09-09 — Tests básicos de smoke (slider N slides, categorías, búsqueda, home HTTP si el server está arriba)
 
@@ -154,11 +155,12 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 - [x] 2026-09-10 — Corrección de bugs: intro no scrolleable, formularios WhatsApp sin popup blocker, toast de favoritos a tono
 - [x] 2026-09-10 — Collages de marcas/productos de cada línea en tarjetas y banners de categoría (`CategoryCollage`). Los JPEG de `public/images/categorias/` quedan de fallback.
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
-- [ ] Conectar inventario real (ERP / backend) en lugar del catálogo de ejemplo servido por `/api/productos`
+- [ ] Unificar la sesión del panel (`chamo_admin_session`) con `role: "admin"` de la tienda cuando exista un único backend de usuarios.
 - [x] 2026-09-10 — Comparar productos (hasta 3 SKUs, `/comparar`, badge en Navbar)
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-11 — Contrato API del panel admin (`types/admin.ts`, mock `services/adminApi.ts`, login `/admin/login`, `API_CONTRACT.md`). Nota: [`cambios/2026-09-11-admin-api-contract.md`](./cambios/2026-09-11-admin-api-contract.md).
 - [x] 2026-09-11 — Diseño base del **panel de administración** (sidebar corporativa, header, dashboard KPI). Nota: [`cambios/2026-09-11-admin-panel-layout.md`](./cambios/2026-09-11-admin-panel-layout.md).
 - [x] 2026-09-11 — **Listo para backend:** `npm run build` roto (2 errores de TS) → arreglado; carrito guarda `unitPrice`/`quantity` y migra el formato viejo; cuentas con `id`; productos con `discountPercent` y sin `image` redundante. `npm run build` + `npm run test` en verde. Nota: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
 - [x] 2026-09-11 — Fix doble loader del logo con reduced-motion + rol admin en `/admin` (bug 3 del carrito sin tocar). Nota: [`cambios/2026-09-11-fix-loader-admin-role.md`](./cambios/2026-09-11-fix-loader-admin-role.md).

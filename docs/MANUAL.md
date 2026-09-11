@@ -36,9 +36,13 @@ app/catalogo/             # Búsqueda y filtros (API)
 app/carrito/              # Cotización local
 app/favoritos/            # Lista persistida (localStorage)
 app/comparar/             # Comparación de hasta 3 SKUs
-app/admin/                # Panel: dashboard, banners, categorías, stubs de módulos
+app/admin/                # Panel: login público + (panel) protegido por cookie
 app/cotizar/              # Formulario + WhatsApp
-app/api/productos/        # GET catálogo filtrable
+app/api/productos/        # GET catálogo filtrable (tienda, no el admin)
+types/admin.ts            # Contrato TS del panel (User, Product, Order, KPIs…)
+services/adminApi.ts      # Mock `/api/v1` (300 ms) — ver API_CONTRACT.md
+lib/auth.ts               # Sesión del panel (cookie + localStorage)
+lib/auth-local.ts         # Cuentas de la tienda (otro almacén)
 app/terminos/ /privacidad/
 components/
   Navbar.tsx              # Header 3 niveles (categorías = mainCategories)
@@ -46,8 +50,9 @@ components/
   FavoritesProvider.tsx   # Favoritos en localStorage
   CompareProvider.tsx     # Comparar (máx. 3) en localStorage
   ContentProvider.tsx     # Overlay CMS local de banners/categorías
-  AuthProvider.tsx        # Cuentas locales + sesión (`role` admin/customer)
-  admin/AdminShell.tsx    # Sidebar + header del panel
+  AuthProvider.tsx        # Cuentas locales + sesión de la tienda (`role` admin/customer)
+  admin/AdminShell.tsx    # Sidebar + header; recibe `AuthSession` del layout
+  admin/AdminLoginForm.tsx
   admin/SiteContentEditor.tsx  # CMS local de banners/categorías
   CategoryCollage.tsx     # Grilla 2×2 de productos/marcas de la línea
   CatalogFilters.tsx      # Filtros de /catalogo
@@ -70,7 +75,7 @@ data/
   media.ts                 # Slides / logo / icon
   home.ts                   # trustItems, mainCategories, distributorBrands
   products.ts               # Catálogo de ejemplo + searchCatalog
-  admin.ts                  # KPI y gráfica de ejemplo del panel
+  admin.ts                  # Gráfica 7 días + ranking demo (KPIs vienen del mock API)
 public/images/slider/       # baner-1.png … baner-3.png
 public/images/categorias/   # Fotos locales por categoría
 public/images/marcas/       # Wordmarks SVG
@@ -135,11 +140,25 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5c Panel de administración
 
-`app/admin/layout.tsx` monta `AdminShell`: sidebar fija `#0B3554` (logo + Lucide),
-header blanco (buscador, notificaciones, avatar). Solo `role: "admin"`. El dashboard
-(`/admin`) muestra 4 KPI de **ejemplo**, gráfica de ventas 7 días y productos más
-vendidos. Banners y categorías del CMS local quedaron en `/admin/banners` y
-`/admin/categorias`. El resto de ítems del menú son páginas base (sin backend).
+El árbol `/admin` se parte en dos layouts para no bloquear el login:
+
+- `app/admin/layout.tsx` — solo metadata.
+- `app/admin/login` — formulario contra `loginAdmin()` (mock). Credenciales de
+  demo: `admin@local.test` / `admin123` (no son datos oficiales).
+- `app/admin/(panel)/layout.tsx` — lee `getAdminSession()` (cookie
+  `chamo_admin_session`, sin delay de red). Si no hay sesión →
+  `redirect('/admin/login')`. Envuelve `AdminShell` con esa sesión.
+- `logoutAdmin()` borra cookie + `localStorage` (`chamo-admin-session-v1`) y
+  vuelve al login. **No** cierra la cuenta de la tienda.
+
+Tipos: `types/admin.ts`. Cliente: `services/adminApi.ts` (300 ms + comentarios
+`TODO Backend`). Contrato HTTP: [`API_CONTRACT.md`](../API_CONTRACT.md) en la
+raíz del repo.
+
+El dashboard pinta **DashboardKPIs** (`totalSales`, `pendingOrders`,
+`lowStockCount`, `newClientsCount`). Productos y pedidos ya listan/crean/cambian
+estado contra el mock. Banners y categorías del CMS local siguen en
+`/admin/banners` y `/admin/categorias`. El resto del menú es placeholder.
 Navegar dentro de `/admin` **no** dispara el BrandLoader de la tienda.
 
 ### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
@@ -301,7 +320,11 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
-| `/admin` | Panel de administración (sidebar + dashboard). Solo `role: "admin"`. KPI y gráfica son de **ejemplo** |
+| `/admin` | Panel (sidebar + dashboard). Requiere cookie `chamo_admin_session`. KPIs del mock `getDashboardKPIs()` |
+| `/admin/login` | Login del panel (`admin@local.test` / `admin123` en el mock) |
+| `/admin/productos` | Listado mock (`getProducts`). Query `?q=` |
+| `/admin/productos/nuevo` | Alta mock (`createProduct`) |
+| `/admin/pedidos` | Pedidos mock + cambio de estado |
 | `/admin/banners` | Editar banners del slider (`chamo-cms-v1`) |
 | `/admin/categorias` | Editar textos de líneas (`chamo-cms-v1`) |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
@@ -313,11 +336,16 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 ### B.4 Contenido que el negocio puede cambiar sin programar
 
-Hay un **panel de administración** en `/admin` (sesión con `role: "admin"`). El
-dashboard es diseño base con cifras de ejemplo. Banners del slider y textos de
-categorías se editan en `/admin/banners` y `/admin/categorias` (`chamo-cms-v1`).
-La primera cuenta creada en ese navegador queda como admin; las siguientes son
-clientes. El código del repo sigue siendo la fuente por defecto:
+Hay un **panel de administración** en `/admin`. La sesión del panel es propia
+(cookie `chamo_admin_session`, login en `/admin/login`; mock
+`admin@local.test` / `admin123`). No es la misma cuenta que “Mi cuenta” de la
+tienda. El dashboard muestra KPIs del contrato (`totalSales`, pedidos
+pendientes, stock bajo, clientes nuevos). Productos y pedidos se gestionan
+contra el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). Banners
+del slider y textos de categorías se editan en `/admin/banners` y
+`/admin/categorias` (`chamo-cms-v1`). El enlace “Editar contenido” del Navbar
+sigue pidiendo `role: "admin"` de la tienda; al entrar a `/admin` hay que
+iniciar la sesión del panel.
 
 - Banners → `/admin/banners` o `public/images/slider/` + `data/media.ts`
 - Categorías del home → `/admin/categorias` o `data/home.ts` + collage de productos de la línea
