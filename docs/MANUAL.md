@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-10**
+Última actualización: **2026-09-11**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -140,6 +140,9 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5c Panel de administración
 
+> Resumen rápido — la referencia completa (arquitectura, credenciales, qué es real vs
+> placeholder, cómo conectar el backend) está en **[A.12 🎛️ Dashboard](#a12-🎛️-dashboard--panel-de-administración)**.
+
 El árbol `/admin` se parte en dos layouts para no bloquear el login:
 
 - `app/admin/layout.tsx` — solo metadata.
@@ -233,6 +236,139 @@ npm run start
 npm run lint
 npm test         # Vitest smoke (slider, categorías, búsqueda)
 ```
+
+---
+
+### A.12 🎛️ Dashboard — Panel de administración
+
+Referencia única y completa del panel `/admin`: cómo se construyó, cómo funciona hoy
+(con datos simulados) y las credenciales para entrar. La versión resumida vive en
+[A.5c](#a5c-panel-de-administración) — esta sección es la de detalle.
+
+#### A.12.1 Qué es
+
+Un panel interno (`/admin/*`) para el equipo de Chamo Import: ver KPIs de ventas,
+gestionar productos y pedidos, y editar los banners/categorías del home — **separado
+del sitio público** (no lo ve un cliente ni aparece en el menú de la tienda). Hoy
+corre 100% en el navegador con datos de ejemplo (`services/adminApi.ts`); está
+armado para que un backend real lo reemplace endpoint por endpoint sin tocar la UI.
+
+#### A.12.2 Cómo se creó (historia y arquitectura)
+
+Se construyó en dos etapas, documentadas en `docs/cambios/`:
+
+1. **v1 — admin liviano** (2026-09-10,
+   [`2026-09-10-sugerencias-login-comparar-admin.md`](./cambios/2026-09-10-sugerencias-login-comparar-admin.md)):
+   una sola página `/admin` protegida con la **cuenta de la tienda**
+   (`role: "admin"` en `lib/auth-local.ts`, la primera cuenta creada en el navegador),
+   solo para editar banners y textos de categorías (`chamo-cms-v1`).
+2. **v2 — panel completo, listo para backend** (2026-09-11,
+   [`2026-09-11-admin-api-contract.md`](./cambios/2026-09-11-admin-api-contract.md)):
+   se reestructuró en un panel de verdad, con **sesión propia** (no la de la tienda),
+   sidebar con 10 secciones, dashboard de KPIs, alta/listado de productos, gestión de
+   pedidos, y un contrato HTTP completo (`API_CONTRACT.md`) para que el desarrollador
+   de backend sepa exactamente qué endpoints implementar.
+
+Piezas clave (v2):
+
+| Archivo | Rol |
+| --- | --- |
+| `types/admin.ts` | Contrato de datos en TypeScript: `AuthSession`, `Product`, `Order`, `DashboardKPIs`, `LoginCredentials`, etc. — 1:1 con lo que describe `API_CONTRACT.md` |
+| `services/adminApi.ts` | Cliente **mock**: cada función simula un endpoint real con 300 ms de latencia y trae en un comentario la ruta HTTP que debe reemplazarla (`// TODO Backend: Reemplazar mock con fetch('/api/v1/...')`) |
+| `lib/auth.ts` | Sesión del panel: lee/escribe la cookie `chamo_admin_session` (+ copia en `localStorage` para el cliente) |
+| `app/admin/actions.ts` | Server Actions: `loginAdminAction`, `createProductAction`, `updateOrderStatusAction` — hacen de puente entre los componentes cliente y `lib/auth.ts`/`services/adminApi.ts` |
+| `app/admin/login/page.tsx` + `components/admin/AdminLoginForm.tsx` | Login del panel (público) |
+| `app/admin/(panel)/layout.tsx` | Layout protegido: si no hay sesión, `redirect('/admin/login')`; si hay, envuelve todo en `AdminShell` |
+| `components/admin/AdminShell.tsx` | Sidebar (`#0B3554`) + header con el nombre/rol de la sesión y botón de salir |
+| `components/admin/SiteContentEditor.tsx` | El editor de banners/categorías de la v1, reutilizado dentro del panel nuevo |
+| `API_CONTRACT.md` (raíz del repo) | El documento de handover: cada endpoint, su body/respuesta de ejemplo, y el paso a paso para "enchufar" el backend real |
+
+#### A.12.3 Cómo funciona
+
+**Flujo de acceso:**
+
+1. `GET /admin/login` — pública. Si ya hay sesión, redirige a `/admin`.
+2. El formulario llama a `loginAdminAction` (Server Action) → `loginAdmin()` en
+   `services/adminApi.ts` (valida contra las credenciales mock, ver A.12.4) →
+   si es correcto, escribe la cookie `chamo_admin_session` (`lib/auth.ts`) y una
+   copia en `localStorage` (`chamo-admin-session-v1`).
+3. Cualquier ruta bajo `/admin/(panel)` (o sea, todo menos `/admin/login`) pasa por
+   `app/admin/(panel)/layout.tsx`, que lee la cookie **en el servidor** con
+   `getAdminSession()` — sin sesión válida, redirige de vuelta a `/admin/login`.
+4. Con sesión válida, se renderiza `AdminShell` (sidebar + header) alrededor de la
+   página pedida.
+5. "Salir" llama a `logoutAdmin()`: borra cookie + `localStorage` y vuelve al login.
+   **No** cierra la sesión de "Mi cuenta" de la tienda — son dos sistemas
+   completamente aparte (ver A.12.5).
+
+**Secciones del sidebar — qué es real y qué es placeholder hoy:**
+
+| Sección | Ruta | Estado |
+| --- | --- | --- |
+| Dashboard | `/admin` | ✅ Real — KPIs desde `getDashboardKPIs()` (mock) |
+| Productos → Ver productos | `/admin/productos` | ✅ Real — `getProducts({ q })`, búsqueda por SKU/nombre/marca |
+| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — `createProduct()`, valida SKU único |
+| Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
+| Banners | `/admin/banners` | ✅ Real — edita `chamo-cms-v1` (slider del home) |
+| Categorías | `/admin/categorias` | ✅ Real — edita `chamo-cms-v1` (textos de líneas del home) |
+| Marcas, Clientes, Inventario, Ofertas, Reportes, Configuración | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
+
+**Datos:** todo lo "real" arriba corre contra `productsDb`/`ordersDb` **en memoria del
+proceso de Next** (dentro de `services/adminApi.ts`) — se reinician con cada reinicio
+del servidor de desarrollo, no hay base de datos todavía. El gráfico de ventas de 7
+días y el ranking de SKUs del dashboard son datos de ejemplo fijos en `data/admin.ts`
+(no tienen endpoint todavía, ver `API_CONTRACT.md`).
+
+#### A.12.4 Credenciales para ingresar
+
+> ⚠️ **Son credenciales de prueba, no una cuenta oficial de Chamo Import.** Están
+> hardcodeadas en `services/adminApi.ts` (`MOCK_ADMIN_EMAIL` / `MOCK_ADMIN_PASSWORD`)
+> solo para poder probar el panel mientras no existe backend. **Se deben borrar del
+> código en cuanto el login real esté conectado** (ver A.12.5).
+
+| Campo | Valor |
+| --- | --- |
+| URL | `/admin/login` (ej. `http://localhost:3000/admin/login` en desarrollo) |
+| Correo | `admin@local.test` |
+| Contraseña | `admin123` |
+| Rol de la sesión | `admin` (el otro rol posible, `editor`, existe en el tipo pero ningún flujo lo asigna todavía) |
+| Duración de la sesión | 8 horas (`ADMIN_SESSION_MAX_AGE_SECONDS` en `lib/auth.ts`) |
+
+Cualquier otro correo/contraseña devuelve `INVALID_CREDENTIALS`. No hay
+"olvidé mi contraseña" ni registro de nuevos usuarios del panel — mientras sea mock,
+solo existe esta cuenta.
+
+#### A.12.5 Dos sesiones distintas — no confundir
+
+| | Sesión de la **tienda** | Sesión del **panel admin** |
+| --- | --- | --- |
+| Para qué | "Mi cuenta" del sitio público (favoritos, carrito, comparar) | Gestionar el negocio en `/admin` |
+| Dónde vive | `lib/auth-local.ts` | `lib/auth.ts` |
+| Storage | `chamo-accounts-v1` / `chamo-session-v1` (solo `localStorage`) | Cookie `chamo_admin_session` + copia en `localStorage` (`chamo-admin-session-v1`) |
+| Cómo se entra | Se registra cualquiera desde `/login` | Con las credenciales mock en `/admin/login` |
+| Quién es "admin" | La primera cuenta creada en ese navegador (`role: "admin"`) | La única cuenta del mock (`admin@local.test`) |
+| Se cierran juntas? | No — cerrar una no afecta a la otra | |
+
+Antes había un solo admin (v1, ligado a la cuenta de la tienda); ahora conviven las
+dos porque el panel necesitaba una sesión que el **servidor** pudiera verificar (con
+cookie) antes de pintar cualquier página, algo que la cuenta de la tienda
+(`localStorage`, solo en el cliente) no podía dar. Pendiente documentado en
+`CLAUDE.md` §10: unificar ambas cuando exista un solo backend de usuarios.
+
+#### A.12.6 Conectar el backend real
+
+Guía completa: [`API_CONTRACT.md`](../API_CONTRACT.md) (raíz del repo) — tiene, por
+cada endpoint (`/api/v1/auth/login`, `/api/v1/dashboard/kpis`, `/api/v1/products`,
+`/api/v1/orders`, etc.), el método, el body, la respuesta de ejemplo y los códigos de
+error esperados. Resumen del "cómo enchufar":
+
+1. Implementar los endpoints listados en `API_CONTRACT.md`.
+2. En `services/adminApi.ts`, cambiar el cuerpo de cada función por un `fetch()` real
+   al endpoint correspondiente, **manteniendo la misma firma** (el resto del panel no
+   se entera del cambio).
+3. En `lib/auth.ts` / `app/admin/actions.ts`, dejar que el `Set-Cookie` lo mande el
+   backend (marcarla `httpOnly: true`) en vez de escribirla desde el cliente.
+4. Borrar `MOCK_ADMIN_EMAIL`/`MOCK_ADMIN_PASSWORD` de `services/adminApi.ts`.
 
 ---
 

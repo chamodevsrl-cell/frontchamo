@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-11 | Nuevo apartado A.12 "Dashboard" en la documentación técnica | [2026-09-11-dashboard-doc-section.md](./2026-09-11-dashboard-doc-section.md) |
 | 2026-09-11 | Contrato API del panel admin (tipos, mock, login, `API_CONTRACT.md`) | [2026-09-11-admin-api-contract.md](./2026-09-11-admin-api-contract.md) |
 | 2026-09-11 | Panel admin: sidebar, header y dashboard base | [2026-09-11-admin-panel-layout.md](./2026-09-11-admin-panel-layout.md) |
 | 2026-09-11 | Revisión merge-readiness: cierre de 5 bugs pendientes de `main` | [2026-09-11-merge-ready-fixes.md](./2026-09-11-merge-ready-fixes.md) |
