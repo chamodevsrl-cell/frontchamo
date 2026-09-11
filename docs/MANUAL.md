@@ -46,7 +46,7 @@ components/
   FavoritesProvider.tsx   # Favoritos en localStorage
   CompareProvider.tsx     # Comparar (máx. 3) en localStorage
   ContentProvider.tsx     # Overlay CMS local de banners/categorías
-  AuthProvider.tsx        # Cuentas locales + sesión
+  AuthProvider.tsx        # Cuentas locales + sesión (`role` admin/customer)
   CategoryCollage.tsx     # Grilla 2×2 de productos/marcas de la línea
   CatalogFilters.tsx      # Filtros de /catalogo
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
@@ -113,7 +113,9 @@ placeholder hasta ficha oficial del cliente.
   el mismo `BrandLoader` de 2.5 s. No se apila con el preloader de la primera
   carga. Un clic dispara **una sola vez** (el `pathname` no lo repite).
 - Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
-  Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil).
+  Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil). Ese clic
+  **reclama** la navegación para que, con `prefers-reduced-motion`, no se encadene
+  un `BrandLoader` de 2.5 s al llegar a `/`.
 - Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
   Lucide (`ShoppingCart`) dorado. Entra desde la izquierda y **se estaciona entero
   detrás (a la izquierda) de la costura dorada**. Al abrirse las puertas, vuelve al
@@ -284,7 +286,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
-| `/admin` | Editar banners y categorías de **este navegador** (requiere cuenta) |
+| `/admin` | Editar banners y categorías de **este navegador**. Solo cuentas con `role: "admin"` (la primera registrada en el navegador). Otras cuentas ven “Sin permiso de admin” |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
 | `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre WhatsApp (sin `window.open`), y mapa |
 | `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
@@ -294,8 +296,9 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 ### B.4 Contenido que el negocio puede cambiar sin programar
 
-Hay un **admin liviano** en `/admin` (con sesión) para banners del slider y textos de
-categorías; guarda en este navegador (`chamo-cms-v1`). El código del repo sigue siendo
+Hay un **admin liviano** en `/admin` (sesión con `role: "admin"`) para banners del slider y textos de
+categorías; guarda en este navegador (`chamo-cms-v1`). La primera cuenta creada en ese
+navegador queda como admin; las siguientes son clientes. El código del repo sigue siendo
 la fuente por defecto:
 
 - Banners → `/admin` o `public/images/slider/` + `data/media.ts`

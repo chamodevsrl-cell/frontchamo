@@ -29,7 +29,7 @@ import { useCompare } from "@/components/CompareProvider";
 import { useFavorites } from "@/components/FavoritesProvider";
 import { useSiteContent } from "@/components/ContentProvider";
 import CategoryIcon from "@/components/CategoryIcon";
-import { firstName } from "@/lib/auth-local";
+import { firstName, isAdminUser } from "@/lib/auth-local";
 
 const mainLinks = [
   { href: "/", label: "Inicio" },
@@ -285,14 +285,16 @@ export default function Navbar() {
                     <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
                       {user.email}
                     </p>
-                    <Link
-                      href="/admin"
-                      onClick={() => setAccountOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
-                    >
-                      <LayoutDashboard className="h-4 w-4 text-brand-primary" />
-                      Editar contenido
-                    </Link>
+                    {isAdminUser(user) ? (
+                      <Link
+                        href="/admin"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                      >
+                        <LayoutDashboard className="h-4 w-4 text-brand-primary" />
+                        Editar contenido
+                      </Link>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => {
@@ -615,14 +617,16 @@ export default function Navbar() {
                   <p className="text-center text-xs text-brand-dark/60">
                     {user.email}
                   </p>
-                  <Link
-                    href="/admin"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
-                  >
-                    <LayoutDashboard className="h-5 w-5" strokeWidth={2} />
-                    Editar contenido
-                  </Link>
+                  {isAdminUser(user) ? (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
+                    >
+                      <LayoutDashboard className="h-5 w-5" strokeWidth={2} />
+                      Editar contenido
+                    </Link>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => {

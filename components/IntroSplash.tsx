@@ -95,7 +95,7 @@ export default function IntroSplash() {
       if (!(link instanceof HTMLAnchorElement)) return;
 
       if (link.matches("[data-site-intro]")) {
-        play("brand");
+        if (play("brand")) loadClaimedByClick.current = true;
         return;
       }
 

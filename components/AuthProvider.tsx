@@ -15,9 +15,11 @@ import {
   createAccount,
   hashPassword,
   normalizeEmail,
+  hydrateSessionUser,
   parseAccounts,
   parseSession,
   randomSalt,
+  toAuthUser,
   verifyAccount,
   type AuthUser,
   type StoredAccount,
@@ -62,9 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const loadedAccounts = parseAccounts(window.localStorage.getItem(ACCOUNTS_KEY));
+    const loadedSession = parseSession(window.localStorage.getItem(SESSION_KEY));
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
-    setAccounts(parseAccounts(window.localStorage.getItem(ACCOUNTS_KEY)));
-    setUser(parseSession(window.localStorage.getItem(SESSION_KEY)));
+    setAccounts(loadedAccounts);
+    setUser(hydrateSessionUser(loadedSession, loadedAccounts));
     setReady(true);
   }, []);
 
@@ -101,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [isOpen]);
 
   const persistUser = useCallback((account: StoredAccount) => {
-    setUser({ name: account.name, email: account.email });
+    setUser(toAuthUser(account));
     setIsOpen(false);
   }, []);
 

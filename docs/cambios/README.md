@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-11 | Fix: doble loader del logo (reduced-motion) + rol admin | [2026-09-11-fix-loader-admin-role.md](./2026-09-11-fix-loader-admin-role.md) |
 | 2026-09-11 | Bugs: doble loader (reduced-motion), rol de admin, precio del carrito + nombres backend | [2026-09-11-bugs-admin-loader-carrito.md](./2026-09-11-bugs-admin-loader-carrito.md) |
 | 2026-09-11 | Loader de nav interna (mismo que entrada) + carrito detrás de la costura | [2026-09-11-loader-nav-carrito-costura.md](./2026-09-11-loader-nav-carrito-costura.md) |
 | 2026-09-11 | Preloader: logo, engranaje y fade-out a 2.5 s | [2026-09-11-preloader-2-5s-logo-engranaje.md](./2026-09-11-preloader-2-5s-logo-engranaje.md) |

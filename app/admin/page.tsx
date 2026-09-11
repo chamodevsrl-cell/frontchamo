@@ -8,6 +8,7 @@ import Reveal from "@/components/Reveal";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useAuth } from "@/components/AuthProvider";
 import { useSiteContent } from "@/components/ContentProvider";
+import { isAdminUser } from "@/lib/auth-local";
 import { slides as defaultSlides } from "@/data/media";
 import { mainCategories } from "@/data/home";
 import { emptyCmsState, type CmsState } from "@/lib/cms";
@@ -56,7 +57,8 @@ export default function AdminPage() {
             Admin de contenido
           </h1>
           <p className="mt-2 text-sm text-brand-dark/70 dark:text-white/70">
-            Inicia sesión para editar banners y categorías de este navegador.
+            Inicia sesión con una cuenta de administrador para editar banners y
+            categorías de este navegador.
           </p>
           <button
             type="button"
@@ -65,6 +67,31 @@ export default function AdminPage() {
           >
             Iniciar sesión
           </button>
+        </main>
+      </div>
+    );
+  }
+
+  if (!isAdminUser(user)) {
+    return (
+      <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
+        <Navbar />
+        <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center">
+          <LayoutDashboard className="mx-auto h-10 w-10 text-brand-primary" />
+          <h1 className="mt-4 font-display text-2xl font-bold text-brand-dark dark:text-white">
+            Sin permiso de admin
+          </h1>
+          <p className="mt-2 text-sm text-brand-dark/70 dark:text-white/70">
+            Esta cuenta no puede editar el contenido. En este navegador, la
+            primera cuenta registrada queda como admin; las siguientes son
+            clientes.
+          </p>
+          <Link
+            href="/"
+            className="mt-4 inline-flex rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white"
+          >
+            Volver al inicio
+          </Link>
         </main>
       </div>
     );

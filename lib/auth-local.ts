@@ -1,17 +1,33 @@
 export const ACCOUNTS_KEY = "chamo-accounts-v1";
 export const SESSION_KEY = "chamo-session-v1";
 
+export type AuthRole = "customer" | "admin";
+
 export type StoredAccount = {
   name: string;
   email: string;
   salt: string;
   passwordHash: string;
+  role: AuthRole;
 };
 
 export type AuthUser = {
   name: string;
   email: string;
+  role: AuthRole;
 };
+
+export function isAuthRole(value: unknown): value is AuthRole {
+  return value === "customer" || value === "admin";
+}
+
+export function isAdminUser(user: AuthUser | null | undefined): boolean {
+  return user?.role === "admin";
+}
+
+export function toAuthUser(account: StoredAccount): AuthUser {
+  return { name: account.name, email: account.email, role: account.role };
+}
 
 export function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -39,19 +55,36 @@ export async function hashPassword(password: string, salt: string) {
   return bytesToHex(new Uint8Array(buffer));
 }
 
+function isStoredAccountShape(account: unknown): account is Omit<StoredAccount, "role"> & {
+  role?: unknown;
+} {
+  if (!account || typeof account !== "object") return false;
+  const row = account as Record<string, unknown>;
+  return (
+    typeof row.name === "string" &&
+    typeof row.email === "string" &&
+    typeof row.salt === "string" &&
+    typeof row.passwordHash === "string"
+  );
+}
+
 export function parseAccounts(raw: string | null): StoredAccount[] {
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (account): account is StoredAccount =>
-        !!account &&
-        typeof account.name === "string" &&
-        typeof account.email === "string" &&
-        typeof account.salt === "string" &&
-        typeof account.passwordHash === "string",
-    );
+    const rows = parsed.filter(isStoredAccountShape);
+    return rows.map((account, index) => ({
+      name: account.name,
+      email: normalizeEmail(account.email),
+      salt: account.salt,
+      passwordHash: account.passwordHash,
+      role: isAuthRole(account.role)
+        ? account.role
+        : index === 0
+          ? "admin"
+          : "customer",
+    }));
   } catch {
     return [];
   }
@@ -66,12 +99,25 @@ export function parseSession(raw: string | null): AuthUser | null {
       typeof parsed?.email === "string" &&
       parsed.email.includes("@")
     ) {
-      return { name: parsed.name, email: normalizeEmail(parsed.email) };
+      return {
+        name: parsed.name,
+        email: normalizeEmail(parsed.email),
+        role: isAuthRole(parsed.role) ? parsed.role : "customer",
+      };
     }
     return null;
   } catch {
     return null;
   }
+}
+
+export function hydrateSessionUser(
+  session: AuthUser | null,
+  accounts: StoredAccount[],
+): AuthUser | null {
+  if (!session) return null;
+  const match = accounts.find((account) => account.email === session.email);
+  return match ? toAuthUser(match) : session;
 }
 
 export async function createAccount(
@@ -92,7 +138,13 @@ export async function createAccount(
   const passwordHash = await hashPassword(input.password, salt);
   return {
     ok: true,
-    account: { name, email, salt, passwordHash },
+    account: {
+      name,
+      email,
+      salt,
+      passwordHash,
+      role: accounts.length === 0 ? "admin" : "customer",
+    },
   };
 }
 

@@ -3,7 +3,9 @@
 - **Fecha:** 2026-09-11
 - **Solicitud:** "Busca error y bugs para solucionar y también recomendaciones como usar ciertos nombres en las variables para que se pueda conectar con el backend más adelante."
 - **Archivos:** `components/IntroSplash.tsx`, `app/admin/page.tsx`, `lib/auth-local.ts`, `components/CartProvider.tsx`, `app/carrito/page.tsx`, `data/products.ts`
-- **Commit:** (pendiente al momento de escribir esta nota)
+**Estado (2026-09-11):** bugs 1 y 2 aplicados en
+[`2026-09-11-fix-loader-admin-role.md`](./2026-09-11-fix-loader-admin-role.md).
+El bug 3 (precio del carrito) **sigue pendiente** de confirmación.
 
 ## Método
 
@@ -132,10 +134,8 @@ agregaste").
 
 ## Recomendación
 
-- Los bugs 1 y 2 son cambios chicos y de bajo riesgo. El bug 3 (precio del carrito) es
-  más una decisión de producto — vale la pena confirmarla antes de tocar `CartLine`,
-  porque cambia el tipo que ya persiste en `localStorage` de los usuarios actuales
-  (habría que migrar registros viejos sin `unitPrice` o tratarlos como "recalcular con
-  precio vivo" de forma explícita).
+- **Aplicado:** bugs 1 y 2 (logo reduced-motion + `role` admin). Ver
+  [`2026-09-11-fix-loader-admin-role.md`](./2026-09-11-fix-loader-admin-role.md).
+- El bug 3 (precio del carrito) sigue pendiente: cambia el formato de `chamo-cart-v1`.
 - La tabla de nombres es una guía, no una lista obligatoria — priorizar `id`/`role` en
   cuentas (bug 2) y `unitPrice` en el carrito (bug 3) porque ya tienen un bug real detrás.

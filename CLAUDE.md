@@ -63,7 +63,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador). Carrito, favoritos y comparar: providers en `localStorage`. Admin liviano `/admin` para banners y categorías.
+- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Carrito, favoritos y comparar: providers en `localStorage`. Admin liviano `/admin` solo para cuentas admin.
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -99,7 +99,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `IntroSplash.tsx` | Puertas al clic del logo; `/carrito` con el ícono detrás de la costura; resto de páginas → `BrandLoader` |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
-| `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión |
+| `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión; `role: "customer" \| "admin"` |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
 | `AuthForm.tsx` | Login / registro / recuperar contraseña (este navegador) |
 | `CompareProvider.tsx` | Comparar hasta 3 SKUs (`chamo-compare-v1`) |
@@ -185,7 +185,7 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-10): login local, comparar, admin liviano, collages de categoría y specs de ejemplo.
+Último avance (2026-09-11): loader de nav interna = preloader; `/admin` exige `role: "admin"`; clic del logo no encadena BrandLoader con reduced-motion.
 
 ## 10. Pendientes conocidos
 
