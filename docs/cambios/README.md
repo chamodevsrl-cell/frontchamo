@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-11 | Revisión merge-readiness: cierre de 5 bugs pendientes de `main` | [2026-09-11-merge-ready-fixes.md](./2026-09-11-merge-ready-fixes.md) |
 | 2026-09-11 | Fix build roto + carrito con precio guardado + nombres listos para backend | [2026-09-11-backend-ready-fixes.md](./2026-09-11-backend-ready-fixes.md) |
 | 2026-09-11 | Fix: doble loader del logo (reduced-motion) + rol admin | [2026-09-11-fix-loader-admin-role.md](./2026-09-11-fix-loader-admin-role.md) |
 | 2026-09-11 | Bugs: doble loader (reduced-motion), rol de admin, precio del carrito + nombres backend | [2026-09-11-bugs-admin-loader-carrito.md](./2026-09-11-bugs-admin-loader-carrito.md) |

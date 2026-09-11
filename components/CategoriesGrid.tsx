@@ -108,9 +108,8 @@ export default function CategoriesGrid() {
     const el = scrollerRef.current;
     if (!el) return;
     const card = el.querySelector("li");
-    const step = card
-      ? card.getBoundingClientRect().width + 16
-      : el.clientWidth * 0.8;
+    const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "16") || 16;
+    const step = card ? card.getBoundingClientRect().width + gap : el.clientWidth * 0.8;
     el.scrollBy({ left: direction * step, behavior: "smooth" });
   }
 

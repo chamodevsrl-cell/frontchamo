@@ -86,11 +86,14 @@ function PaymentBadge({
 export default function Footer() {
   const [logoFailed, setLogoFailed] = useState(false);
   const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
   const year = new Date().getFullYear();
 
   function handleNewsletter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setEmail("");
+    setSubscribed(true);
+    window.setTimeout(() => setSubscribed(false), 4000);
   }
 
   return (
@@ -250,6 +253,11 @@ export default function Footer() {
               <Send className="h-4 w-4" strokeWidth={2} />
             </button>
           </form>
+          {subscribed ? (
+            <p role="status" className="mt-2 text-xs font-medium text-brand-gold">
+              ¡Gracias! Te avisaremos de nuestras ofertas.
+            </p>
+          ) : null}
         </div>
       </div>
 

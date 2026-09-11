@@ -65,6 +65,36 @@ verificado con `npm run build` + `npm run test` en verde después de cada cambio
 - [ ] **`categoryLabel` denormalizado** en cada producto — sin tocar, solo documentado: en un backend real normalmente viene de un `JOIN` con una tabla `categories`.
 - [ ] **`CartProvider`/`FavoritesProvider`/`CompareProvider` casi duplicados** (mismo patrón `localStorage` + `ready` + `idsRef`) — sin tocar; unificarlos en un hook genérico reduciría el riesgo de que se desincronicen, pero no es urgente para conectar el backend.
 
+## ✅ Revisión de merge-readiness a `main` (2026-09-11)
+
+`main` no tiene ninguno de los features de esta rama (carrito, favoritos, comparar,
+cuentas, admin) — no hay conflictos de **código**. Sí hay 5 conflictos de **docs**
+(`CLAUDE.md`, `MANUAL.md`, `SUGERENCIAS.md`, `cambios/README.md` y un archivo
+`cambios/*.md` con el mismo nombre en ambas ramas) porque las dos ramas documentaron
+cosas en paralelo — se resuelven a mano, quedándose con el contenido más completo de
+esta rama y sumando lo que `main` tenía de más.
+
+`main` (antes de divergir) había documentado 5 bugs menores que esta rama nunca había
+cerrado del todo. Se revisó cada uno contra el código actual de esta rama antes de
+mergear:
+
+- [x] **`ProductModal` sí vuelve arriba al cambiar de producto relacionado** — resultó que
+  ya estaba resuelto, pero por otra vía: `FeaturedOffers.tsx`/`ProductCatalog.tsx` le
+  pasan `key={selected.id}` al modal, así que React lo **remonta entero** al cambiar de
+  producto (reinicia `activeImage`, cantidad y el scroll del contenedor). Verificado en
+  vivo con un clic real: `scrollTop` pasó de `2871` a `0`. No hacía falta tocar nada —
+  se corrigió la nota vieja para no reportarlo de nuevo.
+- [x] **`CategoriesGrid`: el paso de las flechas ya usa el gap real** (antes, 16px fijo).
+- [x] **`/login`: el comentario ya no promete "página previa"** (nunca lo hacía).
+- [x] **Boletín del footer: ahora confirma la suscripción** con un mensaje.
+- [x] **Cursor personalizado: los campos de texto ya muestran una barra en vez de la llave.**
+
+Los 5 se aplicaron en esta pasada (`npm run build` + `npm run test` + `npm run lint` en
+verde después de cada uno). Detalle: [`cambios/2026-09-11-merge-ready-fixes.md`](./cambios/2026-09-11-merge-ready-fixes.md).
+
+**Veredicto:** el código está listo (build, tests y lint en verde; sin conflictos de
+código con `main`). Falta resolver a mano los 5 conflictos de documentación al mergear.
+
 ## 💡 Recomendaciones de cosas nuevas a agregar
 
 - [x] 2026-09-09 — **Carrito real** en `localStorage` + página `/carrito`
