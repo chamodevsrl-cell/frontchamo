@@ -307,7 +307,7 @@ Piezas clave (v2):
 | --- | --- | --- |
 | Dashboard | `/admin` | ✅ Real — KPIs desde `getDashboardKPIs()` (mock) |
 | Productos → Ver productos | `/admin/productos` | ✅ Real — `getProducts({ q })`, búsqueda por SKU/nombre/marca |
-| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — `createProduct()`, valida SKU único |
+| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — `createProduct()`, valida SKU único; el `<select>` de categoría viene de `getCategories()` (no de `data/home.ts` directo) |
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
 | Banners | `/admin/banners` | ✅ Real — edita `chamo-cms-v1` (slider del home) |
 | Categorías | `/admin/categorias` | ✅ Real — edita `chamo-cms-v1` (textos de líneas del home) |

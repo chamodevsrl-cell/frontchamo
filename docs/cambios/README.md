@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-11 | Fix: categorías del alta de producto ahora pasan por `getCategories()` del mock | [2026-09-11-categorias-mock-api.md](./2026-09-11-categorias-mock-api.md) |
 | 2026-09-11 | Nuevo apartado A.12 "Dashboard" en la documentación técnica | [2026-09-11-dashboard-doc-section.md](./2026-09-11-dashboard-doc-section.md) |
 | 2026-09-11 | Contrato API del panel admin (tipos, mock, login, `API_CONTRACT.md`) | [2026-09-11-admin-api-contract.md](./2026-09-11-admin-api-contract.md) |
 | 2026-09-11 | Panel admin: sidebar, header y dashboard base | [2026-09-11-admin-panel-layout.md](./2026-09-11-admin-panel-layout.md) |

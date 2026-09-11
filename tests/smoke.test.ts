@@ -244,6 +244,19 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
     expect(kpis.newClientsCount).toBeGreaterThanOrEqual(0);
   });
 
+  it("getCategories devuelve el contrato Category completo", async () => {
+    const { getCategories } = await import("@/services/adminApi");
+    const categories = await getCategories();
+    expect(categories.length).toBeGreaterThan(0);
+    for (const category of categories) {
+      expect(typeof category.id).toBe("string");
+      expect(typeof category.name).toBe("string");
+      expect(typeof category.subcategoriesCount).toBe("number");
+      expect(["active", "hidden"]).toContain(category.status);
+      expect(typeof category.image).toBe("string");
+    }
+  });
+
   it("getProducts filtra por q y createProduct agrega un SKU", async () => {
     const { getProducts, createProduct } = await import("@/services/adminApi");
     const bySku = await getProducts({ q: "TRU-7821" });

@@ -237,6 +237,9 @@ Tipo: `Category` en `types/admin.ts`. El CMS de banners/textos del home
 
 ### `GET /api/v1/categories`
 
+Front: `getCategories()`. Usada hoy por el `<select>` de categoría en
+`/admin/productos/nuevo` (`AdminNewProductForm.tsx`).
+
 ```json
 {
   "ok": true,
@@ -253,6 +256,9 @@ Tipo: `Category` en `types/admin.ts`. El CMS de banners/textos del home
   }
 }
 ```
+
+El mock del front devuelve el array plano; el fetch real debe usar `data.items`
+(mismo patrón que `getProducts`/`getOrders`).
 
 ### `POST /api/v1/categories` / `PUT /api/v1/categories/:id`
 

@@ -14,6 +14,7 @@ import { featuredProducts } from "@/data/products";
 import { mainCategories } from "@/data/home";
 import type {
   AuthSession,
+  Category,
   CreateProductInput,
   DashboardKPIs,
   LoginCredentials,
@@ -319,11 +320,21 @@ export async function updateOrderStatus(
   return { ...order, items: [...order.items] };
 }
 
-/** Listado de categorías del mock (útil para el alta de producto). No es endpoint pedido, pero reutiliza `mainCategories`. */
-export function listMockCategories() {
+/**
+ * GET /api/v1/categories
+ *
+ * Reutiliza `mainCategories` (la tienda) como árbol comercial del panel — el
+ * mock no distingue las dos todavía. `subcategoriesCount` queda en 0 porque
+ * `MainCategory` no modela subcategorías; el backend real sí debería contarlas.
+ */
+export async function getCategories(): Promise<Category[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/categories')
+  await delay();
   return mainCategories.map((category) => ({
     id: category.slug,
     name: category.label,
+    subcategoriesCount: 0,
+    status: "active",
     image: category.image,
   }));
 }

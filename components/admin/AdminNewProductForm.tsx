@@ -3,12 +3,16 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createProductAction } from "@/app/admin/actions";
-import { mainCategories } from "@/data/home";
-import type { CreateProductInput, ProductStatus } from "@/types/admin";
+import type { Category, CreateProductInput, ProductStatus } from "@/types/admin";
 
 const STATUSES: ProductStatus[] = ["active", "draft", "archived"];
 
-export default function AdminNewProductForm() {
+export default function AdminNewProductForm({
+  categories,
+}: {
+  /** Viene de `getCategories()` (mock) — no importar `mainCategories` directo aquí. */
+  categories: Category[];
+}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -100,11 +104,11 @@ export default function AdminNewProductForm() {
             name="categoryId"
             required
             className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-            defaultValue={mainCategories[0]?.slug}
+            defaultValue={categories[0]?.id}
           >
-            {mainCategories.map((category) => (
-              <option key={category.slug} value={category.slug}>
-                {category.label}
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
               </option>
             ))}
           </select>

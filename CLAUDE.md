@@ -195,6 +195,9 @@ Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → a
 login `/admin/login`, layout `(panel)` protegido y [`API_CONTRACT.md`](API_CONTRACT.md).
 Credenciales mock: `admin@local.test` / `admin123`. Detalle:
 [`docs/cambios/2026-09-11-admin-api-contract.md`](docs/cambios/2026-09-11-admin-api-contract.md).
+Revisión de las funciones nuevas del panel: el alta de producto usaba `mainCategories`
+directo en vez del mock — se agregó `getCategories()` a `services/adminApi.ts` y se
+enchufó ahí. Detalle: [`docs/cambios/2026-09-11-categorias-mock-api.md`](docs/cambios/2026-09-11-categorias-mock-api.md).
 
 ## 10. Pendientes conocidos
 

@@ -4,6 +4,32 @@
 
 Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al surgir una idea en un cambio, anótala aquí.
 
+## 🔌 Revisión de backend-readiness del panel admin (2026-09-11)
+
+Se revisaron las funciones nuevas del panel (`AdminNewProductForm.tsx`,
+`AdminOrdersTable.tsx`, `app/admin/(panel)/productos/page.tsx`,
+`app/admin/(panel)/pedidos/page.tsx`) verificando específicamente que todo pase por
+`services/adminApi.ts` — el único punto donde se debe enchufar el backend real (ver
+[A.12.6](./MANUAL.md#a126-conectar-el-backend-real)). Detalle:
+[`cambios/2026-09-11-categorias-mock-api.md`](./cambios/2026-09-11-categorias-mock-api.md).
+
+- [x] **El formulario "Crear producto" no pasaba por el mock API para las categorías.**
+  `AdminNewProductForm.tsx` importaba `mainCategories` directo de `data/home.ts` (la
+  tienda) en vez de llamar a algo en `services/adminApi.ts` — el resto del panel
+  (productos, pedidos, KPIs) sí lo hace. Cuando se conecte el backend real y se
+  reemplacen los `fetch()` en `adminApi.ts`, este dropdown se hubiera quedado leyendo
+  siempre datos locales de la tienda, sin enterarse del backend.
+- [x] **La función que ya existía para esto (`listMockCategories`) no cumplía el tipo
+  `Category`** (le faltaban `subcategoriesCount` y `status`) y **nunca se llamaba desde
+  ningún lado** — código muerto con un contrato roto.
+- [x] **Arreglado:** se renombró a `getCategories()` (async, con el mismo `delay()` de
+  300 ms que el resto del mock, comentario `// TODO Backend` igual que las demás
+  funciones), devuelve el `Category` completo, y `app/admin/(panel)/productos/nuevo/page.tsx`
+  la llama y le pasa el resultado a `AdminNewProductForm` como prop `categories`.
+  Verificado con build/test/lint + un test nuevo (`getCategories devuelve el contrato
+  Category completo`) + prueba en vivo (el `<select>` sigue mostrando las 7
+  categorías, ahora vía el mock en vez del import directo).
+
 ## 🔎 Evaluación UX / UI y funcional (2026-09-10)
 
 Revisión original con el sitio de **`main` antiguo** (`npm run dev`), desktop y móvil.
