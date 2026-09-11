@@ -54,8 +54,9 @@ components/
   StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
   CategoryIcon.tsx        # Iconos Lucide por categoría
   Reveal.tsx              # Fade/slide al entrar en viewport
-  IntroSplash.tsx         # Puertas: logo y /carrito
-  Preloader.tsx           # Carga inicial (Framer Motion)
+  IntroSplash.tsx         # Puertas (logo y /carrito) + BrandLoader en el resto
+  Preloader.tsx           # Carga inicial → BrandLoader
+  BrandLoader.tsx         # Logo + engranaje + CARGANDO... (entrada y nav interna)
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
   FavoriteButton.tsx / Testimonials.tsx / Breadcrumbs.tsx
   QuoteForm.tsx
@@ -104,20 +105,23 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5b Animaciones de entrada
 
-- Al **cargar o refrescar** la pestaña: `Preloader` (Framer Motion) — fondo `#0B3554`,
+- Al **cargar o refrescar** la pestaña: `Preloader` → `BrandLoader` — fondo `#0B3554`,
   logo oficial (`/logo.png`) entra de izquierda a derecha (`x: -100 → 0`, fade in),
   `/engranaje.png` gira debajo (60×60) y el texto **CARGANDO...** en `brand-gold`.
   A los **2.5 s** hace fade-out y se desmonta (`z-[90]` para cubrir Navbar y WhatsApp).
+- Al navegar a **otras páginas** (Catálogo, Categorías, Ofertas, Nosotros, etc.):
+  el mismo `BrandLoader` de 2.5 s. No se apila con el preloader de la primera
+  carga. Un clic dispara **una sola vez** (el `pathname` no lo repite).
 - Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
   Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil).
 - Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
-  Lucide (`ShoppingCart`) dorado. Entra desde la izquierda, **se detiene a la
-  izquierda de la costura dorada** (no encima) y, al abrirse las puertas, **sigue
-  su camino** hacia la derecha. Un clic en el navbar dispara la intro **una sola
-  vez** (el cambio de `pathname` no la repite).
-- Mientras corre cualquiera de las dos, `html` lleva la clase `intro-playing`
+  Lucide (`ShoppingCart`) dorado. Entra desde la izquierda y **se estaciona entero
+  detrás (a la izquierda) de la costura dorada**. Al abrirse las puertas, vuelve al
+  **recorrido normal** (centro del hueco y salida a la derecha). Un clic en el navbar
+  dispara la intro **una sola vez** (el cambio de `pathname` no la repite).
+- Mientras corre cualquiera, `html` lleva la clase `intro-playing`
   (`overflow: hidden !important`) para que el Navbar no libere el scroll del body.
-- Ir a Nosotros, Catálogo, Categorías, Contacto, etc. **no** dispara esa intro.
+- Cambiar de producto **dentro del modal** (sin cambiar de ruta) no muestra este loader.
 - Tamaños con `clamp`/`vmin` y `100dvh` para que el engranaje y las puertas entren en
   móvil y en landscape.
 - Slider, banners de página, categorías, productos y el resto de bloques: `Reveal`
@@ -179,8 +183,8 @@ se tomó contra **`main` antiguo** (antes de catálogo/carrito). En el código a
 - **Cerrado:** `/catalogo`, `/categorias`, `/carrito` y `/favoritos` responden (ya no 404).
 - **Cerrado:** buscador del Navbar → `/catalogo?q=`; carrito y cotización persisten; favoritos persisten con badge y confirmación.
 - **Cerrado:** fallback de logos en `BrandsCarousel` también mira `load` + `naturalWidth === 0` (no solo `onError`). Los wordmarks SVG ya están en `public/images/marcas/`.
-- **Cerrado:** intro del carrito una sola vez por clic; ícono a la izquierda de la costura.
-- **Cerrado:** preloader con logo/engranaje oficiales; fade-out a los 2.5 s (`z-[90]`).
+- **Cerrado:** intro del carrito una sola vez por clic; ícono entero detrás de la costura al entrar y recorrido normal al salir.
+- **Cerrado:** preloader con logo/engranaje oficiales; fade-out a los 2.5 s (`z-[90]`). El mismo overlay cubre la navegación interna.
 - **Cerrado:** login/registro local, comparar (hasta 3), admin liviano `/admin`, collages de categoría, specs de ejemplo completas.
 - **Sigue abierto (cliente / backend):** correo oficial, ficha de `/nosotros`, testimonios reales, logos oficiales, ERP, fichas técnicas oficiales.
 
@@ -217,9 +221,10 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
    de izquierda a derecha, un engranaje girando y el texto **CARGANDO...**. A los
    **2.5 s** se desvanece y aparece el sitio. Si tocas el
    **logo**, las puertas azules con engranaje. Al entrar al **carrito**, las mismas
-   puertas pero pasa un carrito dorado: frena a la **izquierda** de la línea dorada
-   (una sola vez por clic) y, al abrirse, sigue de largo. Ir a Nosotros, Catálogo u
-   otras secciones **no** vuelve a mostrar esa intro.
+   puertas pero pasa un carrito dorado: frena **detrás** (a la izquierda) de la
+   línea dorada y, al abrirse, cruza por el centro (recorrido normal). Al ir a
+   Catálogo, Categorías, Ofertas u otras páginas se ve el **mismo loader** de
+   entrada (logo + engranaje + CARGANDO...).
 
 ### B.2 Inicio (home)
 
@@ -276,7 +281,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | --- | --- |
 | `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
-| `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que frena a la izquierda de la costura dorada (una vez por clic) y sigue al abrir |
+| `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
 | `/admin` | Editar banners y categorías de **este navegador** (requiere cuenta) |

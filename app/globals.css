@@ -267,7 +267,8 @@ html.intro-playing body {
   text-transform: uppercase;
 }
 
-/* Carrito: entra, frena a la izquierda de la costura y sigue al abrir las puertas. */
+/* Carrito: al entrar queda entero detrás (izquierda) de la costura;
+   al abrir las puertas sale por el centro, recorrido normal. */
 .intro-cart {
   position: absolute;
   top: 50%;
@@ -421,19 +422,18 @@ html.intro-playing body {
     transform: translate(calc(-50% - 56vw), -50%);
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  18% {
-    opacity: 1;
-    transform: translate(calc(-50% - 2.5rem + 1.4vw), -50%);
-    animation-timing-function: ease-out;
-  }
-  24% {
-    opacity: 1;
-    transform: translate(calc(-50% - 2.5rem), -50%);
-    animation-timing-function: linear;
-  }
+  /* Borde derecho del ícono a la izquierda de x=50% (la costura), con holgura
+     para la línea dorada y el drop-shadow. Sin overshoot hacia el centro. */
+  18%,
   70% {
     opacity: 1;
-    transform: translate(calc(-50% - 2.5rem), -50%);
+    transform: translate(calc(-100% - 0.75rem), -50%);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
+  }
+  /* Al abrir las puertas, recorrido normal: centro del hueco y salida a la derecha. */
+  78% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
     animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
   }
   100% {

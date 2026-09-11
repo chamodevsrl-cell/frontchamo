@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Cog, ShoppingCart } from "lucide-react";
+import BrandLoader, { BRAND_LOADER_MS } from "@/components/BrandLoader";
 
-type IntroVariant = "brand" | "cart";
+type IntroVariant = "brand" | "cart" | "load";
 
 function lockIntroScroll() {
   document.documentElement.classList.add("intro-playing");
@@ -23,11 +24,31 @@ function isSameOriginPath(href: string, path: string) {
   }
 }
 
+function isInternalPageLink(link: HTMLAnchorElement) {
+  if (link.target === "_blank" || link.hasAttribute("download")) return false;
+  try {
+    const url = new URL(link.href, window.location.origin);
+    if (url.origin !== window.location.origin) return false;
+    if (url.pathname === window.location.pathname && url.search === window.location.search) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function IntroSplash() {
   const pathname = usePathname();
   const lastPlay = useRef(0);
   const lastPath = useRef(pathname);
   const cartClaimedByClick = useRef(false);
+  const loadClaimedByClick = useRef(false);
+  const sessionStart = useRef<number | null>(null);
+  const visibleRef = useRef(false);
+  const variantRef = useRef<IntroVariant>(
+    pathname === "/carrito" ? "cart" : "brand",
+  );
   const [visible, setVisible] = useState(false);
   const [cycle, setCycle] = useState(0);
   const [variant, setVariant] = useState<IntroVariant>(
@@ -35,18 +56,33 @@ export default function IntroSplash() {
   );
 
   const hide = useCallback(() => {
-    unlockIntroScroll();
+    visibleRef.current = false;
     setVisible(false);
+    if (variantRef.current !== "load") {
+      unlockIntroScroll();
+    }
   }, []);
 
   const play = useCallback((next: IntroVariant) => {
     const now = Date.now();
-    if (now - lastPlay.current < 450) return false;
+    if (next === "load") {
+      if (visibleRef.current) return false;
+      const started = sessionStart.current;
+      if (started === null || now - started < BRAND_LOADER_MS + 400) return false;
+    } else if (now - lastPlay.current < 450 && next === variantRef.current) {
+      return false;
+    }
     lastPlay.current = now;
+    variantRef.current = next;
+    visibleRef.current = true;
     setVariant(next);
     setCycle((n) => n + 1);
     setVisible(true);
     return true;
+  }, []);
+
+  useLayoutEffect(() => {
+    sessionStart.current = Date.now();
   }, []);
 
   useEffect(() => {
@@ -68,6 +104,11 @@ export default function IntroSplash() {
         window.location.pathname !== "/carrito"
       ) {
         if (play("cart")) cartClaimedByClick.current = true;
+        return;
+      }
+
+      if (isInternalPageLink(link)) {
+        if (play("load")) loadClaimedByClick.current = true;
       }
     }
 
@@ -79,19 +120,26 @@ export default function IntroSplash() {
     if (pathname === lastPath.current) return;
     lastPath.current = pathname;
     if (pathname === "/carrito") {
+      loadClaimedByClick.current = false;
       if (cartClaimedByClick.current) {
         cartClaimedByClick.current = false;
         return;
       }
       play("cart");
-    } else {
-      cartClaimedByClick.current = false;
+      return;
     }
+
+    cartClaimedByClick.current = false;
+    if (loadClaimedByClick.current) {
+      loadClaimedByClick.current = false;
+      return;
+    }
+    play("load");
   }, [pathname, play]);
 
   useLayoutEffect(() => {
     if (!visible) {
-      unlockIntroScroll();
+      if (variant !== "load") unlockIntroScroll();
       return;
     }
 
@@ -101,13 +149,26 @@ export default function IntroSplash() {
     }
 
     lockIntroScroll();
-    const safety = window.setTimeout(hide, variant === "cart" ? 4200 : 3200);
+    const hold =
+      variant === "cart" ? 4200 : variant === "load" ? BRAND_LOADER_MS : 3200;
+    const safety = window.setTimeout(hide, hold);
 
     return () => {
       window.clearTimeout(safety);
-      unlockIntroScroll();
+      if (variant !== "load") unlockIntroScroll();
     };
   }, [visible, cycle, hide, variant]);
+
+  if (variant === "load") {
+    return (
+      <BrandLoader
+        visible={visible}
+        onExited={() => {
+          unlockIntroScroll();
+        }}
+      />
+    );
+  }
 
   if (!visible) return null;
 
@@ -131,10 +192,7 @@ export default function IntroSplash() {
       <div className="intro-panel intro-panel-right" />
       {variant === "cart" ? (
         <div className="intro-cart" aria-hidden>
-          <ShoppingCart
-            className="intro-cart-icon"
-            strokeWidth={1.6}
-          />
+          <ShoppingCart className="intro-cart-icon" strokeWidth={1.6} />
         </div>
       ) : (
         <div className="intro-gear" aria-hidden>
