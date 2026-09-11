@@ -186,6 +186,7 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-11 — `FRONTEND_DOCUMENTATION.md`: referencia única (variables por componente + cómo conectar el backend + manual de uso). Nota: [`cambios/2026-09-11-frontend-documentation.md`](./cambios/2026-09-11-frontend-documentation.md).
 - [x] 2026-09-11 — Contrato API del panel admin (`types/admin.ts`, mock `services/adminApi.ts`, login `/admin/login`, `API_CONTRACT.md`). Nota: [`cambios/2026-09-11-admin-api-contract.md`](./cambios/2026-09-11-admin-api-contract.md).
 - [x] 2026-09-11 — Diseño base del **panel de administración** (sidebar corporativa, header, dashboard KPI). Nota: [`cambios/2026-09-11-admin-panel-layout.md`](./cambios/2026-09-11-admin-panel-layout.md).
 - [x] 2026-09-11 — **Listo para backend:** `npm run build` roto (2 errores de TS) → arreglado; carrito guarda `unitPrice`/`quantity` y migra el formato viejo; cuentas con `id`; productos con `discountPercent` y sin `image` redundante. `npm run build` + `npm run test` en verde. Nota: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).

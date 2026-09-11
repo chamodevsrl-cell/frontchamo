@@ -7,6 +7,10 @@ Este documento es la memoria de referencia del proyecto para trabajar indistinta
 desde la oficina o desde casa: cualquier sesión de Claude Code debe poder retomar el
 trabajo leyendo solo este archivo + `AGENTS.md`.
 
+> Referencia técnica completa (variables por componente, cómo conectar el backend,
+> manual de uso): [`FRONTEND_DOCUMENTATION.md`](FRONTEND_DOCUMENTATION.md). Contrato
+> HTTP exacto del panel admin: [`API_CONTRACT.md`](API_CONTRACT.md).
+
 ## 1. Stack tecnológico
 
 - **Next.js 16** (App Router, `app/`)

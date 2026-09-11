@@ -34,4 +34,6 @@ Cualquier sesión (Claude Code, Cursor u otra) debe mantenerlas al día junto co
 **Memoria de agentes:** [`../CLAUDE.md`](../CLAUDE.md) + [`../AGENTS.md`](../AGENTS.md)
 resumen este mismo esquema para que cualquier sesión lo retome sin contexto previo.
 
-**Handover backend del panel:** [`../API_CONTRACT.md`](../API_CONTRACT.md).
+**Handover de backend:** [`../FRONTEND_DOCUMENTATION.md`](../FRONTEND_DOCUMENTATION.md)
+(variables por componente + cómo conectar cada pieza + manual de uso completo) y
+[`../API_CONTRACT.md`](../API_CONTRACT.md) (especificación HTTP exacta del panel).

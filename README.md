@@ -43,6 +43,8 @@ Tailwind CSS v4.
 ## 📂 Estructura del proyecto
 
 ```
+FRONTEND_DOCUMENTATION.md  # Referencia única: variables por componente + cómo conectar el backend + manual de uso
+API_CONTRACT.md        # Especificación HTTP exacta del panel admin (para backend)
 app/                  # App Router (páginas y layout)
 components/            # UI reutilizable (Navbar, Footer, Slider, Auth, etc.)
 data/                  # Contenido tipado (slider, home, productos)
@@ -53,7 +55,13 @@ docs/                  # Documentación viva en 3 secciones fijas
 public/images/         # Slider, logo e íconos
 ```
 
-Documentación (3 secciones, ver [`docs/README.md`](./docs/README.md)):
+**¿Vas a conectar el backend?** Empieza por
+[`FRONTEND_DOCUMENTATION.md`](./FRONTEND_DOCUMENTATION.md) — qué variable usa cada
+componente, de dónde sale cada dato hoy, cómo enchufar cada pieza, y el manual de uso
+completo (tienda + panel admin). El contrato HTTP exacto del panel está en
+[`API_CONTRACT.md`](./API_CONTRACT.md).
+
+Documentación del proceso (3 secciones, ver [`docs/README.md`](./docs/README.md)):
 
 1. **Cambios** → [`docs/cambios/`](./docs/cambios/)
 2. **Sugerencias** → [`docs/SUGERENCIAS.md`](./docs/SUGERENCIAS.md)

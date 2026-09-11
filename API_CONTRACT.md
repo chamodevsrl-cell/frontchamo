@@ -7,6 +7,10 @@ comentario `// TODO Backend: Reemplazar mock con fetch('/api/v1/...')`.
 
 Tipos TypeScript 1:1: [`types/admin.ts`](./types/admin.ts).
 
+> Este documento cubre **solo** el panel admin. Para el resto del front (catálogo
+> público, carrito, favoritos, cuentas de la tienda, manual de uso) ver
+> [`FRONTEND_DOCUMENTATION.md`](./FRONTEND_DOCUMENTATION.md).
+
 Base URL sugerida: **`/api/v1`** (mismo origen). Autenticación: header
 
 ```
