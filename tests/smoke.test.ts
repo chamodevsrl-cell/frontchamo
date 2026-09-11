@@ -189,6 +189,24 @@ describe("smoke de catálogo y home", () => {
       `https://wa.me/51959723602?text=${encodeURIComponent("Hola, soy Chamo")}`,
     );
   });
+
+  it("el dashboard admin tiene 4 KPI y 7 días de ventas de ejemplo", async () => {
+    const { adminKpis, adminSalesLast7Days, adminTopProducts } = await import(
+      "@/data/admin"
+    );
+    expect(adminKpis).toHaveLength(4);
+    expect(adminKpis.map((kpi) => kpi.label)).toEqual([
+      "Total productos",
+      "Pedidos hoy",
+      "Ventas del mes",
+      "Stock bajo",
+    ]);
+    expect(adminSalesLast7Days).toHaveLength(7);
+    expect(adminTopProducts.length).toBe(5);
+    expect(adminTopProducts.every((item) => item.image && item.unitsSold > 0)).toBe(
+      true,
+    );
+  });
 });
 
 describe("home HTTP (si el dev server está arriba)", () => {
@@ -220,6 +238,13 @@ describe("home HTTP (si el dev server está arriba)", () => {
       const contactHtml = await contacto.text();
       expect(contactHtml).toContain("CONTACTO");
       expect(contactHtml).toContain("959 723 602");
+
+      const admin = await fetch("http://127.0.0.1:3000/admin", {
+        signal: AbortSignal.timeout(4000),
+      });
+      expect(admin.ok).toBe(true);
+      const adminHtml = await admin.text();
+      expect(adminHtml).toMatch(/Admin \| Chamo Import|Cargando panel|Panel de administración/);
     } catch (error) {
       if (error instanceof Error && error.message.includes("expected")) {
         throw error;

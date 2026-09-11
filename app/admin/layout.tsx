@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import AdminShell from "@/components/admin/AdminShell";
 
 export const metadata: Metadata = {
-  title: "Admin contenido | Chamo Import",
-  description: "Edita banners y categorías de este navegador",
+  title: "Admin | Chamo Import",
+  description: "Panel de administración de Chamo Import S.R.L.",
 };
 
 export default function AdminLayout({
@@ -10,5 +11,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <AdminShell>{children}</AdminShell>;
 }

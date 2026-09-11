@@ -1,364 +1,135 @@
-"use client";
+import {
+  AlertTriangle,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import Image from "next/image";
+import { adminKpis, adminSalesLast7Days, adminTopProducts } from "@/data/admin";
 
-import { useState } from "react";
-import Link from "next/link";
-import { LayoutDashboard, RotateCcw, Save } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Reveal from "@/components/Reveal";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { useAuth } from "@/components/AuthProvider";
-import { useSiteContent } from "@/components/ContentProvider";
-import { isAdminUser } from "@/lib/auth-local";
-import { slides as defaultSlides } from "@/data/media";
-import { mainCategories } from "@/data/home";
-import { emptyCmsState, type CmsState } from "@/lib/cms";
+const KPI_ICONS = {
+  products: Package,
+  orders: ShoppingCart,
+  sales: Wallet,
+  "low-stock": AlertTriangle,
+} as const;
 
-const fieldClass =
-  "w-full rounded-lg border border-brand-primary/35 bg-white px-3 py-2 text-sm text-brand-dark outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 dark:bg-brand-dark/40 dark:text-white";
-
-function slidesFromCms(cms: CmsState) {
-  return defaultSlides.map((slide) => {
-    const over = cms.slides.find((item) => item.id === slide.id);
-    return {
-      id: slide.id,
-      src: over?.src ?? slide.src,
-      alt: over?.alt ?? slide.alt,
-      hidden: over?.hidden ?? false,
-    };
-  });
-}
-
-function categoriesFromCms(cms: CmsState) {
-  return mainCategories.map((category) => {
-    const over = cms.categories.find((item) => item.slug === category.slug);
-    return {
-      slug: category.slug,
-      label: over?.label ?? category.label,
-      eyebrow: over?.eyebrow ?? category.eyebrow,
-      bullets: over?.bullets ?? [...category.bullets],
-      image: over?.image ?? category.image,
-      imageAlt: over?.imageAlt ?? category.imageAlt,
-      bannerTitle: over?.bannerTitle ?? category.bannerTitle,
-    };
-  });
-}
-
-export default function AdminPage() {
-  const { user, openAuth } = useAuth();
-  const { cms, ready } = useSiteContent();
-
-  if (!user) {
-    return (
-      <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
-        <Navbar />
-        <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center">
-          <LayoutDashboard className="mx-auto h-10 w-10 text-brand-primary" />
-          <h1 className="mt-4 font-display text-2xl font-bold text-brand-dark dark:text-white">
-            Admin de contenido
-          </h1>
-          <p className="mt-2 text-sm text-brand-dark/70 dark:text-white/70">
-            Inicia sesión con una cuenta de administrador para editar banners y
-            categorías de este navegador.
-          </p>
-          <button
-            type="button"
-            onClick={() => openAuth("login")}
-            className="mt-4 rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white"
-          >
-            Iniciar sesión
-          </button>
-        </main>
-      </div>
-    );
-  }
-
-  if (!isAdminUser(user)) {
-    return (
-      <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
-        <Navbar />
-        <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center">
-          <LayoutDashboard className="mx-auto h-10 w-10 text-brand-primary" />
-          <h1 className="mt-4 font-display text-2xl font-bold text-brand-dark dark:text-white">
-            Sin permiso de admin
-          </h1>
-          <p className="mt-2 text-sm text-brand-dark/70 dark:text-white/70">
-            Esta cuenta no puede editar el contenido. En este navegador, la
-            primera cuenta registrada queda como admin; las siguientes son
-            clientes.
-          </p>
-          <Link
-            href="/"
-            className="mt-4 inline-flex rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white"
-          >
-            Volver al inicio
-          </Link>
-        </main>
-      </div>
-    );
-  }
-
-  if (!ready) {
-    return (
-      <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
-        <Navbar />
-        <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center text-sm text-brand-dark/70">
-          Cargando contenido local…
-        </main>
-      </div>
-    );
-  }
-
-  return <AdminEditor cms={cms} />;
-}
-
-function AdminEditor({ cms }: { cms: CmsState }) {
-  const { saveCms, resetCms } = useSiteContent();
-  const [notice, setNotice] = useState("");
-  const [slides, setSlides] = useState(() => slidesFromCms(cms));
-  const [categories, setCategories] = useState(() => categoriesFromCms(cms));
-
-  function persist() {
-    saveCms({
-      slides: slides.map((slide) => ({
-        id: slide.id,
-        src: slide.src,
-        alt: slide.alt,
-        hidden: slide.hidden,
-      })),
-      categories: categories.map((category) => ({
-        slug: category.slug,
-        label: category.label,
-        eyebrow: category.eyebrow,
-        bullets: category.bullets as [string, string, string],
-        image: category.image,
-        imageAlt: category.imageAlt,
-        bannerTitle: category.bannerTitle,
-      })),
-    });
-    setNotice("Guardado en este navegador (chamo-cms-v1).");
-  }
-
-  function handleReset() {
-    resetCms();
-    setSlides(slidesFromCms(emptyCmsState));
-    setCategories(categoriesFromCms(emptyCmsState));
-    setNotice("Volviste a los banners y categorías del código.");
-  }
+export default function AdminDashboardPage() {
+  const maxSale = Math.max(...adminSalesLast7Days.map((day) => day.amount));
 
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
-      <Navbar />
-      <main className="mx-auto w-full max-w-[1100px] flex-1 space-y-10 px-4 py-12 sm:px-6">
-        <Reveal>
-          <Breadcrumbs
-            items={[
-              { href: "/", label: "Inicio" },
-              { label: "Admin contenido" },
-            ]}
-          />
-          <h1 className="mt-4 font-display text-3xl font-bold text-brand-dark dark:text-white">
-            Admin liviano
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-brand-dark/70 dark:text-white/70">
-            Edita banners del slider y textos de categorías. Los cambios viven en
-            este navegador hasta que haya un CMS/backend.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={persist}
-              className="inline-flex items-center gap-2 rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
-            >
-              <Save className="h-4 w-4" strokeWidth={2} />
-              Guardar
-            </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="inline-flex items-center gap-2 rounded-lg border border-brand-dark/15 px-4 py-2 text-sm font-semibold text-brand-dark hover:border-brand-primary dark:text-white"
-            >
-              <RotateCcw className="h-4 w-4" strokeWidth={2} />
-              Restaurar código
-            </button>
-            <Link
-              href="/"
-              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold text-brand-primary hover:underline"
-            >
-              Ver el sitio
-            </Link>
-          </div>
-          {notice ? (
-            <p role="status" className="mt-3 text-sm font-medium text-brand-primary">
-              {notice}
-            </p>
-          ) : null}
-        </Reveal>
+    <div className="space-y-6">
+      <div>
+        <h1 className="font-display text-2xl font-bold text-brand-dark sm:text-3xl">
+          Dashboard
+        </h1>
+        <p className="mt-1 text-sm text-brand-dark/65">
+          Resumen operativo de Chamo Import S.R.L. Cifras de ejemplo para el
+          diseño del panel.
+        </p>
+      </div>
 
-        <section className="rounded-2xl border border-brand-dark/10 bg-white p-5 dark:bg-[#102a40]">
-          <h2 className="font-display text-xl font-bold text-brand-dark dark:text-white">
-            Banners
-          </h2>
-          <ul className="mt-4 space-y-4">
-            {slides.map((slide, index) => (
-              <li
-                key={slide.id}
-                className="grid gap-3 rounded-xl border border-brand-dark/8 p-3 sm:grid-cols-2"
-              >
-                <label className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase dark:text-white/60">
-                  Ruta / URL
-                  <input
-                    className={`${fieldClass} mt-1`}
-                    value={slide.src}
-                    onChange={(event) =>
-                      setSlides((current) =>
-                        current.map((item, i) =>
-                          i === index ? { ...item, src: event.target.value } : item,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase dark:text-white/60">
-                  Texto alternativo
-                  <input
-                    className={`${fieldClass} mt-1`}
-                    value={slide.alt}
-                    onChange={(event) =>
-                      setSlides((current) =>
-                        current.map((item, i) =>
-                          i === index ? { ...item, alt: event.target.value } : item,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label className="flex items-center gap-2 text-sm text-brand-dark dark:text-white">
-                  <input
-                    type="checkbox"
-                    checked={slide.hidden}
-                    onChange={(event) =>
-                      setSlides((current) =>
-                        current.map((item, i) =>
-                          i === index
-                            ? { ...item, hidden: event.target.checked }
-                            : item,
-                        ),
-                      )
-                    }
-                  />
-                  Ocultar este banner
-                </label>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="rounded-2xl border border-brand-dark/10 bg-white p-5 dark:bg-[#102a40]">
-          <h2 className="font-display text-xl font-bold text-brand-dark dark:text-white">
-            Categorías
-          </h2>
-          <ul className="mt-4 space-y-6">
-            {categories.map((category, index) => (
-              <li
-                key={category.slug}
-                className="grid gap-3 rounded-xl border border-brand-dark/8 p-3 sm:grid-cols-2"
-              >
-                <p className="sm:col-span-2 font-display text-base font-bold text-brand-dark dark:text-white">
-                  {category.slug}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {adminKpis.map((kpi) => {
+          const Icon = KPI_ICONS[kpi.id];
+          const alert = kpi.tone === "alert";
+          return (
+            <article
+              key={kpi.id}
+              className="rounded-2xl border border-brand-dark/10 bg-white p-5 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-semibold text-brand-dark/60">{kpi.label}</p>
+                <span
+                  className={`flex h-9 w-9 items-center justify-center rounded-xl ${
+                    alert ? "bg-amber-100 text-red-600" : "bg-[#eef6fc] text-brand-primary"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" strokeWidth={2} />
+                </span>
+              </div>
+              <p className="mt-3 font-display text-3xl font-bold text-brand-dark">
+                {kpi.value}
+              </p>
+              {alert ? (
+                <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold tracking-wide text-red-700 uppercase">
+                  <AlertTriangle className="h-3.5 w-3.5" strokeWidth={2.4} />
+                  {kpi.delta}
+                </span>
+              ) : (
+                <p className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-emerald-600">
+                  <TrendingUp className="h-4 w-4" strokeWidth={2} />
+                  {kpi.delta}
                 </p>
-                <label className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase dark:text-white/60">
-                  Nombre
-                  <input
-                    className={`${fieldClass} mt-1`}
-                    value={category.label}
-                    onChange={(event) =>
-                      setCategories((current) =>
-                        current.map((item, i) =>
-                          i === index
-                            ? { ...item, label: event.target.value }
-                            : item,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase dark:text-white/60">
-                  Título de banner
-                  <input
-                    className={`${fieldClass} mt-1`}
-                    value={category.bannerTitle}
-                    onChange={(event) =>
-                      setCategories((current) =>
-                        current.map((item, i) =>
-                          i === index
-                            ? { ...item, bannerTitle: event.target.value }
-                            : item,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase dark:text-white/60">
-                  Antetítulo
-                  <input
-                    className={`${fieldClass} mt-1`}
-                    value={category.eyebrow}
-                    onChange={(event) =>
-                      setCategories((current) =>
-                        current.map((item, i) =>
-                          i === index
-                            ? { ...item, eyebrow: event.target.value }
-                            : item,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase dark:text-white/60">
-                  Imagen
-                  <input
-                    className={`${fieldClass} mt-1`}
-                    value={category.image}
-                    onChange={(event) =>
-                      setCategories((current) =>
-                        current.map((item, i) =>
-                          i === index
-                            ? { ...item, image: event.target.value }
-                            : item,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                {category.bullets.map((bullet, bulletIndex) => (
-                  <label
-                    key={`${category.slug}-b-${bulletIndex}`}
-                    className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase dark:text-white/60 sm:col-span-2"
-                  >
-                    Viñeta {bulletIndex + 1}
-                    <input
-                      className={`${fieldClass} mt-1`}
-                      value={bullet}
-                      onChange={(event) =>
-                        setCategories((current) =>
-                          current.map((item, i) => {
-                            if (i !== index) return item;
-                            const bullets: [string, string, string] = [
-                              ...item.bullets,
-                            ];
-                            bullets[bulletIndex] = event.target.value;
-                            return { ...item, bullets };
-                          }),
-                        )
-                      }
+              )}
+            </article>
+          );
+        })}
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,1fr)]">
+        <article className="rounded-2xl border border-brand-dark/10 bg-white p-5 shadow-sm">
+          <h2 className="font-display text-lg font-bold text-brand-dark">
+            Ventas de los últimos 7 días
+          </h2>
+          <p className="mt-1 text-xs text-brand-dark/50">Montos de ejemplo (S/)</p>
+          <div
+            className="mt-6 flex h-52 items-end gap-2 sm:gap-3"
+            role="img"
+            aria-label="Gráfica de ventas de los últimos 7 días"
+          >
+            {adminSalesLast7Days.map((day) => {
+              const height = Math.max(8, Math.round((day.amount / maxSale) * 100));
+              return (
+                <div key={day.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+                  <div className="flex h-40 w-full items-end justify-center">
+                    <div
+                      className="w-full max-w-10 rounded-t-md bg-brand-primary"
+                      style={{ height: `${height}%` }}
+                      title={`S/ ${day.amount.toLocaleString("es-PE")}`}
                     />
-                  </label>
-                ))}
+                  </div>
+                  <span className="text-xs font-semibold text-brand-dark/60">
+                    {day.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </article>
+
+        <article className="rounded-2xl border border-brand-dark/10 bg-white p-5 shadow-sm">
+          <h2 className="font-display text-lg font-bold text-brand-dark">
+            Productos más vendidos
+          </h2>
+          <p className="mt-1 text-xs text-brand-dark/50">Unidades de ejemplo</p>
+          <ul className="mt-4 divide-y divide-brand-dark/8">
+            {adminTopProducts.map((product) => (
+              <li key={product.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                <Image
+                  src={product.image}
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 shrink-0 rounded-lg object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-brand-dark">
+                    {product.name}
+                  </p>
+                  <p className="text-xs text-brand-dark/50">
+                    {product.brand} · {product.sku}
+                  </p>
+                </div>
+                <span className="shrink-0 font-display text-sm font-bold text-brand-primary">
+                  {product.unitsSold} uds
+                </span>
               </li>
             ))}
           </ul>
-        </section>
-      </main>
+        </article>
+      </section>
     </div>
   );
 }

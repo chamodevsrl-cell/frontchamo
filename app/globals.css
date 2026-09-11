@@ -42,6 +42,15 @@ html.intro-playing body {
   overscroll-behavior: none;
 }
 
+html.admin-shell,
+html.admin-shell body {
+  overflow: hidden;
+}
+
+html.admin-shell footer {
+  display: none !important;
+}
+
 /* Cursor llave inglesa — solo mouse/trackpad (no touch) */
 @media (hover: hover) and (pointer: fine) {
   html,

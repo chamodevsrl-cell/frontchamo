@@ -63,7 +63,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Carrito, favoritos y comparar: providers en `localStorage`. Admin liviano `/admin` solo para cuentas admin.
+- Autenticación: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Carrito, favoritos y comparar: providers en `localStorage`. Panel `/admin` (sidebar + dashboard de ejemplo); CMS de banners/categorías en `/admin/banners` y `/admin/categorias`.
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -104,6 +104,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `AuthForm.tsx` | Login / registro / recuperar contraseña (este navegador) |
 | `CompareProvider.tsx` | Comparar hasta 3 SKUs (`chamo-compare-v1`) |
 | `CompareButton.tsx` | Botón de comparar en tarjeta y modal |
+| `AdminShell.tsx` | Sidebar `#0B3554` + header blanco del panel `/admin` |
 | `ContentProvider.tsx` | Overlay CMS local de banners y categorías |
 | `CategoryCollage.tsx` | Collage 2×2 de productos/marcas de la línea |
 | `Footer.tsx` | Footer corporativo (ver §5) |
@@ -126,7 +127,7 @@ app/                  # App Router (páginas y layout)
   categorias/           # Listado + [slug]
   carrito/              # Cotización local
   comparar/             # Comparación de hasta 3 SKUs
-  admin/                # Admin liviano de banners/categorías
+  admin/                # Panel (dashboard + CMS banners/categorías)
   favoritos/            # Lista persistida
   terminos/ privacidad/ # Políticas
   api/productos/        # GET catálogo
@@ -185,7 +186,8 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-11): `npm run build` estaba roto (2 errores de TS) → arreglado;
+Último avance (2026-09-11): panel de administración con sidebar `#0B3554`, header y
+dashboard KPI de ejemplo. Antes: `npm run build` estaba roto (2 errores de TS) → arreglado;
 `CartLine` ahora guarda `quantity`/`unitPrice`/`wholesaleUnitPrice` (con migración del
 formato viejo) en vez de recalcular el precio en vivo; cuentas con `id`; productos con
 `discountPercent` y sin el campo `image` redundante. Detalle:

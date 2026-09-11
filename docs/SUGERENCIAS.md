@@ -128,7 +128,7 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 - [x] 2026-09-09 — API interna de productos (`app/api/productos`) — el catálogo ya no se consulta solo hardcodeado en la UI
 - [x] 2026-09-10 — Completar specs de **ejemplo** por SKU (origen, material/dimensiones, peso, garantía).
 - [ ] Fichas técnicas **oficiales** por SKU cuando el cliente las envíe
-- [x] 2026-09-10 — CMS / admin liviano en `/admin` (banners y categorías en `chamo-cms-v1`, este navegador)
+- [x] 2026-09-11 — CMS / admin liviano en `/admin` (banners y categorías en `chamo-cms-v1`, este navegador). El panel ahora tiene sidebar + dashboard; el CMS vive en `/admin/banners` y `/admin/categorias`.
 - [x] 2026-09-09 — `allowedDevOrigins` en `next.config` (LAN vía `ALLOWED_DEV_ORIGINS`)
 - [x] 2026-09-09 — Tests básicos de smoke (slider N slides, categorías, búsqueda, home HTTP si el server está arriba)
 
@@ -159,6 +159,7 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-11 — Diseño base del **panel de administración** (sidebar corporativa, header, dashboard KPI). Nota: [`cambios/2026-09-11-admin-panel-layout.md`](./cambios/2026-09-11-admin-panel-layout.md).
 - [x] 2026-09-11 — **Listo para backend:** `npm run build` roto (2 errores de TS) → arreglado; carrito guarda `unitPrice`/`quantity` y migra el formato viejo; cuentas con `id`; productos con `discountPercent` y sin `image` redundante. `npm run build` + `npm run test` en verde. Nota: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
 - [x] 2026-09-11 — Fix doble loader del logo con reduced-motion + rol admin en `/admin` (bug 3 del carrito sin tocar). Nota: [`cambios/2026-09-11-fix-loader-admin-role.md`](./cambios/2026-09-11-fix-loader-admin-role.md).
 - [x] 2026-09-11 — Navegación interna (Catálogo, Categorías, Ofertas, etc.) usa el **mismo loader** de entrada a la web. Intro del carrito: ícono detrás de la costura al entrar, recorrido normal al salir. Nota: [`cambios/2026-09-11-loader-nav-carrito-costura.md`](./cambios/2026-09-11-loader-nav-carrito-costura.md).

@@ -32,6 +32,9 @@ function isInternalPageLink(link: HTMLAnchorElement) {
     if (url.pathname === window.location.pathname && url.search === window.location.search) {
       return false;
     }
+    if (url.pathname.startsWith("/admin") || window.location.pathname.startsWith("/admin")) {
+      return false;
+    }
     return true;
   } catch {
     return false;
@@ -119,6 +122,11 @@ export default function IntroSplash() {
   useEffect(() => {
     if (pathname === lastPath.current) return;
     lastPath.current = pathname;
+    if (pathname.startsWith("/admin")) {
+      cartClaimedByClick.current = false;
+      loadClaimedByClick.current = false;
+      return;
+    }
     if (pathname === "/carrito") {
       loadClaimedByClick.current = false;
       if (cartClaimedByClick.current) {

@@ -36,7 +36,7 @@ app/catalogo/             # Búsqueda y filtros (API)
 app/carrito/              # Cotización local
 app/favoritos/            # Lista persistida (localStorage)
 app/comparar/             # Comparación de hasta 3 SKUs
-app/admin/                # Admin liviano de banners/categorías (localStorage)
+app/admin/                # Panel: dashboard, banners, categorías, stubs de módulos
 app/cotizar/              # Formulario + WhatsApp
 app/api/productos/        # GET catálogo filtrable
 app/terminos/ /privacidad/
@@ -47,6 +47,8 @@ components/
   CompareProvider.tsx     # Comparar (máx. 3) en localStorage
   ContentProvider.tsx     # Overlay CMS local de banners/categorías
   AuthProvider.tsx        # Cuentas locales + sesión (`role` admin/customer)
+  admin/AdminShell.tsx    # Sidebar + header del panel
+  admin/SiteContentEditor.tsx  # CMS local de banners/categorías
   CategoryCollage.tsx     # Grilla 2×2 de productos/marcas de la línea
   CatalogFilters.tsx      # Filtros de /catalogo
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
@@ -68,6 +70,7 @@ data/
   media.ts                 # Slides / logo / icon
   home.ts                   # trustItems, mainCategories, distributorBrands
   products.ts               # Catálogo de ejemplo + searchCatalog
+  admin.ts                  # KPI y gráfica de ejemplo del panel
 public/images/slider/       # baner-1.png … baner-3.png
 public/images/categorias/   # Fotos locales por categoría
 public/images/marcas/       # Wordmarks SVG
@@ -129,6 +132,15 @@ placeholder hasta ficha oficial del cliente.
 - Slider, banners de página, categorías, productos y el resto de bloques: `Reveal`
   (fade + slide-up al entrar en viewport).
 - Si el usuario pide menos movimiento (`prefers-reduced-motion`), no hay animación.
+
+### A.5c Panel de administración
+
+`app/admin/layout.tsx` monta `AdminShell`: sidebar fija `#0B3554` (logo + Lucide),
+header blanco (buscador, notificaciones, avatar). Solo `role: "admin"`. El dashboard
+(`/admin`) muestra 4 KPI de **ejemplo**, gráfica de ventas 7 días y productos más
+vendidos. Banners y categorías del CMS local quedaron en `/admin/banners` y
+`/admin/categorias`. El resto de ítems del menú son páginas base (sin backend).
+Navegar dentro de `/admin` **no** dispara el BrandLoader de la tienda.
 
 ### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
 
@@ -289,7 +301,9 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
-| `/admin` | Editar banners y categorías de **este navegador**. Solo cuentas con `role: "admin"` (la primera registrada en el navegador). Otras cuentas ven “Sin permiso de admin” |
+| `/admin` | Panel de administración (sidebar + dashboard). Solo `role: "admin"`. KPI y gráfica son de **ejemplo** |
+| `/admin/banners` | Editar banners del slider (`chamo-cms-v1`) |
+| `/admin/categorias` | Editar textos de líneas (`chamo-cms-v1`) |
 | `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
 | `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre WhatsApp (sin `window.open`), y mapa |
 | `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
@@ -299,13 +313,14 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 ### B.4 Contenido que el negocio puede cambiar sin programar
 
-Hay un **admin liviano** en `/admin` (sesión con `role: "admin"`) para banners del slider y textos de
-categorías; guarda en este navegador (`chamo-cms-v1`). La primera cuenta creada en ese
-navegador queda como admin; las siguientes son clientes. El código del repo sigue siendo
-la fuente por defecto:
+Hay un **panel de administración** en `/admin` (sesión con `role: "admin"`). El
+dashboard es diseño base con cifras de ejemplo. Banners del slider y textos de
+categorías se editan en `/admin/banners` y `/admin/categorias` (`chamo-cms-v1`).
+La primera cuenta creada en ese navegador queda como admin; las siguientes son
+clientes. El código del repo sigue siendo la fuente por defecto:
 
-- Banners → `/admin` o `public/images/slider/` + `data/media.ts`
-- Categorías del home → `/admin` o `data/home.ts` + collage de productos de la línea
+- Banners → `/admin/banners` o `public/images/slider/` + `data/media.ts`
+- Categorías del home → `/admin/categorias` o `data/home.ts` + collage de productos de la línea
 - Logos de marcas → `public/images/marcas/`
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
 - Teléfono / WhatsApp / correo → `data/contact.ts`
