@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-11 | Preloader: logo, engranaje y fade-out a 2.5 s | [2026-09-11-preloader-2-5s-logo-engranaje.md](./2026-09-11-preloader-2-5s-logo-engranaje.md) |
 | 2026-09-10 | Ejecutar sugerencias: login, comparar, admin, collages | [2026-09-10-sugerencias-login-comparar-admin.md](./2026-09-10-sugerencias-login-comparar-admin.md) |
 | 2026-09-10 | Bugs en intro del carrito y preloader (revisión Claude Code) | [2026-09-10-bugs-intro-preloader.md](./2026-09-10-bugs-intro-preloader.md) |
 | 2026-09-10 | Preloader con logo y engranaje oficiales | [2026-09-10-preloader-logo-engranaje.md](./2026-09-10-preloader-logo-engranaje.md) |

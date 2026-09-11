@@ -36,7 +36,8 @@ en [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intr
 
 - [x] 2026-09-10 — **1. La intro del carrito se dispara dos veces para la misma navegación.** El clic reclama el ingreso (`cartClaimedByClick`) y el efecto de `pathname` no vuelve a disparar. Back/forward sí reproducen. Detalle: [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intro-preloader.md).
 - [x] 2026-09-10 — **2. La costura dorada atraviesa el ícono del carrito.** `intro-cart-path` estaciona el ícono a `calc(-50% - 2.5rem)` (izquierda de la línea). Misma nota.
-- [x] 2026-09-10 — **3. El preloader ignoraba si la página realmente cargó.** Espera `window.load` + mínimo 1.2 s, tope 6 s. Misma nota.
+- [x] 2026-09-11 — Preloader con fade-out fijo a **2.5 s** (brief de logo + engranaje). Cubrir Navbar/WhatsApp con `z-[90]`.
+- [x] 2026-09-10 — **3. El preloader ignoraba si la página realmente cargó.** Se implementó `window.load` + mínimo 1.2 s; el 2026-09-11 el brief volvió al timer de 2.5 s. Misma nota de intro + [`cambios/2026-09-11-preloader-2-5s-logo-engranaje.md`](./cambios/2026-09-11-preloader-2-5s-logo-engranaje.md).
 
 ## 💡 Recomendaciones de cosas nuevas a agregar
 
@@ -102,6 +103,7 @@ en [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intr
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-11 — Preloader según brief: `/logo.png` entra de izquierda a derecha, `/engranaje.png` gira, **CARGANDO...** en oro, fade-out a los 2.5 s (`z-[90]`). Nota: [`cambios/2026-09-11-preloader-2-5s-logo-engranaje.md`](./cambios/2026-09-11-preloader-2-5s-logo-engranaje.md).
 - [x] 2026-09-10 — Login/comparar/admin liviano/collages/specs de ejemplo (`docs/cambios/2026-09-10-sugerencias-login-comparar-admin.md`)
 - [x] 2026-09-10 — Bugs intro/preloader: un solo play al clic de Carrito, ícono a la izquierda de la costura, preloader espera `window.load`
 - [x] 2026-09-10 — Preloader con logo y engranaje oficiales (`/logo.png`, `/engranaje.png`)

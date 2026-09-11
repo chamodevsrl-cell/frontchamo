@@ -105,9 +105,9 @@ placeholder hasta ficha oficial del cliente.
 ### A.5b Animaciones de entrada
 
 - Al **cargar o refrescar** la pestaña: `Preloader` (Framer Motion) — fondo `#0B3554`,
-  logo oficial (`/logo.png`) entra de izquierda a derecha, `/engranaje.png` gira
-  debajo (60×60) y el texto **CARGANDO...** en `brand-gold`. Se oculta cuando la
-  página terminó de cargar (`window.load`) **y** pasaron al menos 1.2 s (tope 6 s).
+  logo oficial (`/logo.png`) entra de izquierda a derecha (`x: -100 → 0`, fade in),
+  `/engranaje.png` gira debajo (60×60) y el texto **CARGANDO...** en `brand-gold`.
+  A los **2.5 s** hace fade-out y se desmonta (`z-[90]` para cubrir Navbar y WhatsApp).
 - Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
   Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil).
 - Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
@@ -179,7 +179,8 @@ se tomó contra **`main` antiguo** (antes de catálogo/carrito). En el código a
 - **Cerrado:** `/catalogo`, `/categorias`, `/carrito` y `/favoritos` responden (ya no 404).
 - **Cerrado:** buscador del Navbar → `/catalogo?q=`; carrito y cotización persisten; favoritos persisten con badge y confirmación.
 - **Cerrado:** fallback de logos en `BrandsCarousel` también mira `load` + `naturalWidth === 0` (no solo `onError`). Los wordmarks SVG ya están en `public/images/marcas/`.
-- **Cerrado:** intro del carrito una sola vez por clic; ícono a la izquierda de la costura; preloader espera `window.load` (mín. 1.2 s, tope 6 s).
+- **Cerrado:** intro del carrito una sola vez por clic; ícono a la izquierda de la costura.
+- **Cerrado:** preloader con logo/engranaje oficiales; fade-out a los 2.5 s (`z-[90]`).
 - **Cerrado:** login/registro local, comparar (hasta 3), admin liviano `/admin`, collages de categoría, specs de ejemplo completas.
 - **Sigue abierto (cliente / backend):** correo oficial, ficha de `/nosotros`, testimonios reales, logos oficiales, ERP, fichas técnicas oficiales.
 
@@ -213,8 +214,8 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 1. En desarrollo: `npm run dev` y abrir http://localhost:3000
 2. En producción: URL pública del hosting (cuando esté desplegado)
 3. Al entrar o refrescar, una pantalla `#0B3554` muestra el **logo oficial** entrando
-   de izquierda a derecha, un engranaje girando y el texto **CARGANDO...**. Se queda
-   hasta que la página cargue (mínimo ~1.2 s) y luego se desvanece. Si tocas el
+   de izquierda a derecha, un engranaje girando y el texto **CARGANDO...**. A los
+   **2.5 s** se desvanece y aparece el sitio. Si tocas el
    **logo**, las puertas azules con engranaje. Al entrar al **carrito**, las mismas
    puertas pero pasa un carrito dorado: frena a la **izquierda** de la línea dorada
    (una sola vez por clic) y, al abrirse, sigue de largo. Ir a Nosotros, Catálogo u
