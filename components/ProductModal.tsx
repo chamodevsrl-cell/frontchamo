@@ -3,8 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import {
-  GitCompareArrows,
-  Heart,
+  BadgePercent,
   Minus,
   Plus,
   ShieldCheck,
@@ -16,17 +15,11 @@ import {
   getRelatedProducts,
   type FeaturedProduct,
 } from "@/data/products";
-
-const WHATSAPP_URL =
-  "https://wa.me/51959723602?text=Hola%2C%20quiero%20cotizar%20este%20producto%3A%20";
-
-function formatPrice(value: number) {
-  return value.toLocaleString("es-PE", {
-    style: "currency",
-    currency: "PEN",
-    minimumFractionDigits: 2,
-  });
-}
+import { whatsappUrl } from "@/data/contact";
+import { formatPrice } from "@/lib/format";
+import { useCart } from "@/components/CartProvider";
+import FavoriteButton from "@/components/FavoriteButton";
+import CompareButton from "@/components/CompareButton";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -53,8 +46,10 @@ export default function ProductModal({
   onSelectProduct,
 }: ProductModalProps) {
   const titleId = useId();
+  const { addItem } = useCart();
   const [activeImage, setActiveImage] = useState(0);
   const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
 
   const images =
     product.images.length >= 5
@@ -63,16 +58,11 @@ export default function ProductModal({
           Array.from(
             { length: 5 - product.images.length },
             (_, i) =>
-              product.images[i % product.images.length] ?? product.image,
+              product.images[i % product.images.length] ?? product.images[0],
           ),
         );
 
   const related = getRelatedProducts(product, 4);
-
-  useEffect(() => {
-    setActiveImage(0);
-    setQty(1);
-  }, [product.id]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -87,9 +77,9 @@ export default function ProductModal({
     };
   }, [onClose]);
 
-  const whatsappHref = `${WHATSAPP_URL}${encodeURIComponent(
-    `${product.name} (${product.sku}) x${qty}`,
-  )}`;
+  const whatsappHref = whatsappUrl(
+    `Hola, quiero cotizar este producto: ${product.name} (${product.sku}) x${qty}`,
+  );
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6">
@@ -164,9 +154,10 @@ export default function ProductModal({
                 <span className="text-xs text-brand-dark/50">
                   SKU: {product.sku}
                 </span>
-                {product.discount ? (
-                  <span className="rounded-full bg-[#cfe8f8] px-2.5 py-0.5 text-[11px] font-extrabold text-brand-primary">
-                    -{product.discount}% OFF
+                {product.discountPercent ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#cfe8f8] px-2.5 py-0.5 text-[11px] font-extrabold text-brand-primary">
+                    <BadgePercent className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
+                    -{product.discountPercent}% OFF
                   </span>
                 ) : null}
               </div>
@@ -236,35 +227,28 @@ export default function ProductModal({
                     <Plus className="h-4 w-4" strokeWidth={2.25} />
                   </button>
                 </div>
-                <button
-                  type="button"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary"
-                  aria-label="Agregar a favoritos"
-                >
-                  <Heart className="h-4 w-4" strokeWidth={2} />
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-dark/12 text-brand-dark transition hover:border-brand-primary hover:text-brand-primary"
-                  aria-label="Comparar producto"
-                >
-                  <GitCompareArrows className="h-4 w-4" strokeWidth={2} />
-                </button>
+                <FavoriteButton productId={product.id} variant="box" />
+                <CompareButton productId={product.id} variant="box" />
               </div>
 
               <div className="flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
+                  onClick={() => {
+                    addItem(product.id, qty);
+                    setAdded(true);
+                    window.setTimeout(() => setAdded(false), 1400);
+                  }}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary"
                 >
                   <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                  Agregar a cotización
+                  {added ? "Agregado" : "Agregar a cotización"}
                 </button>
                 <a
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1ebe57]"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-whatsapp px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1ebe57]"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   Cotizar por WhatsApp
@@ -358,7 +342,7 @@ export default function ProductModal({
                       >
                         <div className="relative aspect-square overflow-hidden bg-brand-gray">
                           <Image
-                            src={item.image}
+                            src={item.images[0]}
                             alt={item.name}
                             fill
                             className="object-cover transition duration-300 group-hover:scale-[1.03]"

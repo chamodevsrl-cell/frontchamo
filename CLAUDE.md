@@ -28,11 +28,10 @@ trabajo leyendo solo este archivo + `AGENTS.md`.
 | `brand-primary` | Azul principal / industrial (barra de navegación, bordes, CTAs, acentos) | `#127EC9` |
 | `brand-gold` | Amarillo dorado (badges Oferta/Nuevo, detalles, títulos de footer) | `#E4B714` |
 | `brand-gray` | Gris claro (fondos suaves, hover) | `#F4F4F4` |
-| — | Verde WhatsApp (burbuja flotante, `WhatsAppFloat.tsx`, hardcodeado sin token) | `#25D366` |
+| `brand-whatsapp` | Verde WhatsApp (burbuja flotante, CTAs) | `#25D366` |
 
-Definidos en `app/globals.css` (`:root` + `@theme inline`). El verde de WhatsApp **no**
-tiene token de marca todavía (`bg-[#25D366]` inline) — si se usa en más lugares, conviene
-agregarlo como `--brand-whatsapp` en `globals.css`.
+Definidos en `app/globals.css` (`:root` + `@theme inline`). El verde de WhatsApp
+es `--brand-whatsapp` / `brand-whatsapp`.
 
 ## 3. Datos oficiales de la empresa
 
@@ -41,16 +40,9 @@ agregarlo como `--brand-whatsapp` en `globals.css`.
 - **Ubicación:** Lima, Perú — Google Maps: https://maps.app.goo.gl/mrh3WueTJErXS2sg6
 - **Idioma base del sitio:** `es` (`app/layout.tsx` → `<html lang="es">`)
 
-> ⚠️ **Pendiente de sincronizar:** el código todavía usa el teléfono placeholder
-> `+51 999 999 999` en **4 lugares** — [`components/WhatsAppFloat.tsx`](components/WhatsAppFloat.tsx)
-> (`WHATSAPP_URL`), [`components/Footer.tsx`](components/Footer.tsx) (`tel:+51999999999`),
-> [`app/cotizar/page.tsx`](app/cotizar/page.tsx) (enlace WhatsApp) y
-> [`app/contacto/page.tsx`](app/contacto/page.tsx) (`tel:+51999999999`). Hay que
-> reemplazarlo por `+51 959 723 602` (`wa.me/51959723602`) en los cuatro y registrar el
-> commit en `docs/cambios/`. **`components/ProductModal.tsx` ya usa el número oficial**
-> (`wa.me/51959723602`) — tomarlo como referencia al corregir el resto.
-> El correo del footer y de `/contacto` (`ventas@chamoimport.com`) también es
-> provisional; confirmar con el cliente antes de darlo por oficial.
+> Teléfono / WhatsApp oficial **+51 959 723 602** (`wa.me/51959723602`) unificado en
+> `data/contact.ts` (float, footer, cotizar, contacto y modal). El correo
+> `ventas@chamoimport.com` sigue provisional; confirmar con el cliente.
 
 ## 4. Tipografías
 
@@ -59,24 +51,23 @@ agregarlo como `--brand-whatsapp` en `globals.css`.
 
 Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 
-## 5. Estado actual del sitio (2026-09-08)
+## 5. Estado actual del sitio (2026-09-10)
 
 - **Navbar de 3 niveles** (`components/Navbar.tsx`), estilo ferretería:
   1. Barra superior `brand-dark`: envíos, atención mayorista, enlaces Nosotros/Contacto, redes sociales.
-  2. Fila blanca: logo, buscador desktop, lupa toggle en móvil, Mi cuenta, Favoritos, Carrito.
-  3. Barra `brand-primary`: botón **Categorías** (fondo `brand-dark`, dropdown con 5 categorías + "Ver todas") y menú principal uppercase (Inicio, Catálogo, Ofertas, Nosotros, Contacto). El ítem activo y el hover solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo además lleva una **barra dorada animada** debajo (`navIndicator`, calculada por `offsetLeft`/`offsetWidth` del link con `data-nav-active`).
+  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta, Favoritos (badge), Carrito (badge con `CartProvider`).
+  3. Barra `brand-primary`: botón **Categorías** (fondo `brand-dark`, dropdown desde `mainCategories` + "Ver todas") y menú principal uppercase (Inicio, Catálogo, Ofertas, Nosotros, Contacto). El ítem activo y el hover solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo además lleva una **barra dorada animada** debajo (`navIndicator`, calculada por `offsetLeft`/`offsetWidth` del link con `data-nav-active`).
   - Menú móvil tipo drawer lateral con categorías + navegación + botón "Mi cuenta".
   - Los badges **Oferta/Nuevo** (no el botón de categorías) son los que usan `brand-gold` — ver `FeaturedOffers.tsx` / `CategoriesGrid.tsx`.
-- **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) en vez de un botón dentro del navbar; también hay entrada "Cotizar" en `app/cotizar/page.tsx`.
-- **Footer corregido** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + métodos de pago (Visa, Mastercard, Yape, Plin) + mapa embebido de Google Maps (Lima) + boletín de correo.
-- **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers).
-- **Categorías** (`CategoriesGrid.tsx`): ya no es grilla estática — es **carrusel horizontal** (`snap-x`, igual patrón que `FeaturedOffers`) con **flechas circulares** (◀ ▶) en la cabecera, visibles en PC y móvil, más swipe táctil. 7 tarjetas (`data/home.ts` → `mainCategories`: Ferretería, Electricidad, Seguridad, Hogar, Herramientas, Construcción, Pinturas).
-- Autenticación: `AuthProvider` (contexto global) + `AuthModal` (modal login/registro montado en `layout.tsx`) + `AuthForm`.
-- **Modal de producto** (`ProductModal.tsx` + `data/products.ts`, 8 productos de ejemplo): galería con thumbs, precio unitario + mayorista, cantidad, "Agregar a cotización" y **Cotizar por WhatsApp** (`wa.me/51959723602`, ya con el número oficial); debajo, tabla **Especificaciones técnicas** (cabecera `brand-dark`, filas zebra `#eef6fc`) construida desde `product.specs` + `product.packaging`, y una grilla de **productos relacionados de la misma categoría** (`getRelatedProducts`) — al hacer clic en uno, cambia el producto dentro del mismo modal.
-- Modo oscuro: clase `.dark` + preferencia en `localStorage` (tokens `--background`/`--foreground` en `globals.css`); actualmente `Navbar.tsx` fuerza `classList.remove("dark")` en cada mount — revisar si es intencional antes de reactivar el toggle.
-- Cursor personalizado (`WrenchCursor.tsx`): llave inglesa, solo en dispositivos con mouse/trackpad (`@media (hover: hover) and (pointer: fine)`).
-- Hero slider (`HeroSlider.tsx`): sin flechas, puntos + swipe táctil, banners full-bleed en `public/images/slider/`.
-- **Documentación viva** en `docs/` — 3 secciones fijas: `cambios/` (historial), `SUGERENCIAS.md` (backlog), `MANUAL.md` (técnica + usuario). Ver §9. En Cursor el agente es Auto (Composer); Claude Code y Cursor comparten estos mismos archivos vía Git, así que cualquier sesión puede dejar código sin que la otra se entere hasta el próximo `git pull` — por eso conviene revisar `git log` antes de dar por hecho el estado del sitio.
+- **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) con el número oficial; `/cotizar` arma el mensaje con formulario + carrito.
+- **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
+- **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
+- **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
+- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS banners/categorías en `/admin/banners` y `/admin/categorias`.
+- **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
+- Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
+- Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
+- API: `GET /api/productos`. Tests: `npm test`.
 
 ## 6. Componentes (`components/`)
 
@@ -84,15 +75,38 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | --- | --- |
 | `Navbar.tsx` | Header de 3 niveles (ver §5) |
 | `WhatsAppFloat.tsx` | Burbuja flotante WhatsApp (verde `#25D366`, fija inferior derecha) |
-| `HeroSlider.tsx` | Slider de anuncios del home, animación de entrada, swipe táctil |
+| `HeroSlider.tsx` | Slider de anuncios: solo banners reales (sin placeholder), swipe táctil |
 | `BrandsCarousel.tsx` | Carrusel de marcas distribuidoras (marquee CSS), debajo del slider |
 | `CategoriesGrid.tsx` | Categorías en carrusel horizontal con flechas circulares + borde brillante de marca |
-| `FeaturedOffers.tsx` | Sección de ofertas destacadas, carrusel en móvil / grilla en desktop (usa `ProductModal`) |
+| `FeaturedOffers.tsx` | Ofertas destacadas: carrusel de una fila (igual que categorías) + `ProductModal` |
 | `ProductModal.tsx` | Modal de producto: galería, precios, ficha técnica (tabla) y relacionados por categoría |
 | `TrustInfoBar.tsx` | Barra de confianza (envíos, garantía, atención, etc.) |
-| `AuthProvider.tsx` | Contexto de autenticación (estado global login/registro) |
+| `CartProvider.tsx` | Carrito / cotización en `localStorage` |
+| `FavoritesProvider.tsx` | Favoritos en `localStorage` (`chamo-favorites-v1`) |
+| `FavoriteButton.tsx` | Corazón con persistencia + confirmación “Guardado” |
+| `Testimonials.tsx` | Prueba social B2B de ejemplo en la home |
+| `Breadcrumbs.tsx` | Miga de pan en páginas internas |
+| `ProductCard.tsx` | Tarjeta de producto reutilizable (home, catálogo, ofertas) |
+| `ProductCatalog.tsx` | Grilla + modal |
+| `CatalogFilters.tsx` | Filtros de `/catalogo` (query string) |
+| `CategoryBanner.tsx` | Detalle de categoría: reutiliza `PageBanner` (imagen + título centrado) |
+| `PageBanner.tsx` | Banner ancho compartido (categorías y `/nosotros`) |
+| `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |
+| `CategoryIcon.tsx` | Icono Lucide por categoría (menú, home, `/categorias`) |
+| `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
+| `BrandLoader.tsx` | Overlay compartido: logo oficial + engranaje + “CARGANDO...” (2.5 s) |
+| `Preloader.tsx` | Carga inicial: monta `BrandLoader` |
+| `IntroSplash.tsx` | Puertas al clic del logo; `/carrito` con el ícono detrás de la costura; resto de páginas → `BrandLoader` |
+| `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
+| `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
+| `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión; `role: "customer" \| "admin"` |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
-| `AuthForm.tsx` | Formulario iniciar sesión / registrarse |
+| `AuthForm.tsx` | Login / registro / recuperar contraseña (este navegador) |
+| `CompareProvider.tsx` | Comparar hasta 3 SKUs (`chamo-compare-v1`) |
+| `CompareButton.tsx` | Botón de comparar en tarjeta y modal |
+| `AdminShell.tsx` | Sidebar `#0B3554` + header; sesión `AuthSession` (no `AuthProvider`) |
+| `ContentProvider.tsx` | Overlay CMS local de banners y categorías |
+| `CategoryCollage.tsx` | Collage 2×2 de productos/marcas de la línea |
 | `Footer.tsx` | Footer corporativo (ver §5) |
 | `WrenchCursor.tsx` | Cursor personalizado (llave inglesa) en desktop |
 | `SocialIcons.tsx` | Iconos SVG de Facebook/Instagram/YouTube reutilizados en Navbar y Footer |
@@ -103,24 +117,41 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 app/                  # App Router (páginas y layout)
   layout.tsx           # Fuentes, metadata, AuthProvider, Footer, WhatsApp float, cursor
   page.tsx              # Home (Navbar + HeroSlider + Brands + Categorías + Ofertas + TrustBar)
-  globals.css           # Tokens de marca + Tailwind v4 + animaciones (hero, marquee)
+  globals.css           # Tokens de marca + Tailwind v4 + animaciones (hero, reveal, intro, marquee)
   login/                # Auth (/login)
   nosotros/             # Empresa (/nosotros)
   contacto/             # Contacto + enlace a Maps (/contacto)
   ofertas/              # Ofertas (/ofertas)
   cotizar/              # Cotización mayorista (/cotizar)
+  catalogo/             # Búsqueda y filtros
+  categorias/           # Listado + [slug]
+  carrito/              # Cotización local
+  comparar/             # Comparación de hasta 3 SKUs
+  admin/                # login + (panel) protegido
+  favoritos/            # Lista persistida
+  terminos/ privacidad/ # Políticas
+  api/productos/        # GET catálogo (tienda)
+types/admin.ts         # Contrato del panel
+services/adminApi.ts   # Mock `/api/v1`
+lib/auth.ts            # Sesión del panel
+API_CONTRACT.md        # Handover HTTP para backend
 components/            # UI reutilizable (ver §6)
 data/
+  contact.ts            # Teléfono / WhatsApp / correo / Maps
+  company.ts            # Historia / misión / visión de /nosotros (placeholder)
   media.ts              # Rutas de slider, logo e icono (LOGO_SRC, ICON_SRC, slides)
   home.ts                # Datos de secciones del home (marcas, categorías, trust bar…)
   products.ts            # Catálogo de productos de ejemplo
+  testimonials.ts        # Testimonios de ejemplo (home)
 docs/                   # Documentación viva en 3 secciones fijas (ver §9)
   README.md              # Índice + flujo obligatorio
   cambios/               # Sección 1 — nota antes/después por solicitud
   SUGERENCIAS.md         # Sección 2 — backlog y recomendaciones
   MANUAL.md              # Sección 3 — documentación técnica (Parte A) + manual de usuario (Parte B)
 public/images/
-  slider/                # Anuncios del home (baner 1.png, baner 2.png, baner 3.png)
+  slider/                # baner-1.png, baner-2.png, baner-3.png
+  categorias/            # Fotos locales por línea
+  marcas/                # Wordmarks SVG
   logo/                  # logo-chamo-import.png (navbar / footer)
   icon/                  # logo-chamo-import.png (favicon)
 ```
@@ -132,6 +163,7 @@ npm run dev      # servidor de desarrollo (localhost:3000)
 npm run build    # build de producción
 npm run start    # sirve el build de producción
 npm run lint     # ESLint
+npm test         # Vitest smoke
 ```
 
 Flujo de Git habitual del proyecto:
@@ -158,25 +190,24 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-08): consolidación de la documentación viva en estas 3 secciones
-(antes eran 5 archivos sueltos), y una segunda pasada de revisión que sincronizó
-`CLAUDE.md` / `MANUAL.md` / `SUGERENCIAS.md` con cambios de código que se habían hecho
-en paralelo (carrusel de categorías con flechas, modal de producto con ficha técnica y
-relacionados).
+Último avance (2026-09-11): contrato del Panel Admin para el backend —
+`types/admin.ts`, mock `services/adminApi.ts` (300 ms), sesión en `lib/auth.ts`,
+login `/admin/login`, layout `(panel)` protegido y [`API_CONTRACT.md`](API_CONTRACT.md).
+Credenciales mock: `admin@local.test` / `admin123`. Detalle:
+[`docs/cambios/2026-09-11-admin-api-contract.md`](docs/cambios/2026-09-11-admin-api-contract.md).
+Revisión de las funciones nuevas del panel: el alta de producto usaba `mainCategories`
+directo en vez del mock — se agregó `getCategories()` a `services/adminApi.ts` y se
+enchufó ahí. Detalle: [`docs/cambios/2026-09-11-categorias-mock-api.md`](docs/cambios/2026-09-11-categorias-mock-api.md).
 
 ## 10. Pendientes conocidos
 
-- **Bug confirmado (2026-09-10):** el fallback de texto de `BrandsCarousel.tsx` no se activa — las 10 imágenes de `public/images/marcas/` fallan (404) pero el `onError`/`setFailed(true)` no reemplaza el `<img>` por el `<span>` de texto; el usuario ve el ícono nativo de "imagen rota". Ver [`docs/cambios/2026-09-10-auditoria-ux-funcional.md`](docs/cambios/2026-09-10-auditoria-ux-funcional.md).
-- **Bug confirmado (2026-09-10):** `ProductModal.tsx` no hace scroll al tope al cambiar a un producto relacionado (el `useEffect` resetea `activeImage`/`qty` pero no el `scrollTop`) — el usuario se queda viendo la ficha técnica de abajo sin la info principal del producto nuevo. Fix propuesto en [`docs/cambios/2026-09-10-bugs-cambios-recientes.md`](docs/cambios/2026-09-10-bugs-cambios-recientes.md).
-- **Bug menor (2026-09-10):** `CategoriesGrid.tsx` → `scrollByCard` usa un gap fijo de 16px en vez del gap real por breakpoint (12/16/20px) — mismo doc de arriba tiene el fix.
-- **Comentario incorrecto (2026-09-10):** `app/login/page.tsx` dice que vuelve a "la home (o página previa)" pero siempre hace `router.replace("/")` — nunca vuelve a la página anterior (confirmado en vivo desde `/contacto`). Ver [`docs/cambios/2026-09-10-bugs-resto-proyecto.md`](docs/cambios/2026-09-10-bugs-resto-proyecto.md).
-- **Sin feedback (2026-09-10):** boletín del footer sin mensaje de éxito/error; favoritos/comparar en `FeaturedOffers.tsx` sin toggle visual al hacer clic; cursor personalizado (`WrenchCursor.tsx`) no distingue campos de texto de botones.
-- **4 rutas 404 reales confirmadas:** `/catalogo`, `/categorias`, `/carrito`, `/favoritos` (enlazadas desde nav principal, "Ver todas" de categorías, e íconos de carrito/favoritos).
-- **Funciones sin lógica real (solo UI):** buscador del navbar (`handleSearch` solo hace `preventDefault`), "Añadir al carrito" (`FeaturedOffers.tsx`), "Agregar a cotización" (`ProductModal.tsx`), login/registro (`AuthForm.tsx`, lo admite su propio mensaje), favoritos. Plan de cierre priorizado en `docs/SUGERENCIAS.md`.
-- Sincronizar el teléfono/WhatsApp oficial (+51 959 723 602) en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx` (ver §3) — `ProductModal.tsx` ya lo tiene correcto, usarlo de referencia.
+- Backend real: sustituir el mock de `services/adminApi.ts` por `fetch('/api/v1/...')` según `API_CONTRACT.md`. Cuentas/carrito/comparar de la tienda siguen en este navegador.
+- `FavoritesProvider` sigue en `ids: string[]` (sin `addedAt`) — cambiar a `{productId, addedAt}[]` si se necesita ordenar u sincronizar con cuenta real.
+- `categoryLabel` sigue denormalizado en cada producto (documentado, no corregido).
 - Confirmar correo de contacto oficial (footer y `/contacto`).
+- Reemplazar textos placeholder de `/nosotros` (`data/company.ts`) por ficha oficial.
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).
-- Las rutas `/catalogo`, `/categorias`, `/favoritos` y `/carrito` están enlazadas desde Navbar/Footer pero aún no tienen página propia en `app/`.
-- Fotos propias de categorías (hoy Unsplash) y logos de marcas en `public/images/marcas/` (hoy varios 404).
-- Unificar categorías del Navbar con `mainCategories` en `data/home.ts`.
-- `data/products.ts` sigue siendo catálogo de ejemplo hardcodeado (8 productos) — pendiente conectar a backend/API real.
+- Fotos reales de tienda/almacén y logos oficiales de marca (hoy JPEG localizados y wordmarks SVG).
+- Specs técnicas oficiales por SKU cuando el cliente envíe fichas.
+- Unificar sesión del panel (`chamo_admin_session`) con `role: "admin"` de la tienda cuando exista un único backend de usuarios.
+- Sustituir testimonios de ejemplo por casos reales de distribuidores.

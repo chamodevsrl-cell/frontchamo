@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 
-/** /login abre el modal global y vuelve a la home (o página previa). */
+/** /login abre el modal global y vuelve a la home (no conserva la página previa). */
 export default function LoginPage() {
   const router = useRouter();
   const { openAuth } = useAuth();

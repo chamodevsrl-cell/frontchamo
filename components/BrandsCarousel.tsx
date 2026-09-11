@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { distributorBrands } from "@/data/home";
+import { isBrokenImage } from "@/lib/image";
 
 function BrandCard({
   name,
@@ -11,16 +12,41 @@ function BrandCard({
   src: string;
 }) {
   const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const img = imgRef.current;
+    if (!img) return;
+
+    const markFailed = () => setFailed(true);
+    const markIfBroken = () => {
+      if (isBrokenImage(img)) markFailed();
+    };
+
+    img.addEventListener("error", markFailed);
+    img.addEventListener("load", markIfBroken);
+    // 404 en dev a veces no dispara onError; una imagen ya "completa" con width 0 está rota.
+    markIfBroken();
+
+    return () => {
+      img.removeEventListener("error", markFailed);
+      img.removeEventListener("load", markIfBroken);
+    };
+  }, [src]);
 
   return (
     <div className="flex h-16 w-[140px] shrink-0 items-center justify-center rounded-md border border-brand-dark/8 bg-white px-4 shadow-sm sm:h-[4.5rem] sm:w-[155px]">
       {!failed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          ref={imgRef}
           src={src}
           alt={name}
           className="max-h-8 max-w-[100px] object-contain sm:max-h-9 sm:max-w-[110px]"
           onError={() => setFailed(true)}
+          onLoad={(event) => {
+            if (isBrokenImage(event.currentTarget)) setFailed(true);
+          }}
         />
       ) : (
         <span className="font-display text-[11px] font-bold tracking-wide text-brand-dark/55 uppercase">

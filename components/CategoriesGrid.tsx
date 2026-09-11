@@ -1,10 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
+import { categoryWhatsappUrl } from "@/data/contact";
+import Reveal from "@/components/Reveal";
+import CategoryIcon from "@/components/CategoryIcon";
+import CategoryCollage from "@/components/CategoryCollage";
+import { useSiteContent } from "@/components/ContentProvider";
 
 const shinyCard =
   "border border-brand-primary/35 shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_18px_rgba(18,126,201,0.35)] hover:shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_28px_rgba(18,126,201,0.55)]";
@@ -12,14 +16,15 @@ const shinyCard =
 function CategoryCard({ category }: { category: MainCategory }) {
   return (
     <article
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl transition duration-300 hover:-translate-y-0.5 ${shinyCard}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl text-brand-dark transition duration-300 hover:-translate-y-0.5 dark:bg-[#102a40] dark:text-white ${shinyCard}`}
       style={{ backgroundColor: category.tint }}
     >
-      <div className="flex flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-4 lg:px-6 lg:pt-6">
-        <p className="text-[10px] font-bold tracking-[0.12em] text-brand-primary uppercase sm:text-[11px] lg:text-xs">
+      <div className="flex flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-4 lg:px-6 lg:pt-6 dark:bg-[#102a40]">
+        <p className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] text-brand-primary uppercase sm:text-[11px] lg:text-xs">
+          <CategoryIcon slug={category.slug} className="h-3.5 w-3.5" />
           {category.eyebrow}
         </p>
-        <h3 className="font-display mt-1.5 text-xl font-extrabold tracking-tight text-brand-dark uppercase sm:mt-2 sm:text-2xl lg:text-[1.65rem]">
+        <h3 className="font-display mt-1.5 text-xl font-extrabold tracking-tight text-brand-dark uppercase sm:mt-2 sm:text-2xl lg:text-[1.65rem] dark:text-white">
           {category.label}
         </h3>
 
@@ -27,7 +32,7 @@ function CategoryCard({ category }: { category: MainCategory }) {
           {category.bullets.map((bullet) => (
             <li
               key={bullet}
-              className="flex items-start gap-2 text-xs text-brand-dark/75 sm:gap-2.5 sm:text-sm"
+              className="flex items-start gap-2 text-xs text-brand-dark/75 sm:gap-2.5 sm:text-sm dark:text-white/80"
             >
               <span
                 className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-primary"
@@ -38,23 +43,33 @@ function CategoryCard({ category }: { category: MainCategory }) {
           ))}
         </ul>
 
-        <Link
-          href={category.href}
-          className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_0_14px_rgba(18,126,201,0.45)] transition hover:bg-brand-dark sm:mt-5 sm:px-4 sm:py-2 sm:text-sm"
-        >
-          Explorar
-          <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
-        </Link>
+        <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5">
+          <Link
+            href={category.href}
+            className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_0_14px_rgba(18,126,201,0.45)] transition hover:bg-brand-dark sm:px-4 sm:py-2 sm:text-sm"
+          >
+            Explorar
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
+          </Link>
+          <a
+            href={categoryWhatsappUrl(category.label)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-1.5 rounded-full border border-brand-whatsapp/40 bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-dark transition hover:bg-brand-whatsapp hover:text-white sm:px-4 sm:py-2 sm:text-sm"
+          >
+            <MessageCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Cotizar línea
+          </a>
+        </div>
       </div>
 
       <div className="px-3 pb-3 sm:px-4 sm:pb-4 lg:px-5 lg:pb-5">
         <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-brand-primary/15 bg-white/50">
-          <Image
-            src={category.image}
-            alt={category.imageAlt}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width: 1024px) 72vw, 18.5rem"
+          <CategoryCollage
+            slug={category.slug}
+            fallback={category.image}
+            fallbackAlt={category.imageAlt}
+            className="transition duration-500 group-hover:scale-[1.03]"
           />
         </div>
       </div>
@@ -63,6 +78,8 @@ function CategoryCard({ category }: { category: MainCategory }) {
 }
 
 export default function CategoriesGrid() {
+  const { categories } = useSiteContent();
+  const list = categories.length > 0 ? categories : mainCategories;
   const scrollerRef = useRef<HTMLUListElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -91,9 +108,8 @@ export default function CategoriesGrid() {
     const el = scrollerRef.current;
     if (!el) return;
     const card = el.querySelector("li");
-    const step = card
-      ? card.getBoundingClientRect().width + 16
-      : el.clientWidth * 0.8;
+    const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "16") || 16;
+    const step = card ? card.getBoundingClientRect().width + gap : el.clientWidth * 0.8;
     el.scrollBy({ left: direction * step, behavior: "smooth" });
   }
 
@@ -105,7 +121,7 @@ export default function CategoriesGrid() {
             <span className="h-8 w-1 rounded-full bg-brand-primary" aria-hidden />
             <h2
               id="categorias-heading"
-              className="font-display text-2xl font-bold text-brand-dark sm:text-3xl"
+              className="font-display text-2xl font-bold text-brand-dark sm:text-3xl dark:text-white"
             >
               Categorías principales
             </h2>
@@ -145,12 +161,14 @@ export default function CategoriesGrid() {
           ref={scrollerRef}
           className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 scrollbar-none sm:gap-4 sm:px-6 lg:gap-5 lg:px-0"
         >
-          {mainCategories.map((category) => (
+          {list.map((category, index) => (
             <li
               key={category.href}
               className="w-[min(78vw,18rem)] shrink-0 snap-start sm:w-[min(48vw,20rem)] lg:w-[17.5rem] xl:w-[18.75rem]"
             >
-              <CategoryCard category={category} />
+              <Reveal delayMs={Math.min(index, 6) * 70}>
+                <CategoryCard category={category} />
+              </Reveal>
             </li>
           ))}
         </ul>

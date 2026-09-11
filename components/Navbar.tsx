@@ -2,10 +2,14 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronDown,
+  GitCompareArrows,
   Heart,
+  LayoutDashboard,
+  LayoutGrid,
+  LogOut,
   Menu,
   Search,
   ShoppingCart,
@@ -18,15 +22,14 @@ import {
   YoutubeIcon,
 } from "@/components/SocialIcons";
 import { LOGO_SRC } from "@/data/media";
+import { mainCategories } from "@/data/home";
 import { useAuth } from "@/components/AuthProvider";
-
-const categories = [
-  { href: "/categorias/herramientas", label: "Herramientas" },
-  { href: "/categorias/electricos", label: "Eléctricos" },
-  { href: "/categorias/seguridad", label: "Seguridad industrial" },
-  { href: "/categorias/ferreteria", label: "Ferretería general" },
-  { href: "/categorias/abrasivos", label: "Abrasivos" },
-] as const;
+import { useCart } from "@/components/CartProvider";
+import { useCompare } from "@/components/CompareProvider";
+import { useFavorites } from "@/components/FavoritesProvider";
+import { useSiteContent } from "@/components/ContentProvider";
+import CategoryIcon from "@/components/CategoryIcon";
+import { firstName, isAdminUser } from "@/lib/auth-local";
 
 const mainLinks = [
   { href: "/", label: "Inicio" },
@@ -43,13 +46,21 @@ const topLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { openAuth } = useAuth();
+  const router = useRouter();
+  const { openAuth, user, logout } = useAuth();
+  const { count } = useCart();
+  const { count: favoritesCount } = useFavorites();
+  const { count: compareCount } = useCompare();
+  const { categories } = useSiteContent();
+  const navCategories = categories.length > 0 ? categories : mainCategories;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [logoFailed, setLogoFailed] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const mainNavRef = useRef<HTMLElement>(null);
   const [navIndicator, setNavIndicator] = useState({
@@ -84,8 +95,12 @@ export default function Navbar() {
   }, [pathname]);
 
   useEffect(() => {
+    if (document.documentElement.classList.contains("intro-playing")) {
+      return;
+    }
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => {
+      if (document.documentElement.classList.contains("intro-playing")) return;
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
@@ -97,6 +112,12 @@ export default function Navbar() {
         !categoriesRef.current.contains(event.target as Node)
       ) {
         setCategoriesOpen(false);
+      }
+      if (
+        accountRef.current &&
+        !accountRef.current.contains(event.target as Node)
+      ) {
+        setAccountOpen(false);
       }
     }
     document.addEventListener("mousedown", onClickOutside);
@@ -110,6 +131,10 @@ export default function Navbar() {
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const query = searchQuery.trim();
+    router.push(query ? `/catalogo?q=${encodeURIComponent(query)}` : "/catalogo");
+    setMobileSearchOpen(false);
+    setMobileOpen(false);
   }
 
   function isActive(href: string) {
@@ -179,6 +204,7 @@ export default function Navbar() {
         <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-4 py-3.5 sm:gap-5 sm:px-6 lg:gap-8 lg:px-8 xl:px-10">
           <Link
             href="/"
+            data-site-intro
             className="relative flex h-12 w-32 shrink-0 items-center sm:h-14 sm:w-40 lg:w-48"
             aria-label="Chamo Import — inicio"
           >
@@ -241,50 +267,144 @@ export default function Navbar() {
               )}
             </button>
 
-            <button
-              type="button"
-              onClick={() => openAuth("login")}
-              className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+            {user ? (
+              <div className="relative hidden sm:block" ref={accountRef}>
+                <button
+                  type="button"
+                  onClick={() => setAccountOpen((open) => !open)}
+                  className="inline-flex flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
+                  aria-expanded={accountOpen}
+                >
+                  <User className="h-5 w-5" strokeWidth={2} />
+                  <span className="max-w-[4.5rem] truncate text-[11px] font-semibold">
+                    {firstName(user.name)}
+                  </span>
+                </button>
+                {accountOpen ? (
+                  <div className="absolute top-full right-0 z-50 mt-1 min-w-[12rem] overflow-hidden rounded-lg border border-brand-dark/10 bg-white shadow-xl">
+                    <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
+                      {user.email}
+                    </p>
+                    {isAdminUser(user) ? (
+                      <Link
+                        href="/admin"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                      >
+                        <LayoutDashboard className="h-4 w-4 text-brand-primary" />
+                        Editar contenido
+                      </Link>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout();
+                        setAccountOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                    >
+                      <LogOut className="h-4 w-4 text-brand-primary" />
+                      Cerrar sesión
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuth("login")}
+                className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              >
+                <User className="h-5 w-5" strokeWidth={2} />
+                <span className="text-[11px] font-semibold">Cuenta</span>
+              </button>
+            )}
+
+            <Link
+              href="/comparar"
+              className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              aria-label={`Comparar, ${compareCount} productos`}
             >
-              <User className="h-5 w-5" strokeWidth={2} />
-              <span className="text-[11px] font-semibold">Cuenta</span>
-            </button>
+              <GitCompareArrows className="h-5 w-5" strokeWidth={2} />
+              <span className="text-[11px] font-semibold">Comparar</span>
+              <span
+                suppressHydrationWarning
+                className="absolute -top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {compareCount}
+              </span>
+            </Link>
 
             <Link
               href="/favoritos"
-              className="hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              aria-label={`Favoritos, ${favoritesCount} productos`}
             >
               <Heart className="h-5 w-5" strokeWidth={2} />
               <span className="text-[11px] font-semibold">Favoritos</span>
+              <span
+                suppressHydrationWarning
+                className="absolute -top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {favoritesCount}
+              </span>
             </Link>
 
             <Link
               href="/carrito"
+              data-cart-intro
               className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+              aria-label={`Carrito, ${count} productos`}
             >
               <ShoppingCart className="h-5 w-5" strokeWidth={2} />
               <span className="text-[11px] font-semibold">Carrito</span>
-              <span className="absolute top-0.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
-                0
+              <span
+                suppressHydrationWarning
+                className="absolute -top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {count}
               </span>
             </Link>
 
             {/* Compact icons on very small screens */}
             <Link
+              href="/comparar"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
+              aria-label={`Comparar, ${compareCount} productos`}
+            >
+              <GitCompareArrows className="h-5 w-5" strokeWidth={2} />
+              <span
+                suppressHydrationWarning
+                className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {compareCount}
+              </span>
+            </Link>
+            <Link
               href="/favoritos"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
-              aria-label="Favoritos"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
+              aria-label={`Favoritos, ${favoritesCount} productos`}
             >
               <Heart className="h-5 w-5" strokeWidth={2} />
+              <span
+                suppressHydrationWarning
+                className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {favoritesCount}
+              </span>
             </Link>
             <Link
               href="/carrito"
+              data-cart-intro
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
-              aria-label="Carrito"
+              aria-label={`Carrito, ${count} productos`}
             >
               <ShoppingCart className="h-5 w-5" strokeWidth={2} />
-              <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white">
-                0
+              <span
+                suppressHydrationWarning
+                className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+              >
+                {count}
               </span>
             </Link>
 
@@ -343,7 +463,7 @@ export default function Navbar() {
               className="inline-flex h-full items-center gap-2 bg-brand-dark px-4 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition hover:bg-[#082a43]"
               aria-expanded={categoriesOpen}
             >
-              <Menu className="h-4 w-4" strokeWidth={2.5} />
+              <LayoutGrid className="h-4 w-4" strokeWidth={2.5} />
               Categorías
               <ChevronDown
                 className={`h-4 w-4 transition ${categoriesOpen ? "rotate-180" : ""}`}
@@ -354,13 +474,17 @@ export default function Navbar() {
             {categoriesOpen && (
               <div className="absolute top-full left-0 z-50 mt-0 min-w-[240px] overflow-hidden rounded-b-lg border border-brand-dark/10 bg-white shadow-xl">
                 <ul className="py-2">
-                  {categories.map((category) => (
-                    <li key={category.href}>
+                  {navCategories.map((category) => (
+                    <li key={category.slug}>
                       <Link
                         href={category.href}
                         onClick={() => setCategoriesOpen(false)}
-                        className="block px-4 py-2.5 text-sm font-medium text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
                       >
+                        <CategoryIcon
+                          slug={category.slug}
+                          className="h-4 w-4 text-brand-primary"
+                        />
                         {category.label}
                       </Link>
                     </li>
@@ -442,13 +566,17 @@ export default function Navbar() {
               <p className="mb-2 text-xs font-bold tracking-wide text-brand-dark/50 uppercase">
                 Categorías
               </p>
-              {categories.map((category) => (
+              {navCategories.map((category) => (
                 <Link
-                  key={category.href}
+                  key={category.slug}
                   href={category.href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
                 >
+                  <CategoryIcon
+                    slug={category.slug}
+                    className="h-4 w-4 text-brand-primary"
+                  />
                   {category.label}
                 </Link>
               ))}
@@ -474,20 +602,56 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+              <Link
+                href="/comparar"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2.5 font-display text-base font-semibold text-brand-dark hover:bg-brand-gray"
+              >
+                Comparar
+              </Link>
             </nav>
 
-            <div className="border-t border-brand-dark/10 p-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileOpen(false);
-                  openAuth("login");
-                }}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
-              >
-                <User className="h-5 w-5" strokeWidth={2} />
-                Mi cuenta
-              </button>
+            <div className="border-t border-brand-dark/10 p-4 space-y-2">
+              {user ? (
+                <>
+                  <p className="text-center text-xs text-brand-dark/60">
+                    {user.email}
+                  </p>
+                  {isAdminUser(user) ? (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
+                    >
+                      <LayoutDashboard className="h-5 w-5" strokeWidth={2} />
+                      Editar contenido
+                    </Link>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setMobileOpen(false);
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
+                  >
+                    <LogOut className="h-5 w-5" strokeWidth={2} />
+                    Cerrar sesión
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    openAuth("login");
+                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
+                >
+                  <User className="h-5 w-5" strokeWidth={2} />
+                  Mi cuenta
+                </button>
+              )}
             </div>
           </aside>
         </div>

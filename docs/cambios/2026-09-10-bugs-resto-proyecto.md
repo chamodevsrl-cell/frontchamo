@@ -1,5 +1,11 @@
 # Bugs y mejoras en el resto del proyecto (tercera pasada)
 
+> Escrita en `main` antes de que existiera esta rama de features. De los 4 hallazgos
+> aquí, favoritos/comparar quedaron resueltos por el trabajo normal de la rama (ahora
+> son reales, con persistencia); `/login`, el boletín y el cursor se cerraron al
+> mergear (2026-09-11) — ver
+> [`2026-09-11-merge-ready-fixes.md`](./2026-09-11-merge-ready-fixes.md).
+
 - **Fecha:** 2026-09-10
 - **Solicitud:** "Busca ahora en el proyecto nuevos bugs o mejoras a hacer."
 - **Archivos revisados:** `app/login/page.tsx`, `components/Footer.tsx`, `components/FeaturedOffers.tsx`, `components/WrenchCursor.tsx`, `components/HeroSlider.tsx`, `app/ofertas/page.tsx`, `app/nosotros/page.tsx`, `next.config.ts` — el resto del proyecto que no se había revisado a fondo en las dos auditorías anteriores del mismo día.

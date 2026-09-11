@@ -5,6 +5,11 @@
 - **Archivos:** `docs/SUGERENCIAS.md` (resultados), ninguno de código (auditoría de solo lectura)
 - **Commit:** (pendiente al momento de escribir esta nota)
 
+> **Estado (cierre 2026-09-10):** esta nota describe `main` **antes** de catálogo/carrito/favoritos.
+> El cierre de los huecos está en
+> [`2026-09-10-cierre-auditoria-ux.md`](./2026-09-10-cierre-auditoria-ux.md).
+> No usar los 404 ni el fallback de marcas de abajo como estado actual del código.
+
 ## Método
 
 Se levantó el sitio real (`npm run dev`, Next.js 16 + Turbopack) en el Browser pane, en

@@ -1,91 +1,54 @@
-# Bugs en los cambios recientes (Navbar, CategoriesGrid, ProductModal)
+# Bugs en los cambios recientes (intro, WhatsApp, favoritos)
 
 - **Fecha:** 2026-09-10
-- **Solicitud:** "Lee los nuevos cambios y busca error o bugs y agrégalo a problemas y una solución."
-- **Archivos revisados:** `components/Navbar.tsx`, `components/CategoriesGrid.tsx`, `components/ProductModal.tsx` (los tres componentes tocados en los últimos commits: indicador dorado del nav, carrusel de categorías con flechas, ficha técnica + relacionados del modal)
-- **Commit:** (pendiente al momento de escribir esta nota)
+- **Solicitud:** Volver a analizar los cambios del PR y buscar errores/bugs
+- **Archivos:** `components/IntroSplash.tsx`, `app/globals.css`, `components/Navbar.tsx`, `data/contact.ts`, `components/ContactForm.tsx`, `components/QuoteForm.tsx`, `components/FavoritesProvider.tsx`, `components/Reveal.tsx`
+- **Commit:** (se completa al subir)
 
-## Método
+## Qué había antes
 
-Con el sitio corriendo (`npm run dev`, mismo servidor que ya tenía levantado la sesión
-de Cursor en el puerto 3000), se verificó cada sospecha con JavaScript ejecutado en la
-página real — no solo lectura de código:
+Revisión del branch frente a `main` y del código de intro / contacto / favoritos.
+Tres bugs reales (el resto eran falsos positivos: las fotos del slider y de
+categorías sí están en `public/images/`).
 
-- Se midió `offsetLeft`/`offsetWidth` del link activo contra el `left`/`width` inline
-  de la barra dorada del Navbar, antes y después de `document.fonts.ready`, para
-  descartar una condición de carrera con la fuente `next/font` (Barlow Semi Condensed).
-  **Resultado: no hay bug ahí** — Next.js genera un fallback con métricas ajustadas
-  (`"Barlow Semi Condensed Fallback"`) que evita el desajuste; `width` del link y de la
-  barra coincidieron exactamente (76px = 76px). Se descarta este hallazgo.
-- Se abrió el modal de "Taladro percutor..." vía `.click()`, se bajó el scroll interno
-  hasta el fondo, se hizo clic en el primer producto relacionado, y se comparó
-  `scrollTop` antes/después.
-- Se midió el `gap` real (`getComputedStyle`) del carrusel de categorías en desktop
-  contra el valor que usa `scrollByCard` en el código.
+1. **Intro scrolleable.** `IntroSplash` ponía `document.body.style.overflow = "hidden"`,
+   pero el `Navbar` (efecto del menú móvil) lo volvía a `""` al montar. En la
+   carga y al clic del logo se podía mover el home detrás de las puertas.
+2. **Formularios de WhatsApp en silencio.** `/contacto` y `/cotizar` usaban
+   `window.open(wa.me, "_blank")`. El bloqueador de popups puede devolver `null`
+   y el envío no abre el chat.
+3. **Toast de favoritos desfasado.** `toggle` leía `ids` cerrado y `setIds` era
+   funcional: dos clics rápidos podían decir “Guardado” dos veces y dejar el
+   corazón vacío.
 
-## Hallazgos
-
-### Bug 1 — el modal no vuelve arriba al cambiar de producto relacionado
-
-**Problema:** en `ProductModal.tsx`, el `useEffect` que depende de `product.id` resetea
-`activeImage` y `qty` pero no el scroll del contenedor `overflow-y-auto`.
-
-Evidencia (medido en vivo):
-
-```json
-{
-  "before": { "scrollTop": 714, "title": "Taladro percutor 1/2\" 750W industrial" },
-  "after":  { "scrollTop": 714, "title": "Amoladora angular 4 1/2\" 850W" }
-}
-```
-
-El título cambia (el producto sí cambió) pero `scrollTop` es idéntico: el usuario se
-queda viendo la ficha técnica/relacionados del producto nuevo sin ver su imagen, precio
-ni el botón de WhatsApp — como si el clic no hubiera hecho nada visible.
-
-**Solución propuesta:**
+## Código anterior
 
 ```tsx
-const scrollRef = useRef<HTMLDivElement>(null);
+document.body.style.overflow = "hidden";
+// Navbar, al montar:
+document.body.style.overflow = mobileOpen ? "hidden" : "";
 
-useEffect(() => {
-  setActiveImage(0);
-  setQty(1);
-  scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-}, [product.id]);
+window.open(whatsappUrl(text), "_blank", "noopener,noreferrer");
 
-// ...
-<div ref={scrollRef} className="flex-1 overflow-y-auto">
+const nextActive = !ids.includes(productId);
+setIds((current) => /* add or remove */);
+flash(nextActive ? "Guardado en favoritos" : "Quitado de favoritos");
 ```
 
-### Bug 2 — el paso de las flechas de categorías no coincide con el gap real
+## Código nuevo
 
-**Problema:** `scrollByCard` en `CategoriesGrid.tsx` usa `card.getBoundingClientRect().width + 16` (gap fijo). El gap real cambia por breakpoint (`gap-3`/`sm:gap-4`/`lg:gap-5` = 12/16/20px). Medido en desktop: `gap` real = 20px, no 16px.
-
-**Solución propuesta:**
-
-```tsx
-function scrollByCard(direction: -1 | 1) {
-  const el = scrollerRef.current;
-  if (!el) return;
-  const card = el.querySelector("li");
-  const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "16");
-  const step = card ? card.getBoundingClientRect().width + gap : el.clientWidth * 0.8;
-  el.scrollBy({ left: direction * step, behavior: "smooth" });
-}
-```
-
-### Descartado — no era un bug
-
-Se investigó si el indicador dorado animado del Navbar podía desalinearse por una
-condición de carrera entre el primer render (fuente de reserva) y la carga de
-`Barlow Semi Condensed` vía `next/font`. Se confirmó que **no** ocurre: Next.js genera
-automáticamente una fuente de reserva con métricas ajustadas para este caso exacto, y
-la medición en vivo mostró `width` idéntico en el link y en la barra.
+- Clase `html.intro-playing` con `overflow: hidden !important` (gana al inline
+  del Navbar). El Navbar no pisa el overflow si la intro está en curso.
+- `openWhatsApp()` crea un `<a target="_blank">`, lo clickea y lo quita
+  (gesto de usuario; no depende de `window.open`).
+- `idsRef` se actualiza en el mismo `toggle` que el toast, así el segundo clic
+  ve el estado real.
 
 ## Recomendación
 
-- Aplicar los dos fixes de arriba (son cambios pequeños y acotados a un archivo cada uno).
-- Ver también los bugs 1–4 documentados el mismo día en
-  [`SUGERENCIAS.md`](../SUGERENCIAS.md#-evaluación-ux--ui-y-funcional-2026-09-10)
-  (logos rotos, rutas 404) — ese archivo ahora trae "Problema" + "Solución" para cada uno.
+- Confirmar en desktop que durante las puertas no hay scroll, y que Catálogo /
+  Nosotros / Contacto siguen sin intro.
+- Enviar el formulario de contacto y el de cotizar: debe abrir `wa.me/51959723602`.
+- El corazón: un clic = “Guardado”, el segundo inmediato = “Quitado”, icono a tono.
+- No son bugs de este pase: login stub, botón Comparar decorativo, correo
+  `ventas@chamoimport.com` provisional, fotos Unsplash de productos.

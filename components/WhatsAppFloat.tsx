@@ -1,5 +1,8 @@
-const WHATSAPP_URL =
-  "https://wa.me/51999999999?text=Hola%2C%20quiero%20informaci%C3%B3n%20como%20mayorista";
+import { whatsappUrl } from "@/data/contact";
+
+const WHATSAPP_URL = whatsappUrl(
+  "Hola, quiero información como mayorista",
+);
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -21,9 +24,9 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="group fixed right-4 bottom-4 z-[70] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(37,211,102,0.45)] transition duration-200 hover:scale-105 hover:bg-[#1ebe57] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] sm:right-6 sm:bottom-6 sm:h-16 sm:w-16"
+      className="group fixed right-4 bottom-4 z-[70] flex h-14 w-14 items-center justify-center rounded-full bg-brand-whatsapp text-white shadow-[0_8px_24px_rgba(37,211,102,0.45)] transition duration-200 hover:scale-105 hover:bg-[#1ebe57] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-whatsapp sm:right-6 sm:bottom-6 sm:h-16 sm:w-16"
     >
-      <span className="absolute inset-0 animate-ping rounded-full bg-[#25D366]/40 [animation-duration:2.4s]" />
+      <span className="absolute inset-0 animate-ping rounded-full bg-brand-whatsapp/40 [animation-duration:2.4s]" />
       <WhatsAppIcon className="relative h-7 w-7 sm:h-8 sm:w-8" />
       <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-brand-dark px-3 py-1.5 text-sm font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 sm:block">
         WhatsApp

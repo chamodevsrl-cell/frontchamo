@@ -1,38 +1,32 @@
 export type Slide = {
   id: number;
-  /** Ruta en /public/images/slider/ — deja el archivo vacío o agrégalo después */
   src: string;
   alt: string;
-  title: string;
-  subtitle: string;
-  /** Si el banner ya trae texto en la imagen, no superponer título */
-  fullBleed?: boolean;
+  width: number;
+  height: number;
 };
 
 export const slides: Slide[] = [
   {
     id: 1,
-    src: "/images/slider/baner 1.png",
+    src: "/images/slider/baner-1.png",
     alt: "Campaña navideña Chamo Import",
-    title: "Campaña navideña",
-    subtitle: "Regala herramientas, construye grandes proyectos.",
-    fullBleed: true,
+    width: 1983,
+    height: 793,
   },
   {
     id: 2,
-    src: "/images/slider/baner 2.png",
+    src: "/images/slider/baner-2.png",
     alt: "Herramientas profesionales DeWalt y Bosch",
-    title: "Herramientas profesionales",
-    subtitle: "Marcas líderes para obra y ferretería",
-    fullBleed: true,
+    width: 2170,
+    height: 725,
   },
   {
     id: 3,
-    src: "/images/slider/baner 3.png",
+    src: "/images/slider/baner-3.png",
     alt: "Envíos Chamo Import a toda la sierra del Perú",
-    title: "Envíos a todo el Perú",
-    subtitle: "Llevamos tus productos a toda la sierra",
-    fullBleed: true,
+    width: 2170,
+    height: 725,
   },
 ];
 

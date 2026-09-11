@@ -1,108 +1,216 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-10**
+Última actualización: **2026-09-11**
 
 Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al surgir una idea en un cambio, anótala aquí.
 
+## 🔌 Revisión de backend-readiness del panel admin (2026-09-11)
+
+Se revisaron las funciones nuevas del panel (`AdminNewProductForm.tsx`,
+`AdminOrdersTable.tsx`, `app/admin/(panel)/productos/page.tsx`,
+`app/admin/(panel)/pedidos/page.tsx`) verificando específicamente que todo pase por
+`services/adminApi.ts` — el único punto donde se debe enchufar el backend real (ver
+[A.12.6](./MANUAL.md#a126-conectar-el-backend-real)). Detalle:
+[`cambios/2026-09-11-categorias-mock-api.md`](./cambios/2026-09-11-categorias-mock-api.md).
+
+- [x] **El formulario "Crear producto" no pasaba por el mock API para las categorías.**
+  `AdminNewProductForm.tsx` importaba `mainCategories` directo de `data/home.ts` (la
+  tienda) en vez de llamar a algo en `services/adminApi.ts` — el resto del panel
+  (productos, pedidos, KPIs) sí lo hace. Cuando se conecte el backend real y se
+  reemplacen los `fetch()` en `adminApi.ts`, este dropdown se hubiera quedado leyendo
+  siempre datos locales de la tienda, sin enterarse del backend.
+- [x] **La función que ya existía para esto (`listMockCategories`) no cumplía el tipo
+  `Category`** (le faltaban `subcategoriesCount` y `status`) y **nunca se llamaba desde
+  ningún lado** — código muerto con un contrato roto.
+- [x] **Arreglado:** se renombró a `getCategories()` (async, con el mismo `delay()` de
+  300 ms que el resto del mock, comentario `// TODO Backend` igual que las demás
+  funciones), devuelve el `Category` completo, y `app/admin/(panel)/productos/nuevo/page.tsx`
+  la llama y le pasa el resultado a `AdminNewProductForm` como prop `categories`.
+  Verificado con build/test/lint + un test nuevo (`getCategories devuelve el contrato
+  Category completo`) + prueba en vivo (el `<select>` sigue mostrando las 7
+  categorías, ahora vía el mock en vez del import directo).
+
 ## 🔎 Evaluación UX / UI y funcional (2026-09-10)
 
-Revisión con el sitio corriendo (`npm run dev`), en desktop y móvil (375px), más lectura
-de código. Ampliada con una segunda pasada centrada en los cambios recientes de Navbar,
-CategoriesGrid y ProductModal, y una tercera barriendo el resto del proyecto
-(HeroSlider, `/login`, Footer, WrenchCursor) — cada bug verificado con clics/mediciones
-reales en el DOM, no solo lectura. Detalle completo en las notas de auditoría:
-[`cambios/2026-09-10-auditoria-ux-funcional.md`](./cambios/2026-09-10-auditoria-ux-funcional.md),
-[`cambios/2026-09-10-bugs-cambios-recientes.md`](./cambios/2026-09-10-bugs-cambios-recientes.md) y
-[`cambios/2026-09-10-bugs-resto-proyecto.md`](./cambios/2026-09-10-bugs-resto-proyecto.md).
+Revisión original con el sitio de **`main` antiguo** (`npm run dev`), desktop y móvil.
+Detalle: [`cambios/2026-09-10-auditoria-ux-funcional.md`](./cambios/2026-09-10-auditoria-ux-funcional.md).
+Cierre de los huecos abiertos: [`cambios/2026-09-10-cierre-auditoria-ux.md`](./cambios/2026-09-10-cierre-auditoria-ux.md).
 
 **Lo que funciona bien:**
-- Navbar de 3 niveles con jerarquía clara; hover e ítem activo con indicador dorado animado — se siente pulido.
-- Hero slider full-bleed, carrusel de categorías con flechas y carrusel de productos: buena experiencia táctil y de mouse.
-- Modal de producto (ficha técnica + relacionados + WhatsApp con número oficial y mensaje prellenado) es el punto más sólido del sitio hoy — ayuda de verdad a decidir una compra mayorista.
-- CTA de WhatsApp muy visible, coherente con cómo se vende en Perú (B2B por chat).
+- Navbar de 3 niveles con jerarquía clara; hover e ítem activo con indicador dorado animado.
+- Hero slider full-bleed, carrusel de categorías con flechas y carrusel de productos.
+- Modal de producto (ficha técnica + relacionados + WhatsApp con número oficial y mensaje prellenado).
+- CTA de WhatsApp visible, coherente con venta B2B en Perú.
 
-**Bugs confirmados (no solo sospecha — verificados en runtime), con solución propuesta:**
+**Bugs de la auditoría — estado actual:**
+- [x] 2026-09-10 — **Fallback de logos rotos.** `BrandsCarousel` ahora marca fallo con `onError`, `onLoad` y `naturalWidth === 0` (`lib/image.ts`). Los wordmarks SVG ya están en `public/images/marcas/`.
+- [x] 2026-09-10 — **Rutas que daban 404 en `main`:** `/catalogo`, `/categorias`, `/carrito` (este PR, 2026-09-09) y `/favoritos` (esta pasada).
+- [x] 2026-09-10 — **Intro scrolleable / WhatsApp bloqueado / toast de favoritos.** Clase `intro-playing`, `openWhatsApp()` y `idsRef` en favoritos. Detalle: [`cambios/2026-09-10-bugs-cambios-recientes.md`](./cambios/2026-09-10-bugs-cambios-recientes.md).
 
-- [ ] **1. Fallback de logos rotos no funciona.**
-  - **Problema:** en `components/BrandsCarousel.tsx`, cuando la imagen de marca falla (los 10 archivos de `public/images/marcas/` no existen → 404), el `onError` **no** reemplaza el `<img>` por el texto de respaldo: los 20 `<img>` (marcas × 2, por el loop del marquee) siguen en el DOM con `naturalWidth: 0` y **cero** `<span>` de fallback renderizados (verificado contando nodos en el DOM). El usuario ve el ícono nativo de "imagen rota" del navegador junto al nombre, justo debajo del slider — mala primera impresión.
-  - **Solución:** además de subir los logos reales, blindar el fallback: usar `onError={(e) => { e.currentTarget.style.display = "none"; setFailed(true); }}` para ocultar el `<img>` roto de inmediato (no depender solo del re-render condicional), o migrar a `next/image` con `onError` + `unoptimized` para rutas locales. Verificar además que no haya una carga en caché (`complete: true`, `naturalWidth: 0`) que impida que el evento `error` vuelva a dispararse en un remount.
+**Funciones que eran solo UI — estado actual:**
+- [x] 2026-09-09 — El **buscador** navega a `/catalogo?q=`
+- [x] 2026-09-09 — **Añadir al carrito** / **Agregar a cotización** persisten en `localStorage` y actualizan el badge
+- [x] 2026-09-10 — **Login / registro** en este navegador (`chamo-accounts-v1`): crea cuenta, entra, recupera contraseña y cierra sesión. Pendiente migrar a backend.
+- [x] 2026-09-10 — **Favoritos** persisten (`chamo-favorites-v1`), cuentan en el Navbar y confirman “Guardado”
 
-- [ ] **2. El modal de producto no vuelve arriba al cambiar de "relacionado".**
-  - **Problema (confirmado con clic real):** en `components/ProductModal.tsx`, si el usuario baja hasta "Productos relacionados" y hace clic en uno, el `useEffect` que depende de `product.id` sí resetea `activeImage` y `qty`, pero **no** resetea el scroll del contenedor (`div.overflow-y-auto`). Probado en vivo: `scrollTop` quedó en `714` antes y después de cambiar de "Taladro percutor" a "Amoladora angular" — el título cambió pero la vista se queda abajo, mostrando la ficha técnica del producto nuevo sin su imagen, precio ni botón de WhatsApp, como si el clic no hubiera hecho nada.
-  - **Solución:** agregar un `ref` al contenedor `overflow-y-auto` y, en el mismo `useEffect` que resetea `activeImage`/`qty` (dependencia `[product.id]`), llamar `scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })`.
+## 🐛 Bugs nuevos en la intro/preloader (2026-09-10, revisión de Claude Code)
 
-- [ ] **3. Las flechas del carrusel de categorías avanzan un poco menos de lo real.**
-  - **Problema (confirmado midiendo el DOM):** `scrollByCard` en `components/CategoriesGrid.tsx` calcula el paso como `card.getBoundingClientRect().width + 16` — un gap fijo de 16px. El gap real varía por breakpoint (`gap-3`=12px en móvil, `sm:gap-4`=16px, `lg:gap-5`=20px); en desktop medí 20px de gap real contra los 16px asumidos. El `snap-mandatory` disimula el error re-alineando la tarjeta, pero el scroll da un salto/corrección visible en vez de un desplazamiento limpio de una tarjeta exacta.
-  - **Solución:** leer el gap real en vez de un número fijo: `const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || "16"); const step = card.getBoundingClientRect().width + gap;`.
+El usuario mandó una captura de la intro del carrito (línea dorada atravesando el
+ícono) y describió que la animación se repite dos veces. Verificado en vivo levantando
+esta rama en un servidor propio (puerto 3055) — detalle completo con evidencia medida
+en [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intro-preloader.md).
 
-- [ ] **4. 4 rutas enlazadas devuelven 404 real.**
-  - **Problema:** confirmado con `fetch()` (no solo "podría"): `/catalogo` (nav principal), `/categorias` ("Ver todas" en categorías), `/carrito` (ícono con badge), `/favoritos` (ícono con corazón). Son 4 de los puntos de navegación más visibles del sitio.
-  - **Solución:** ver plan en "Recomendaciones de cosas nuevas a agregar" abajo (catálogo real, carrito/favoritos con `localStorage`, página `/categorias`) — mientras se construyen, considerar ocultar o deshabilitar visualmente el enlace en vez de dejarlo romperse.
+- [x] 2026-09-10 — **1. La intro del carrito se dispara dos veces para la misma navegación.** El clic reclama el ingreso (`cartClaimedByClick`) y el efecto de `pathname` no vuelve a disparar. Back/forward sí reproducen. Detalle: [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intro-preloader.md).
+- [x] 2026-09-11 — **2. La costura dorada atraviesa el ícono del carrito.** Park a `translate(-100% - 0.75rem)` (el ícono queda entero a la izquierda de la línea); al abrir, recorrido normal por el centro. Nota: [`cambios/2026-09-11-loader-nav-carrito-costura.md`](./cambios/2026-09-11-loader-nav-carrito-costura.md).
+- [x] 2026-09-11 — Preloader con fade-out fijo a **2.5 s** (brief de logo + engranaje). Cubrir Navbar/WhatsApp con `z-[90]`.
+- [x] 2026-09-10 — **3. El preloader ignoraba si la página realmente cargó.** Se implementó `window.load` + mínimo 1.2 s; el 2026-09-11 el brief volvió al timer de 2.5 s. Misma nota de intro + [`cambios/2026-09-11-preloader-2-5s-logo-engranaje.md`](./cambios/2026-09-11-preloader-2-5s-logo-engranaje.md).
 
-- [ ] **5. `/login` nunca vuelve a la página anterior, aunque su propio comentario lo promete.**
-  - **Problema (confirmado navegando en vivo):** `app/login/page.tsx` trae el comentario `/login abre el modal global y vuelve a la home (o página previa)`, pero el código hace siempre `router.replace("/")`. Probado en vivo: estando en `/contacto` y navegando a `/login`, termina en `/` con el modal abierto — nunca vuelve a `/contacto`. No es grave (es una ruta poco usada, ya que "Mi cuenta" abre el modal sin navegar), pero el comentario miente sobre el comportamiento real.
-  - **Solución:** o se implementa de verdad ("volver a la página previa" con `document.referrer` del mismo origen o un query param `?from=`), o se corrige el comentario para que diga solo "vuelve a la home" y no prometa algo que no hace.
+## 🐛 Bugs nuevos (2026-09-11, revisión de Claude Code)
 
-- [ ] **6. El boletín del footer no confirma ni falla — solo intenta limpiar el campo.**
-  - **Problema:** `handleNewsletter` en `components/Footer.tsx` solo hace `event.preventDefault(); setEmail("")` — no hay ningún mensaje de éxito/error en el JSX (a diferencia de `AuthForm.tsx`, que sí tiene un `role="status"` para sus mensajes). El usuario no tiene forma de saber si "se suscribió" o no.
-  - **Solución:** agregar el mismo patrón `role="status"` que ya usa `AuthForm.tsx` con un mensaje tipo "¡Gracias! Te avisaremos de nuestras ofertas" — aunque sea local mientras no hay backend de newsletter.
+Revisión del estado actual de esta rama (tip `0e78c52`), centrada en `IntroSplash.tsx`
+(loader de navegación interna, nuevo ese mismo día) y en las áreas que más importan de
+cara a un backend real (cuentas, carrito, admin). Detalle completo:
+[`cambios/2026-09-11-bugs-admin-loader-carrito.md`](./cambios/2026-09-11-bugs-admin-loader-carrito.md).
 
-- [ ] **7. Favoritos/Comparar en las tarjetas de producto no dan ningún feedback al hacer clic.**
-  - **Problema:** en `FeaturedOffers.tsx`, los botones de corazón (favoritos) y `GitCompareArrows` (comparar) solo hacen `event.stopPropagation()` — ningún cambio visual, ni siquiera un toggle local del ícono (relleno/vacío). El usuario no sabe si el clic "hizo algo".
-  - **Solución:** aunque no haya persistencia real todavía, agregar un `useState` local que rellene el ícono (`fill="currentColor"` en el corazón) al hacer clic — da sensación de interfaz viva mientras se conecta backend real.
+- [x] 2026-09-11 — **1. Doble pantalla de carga al hacer clic en el logo con `prefers-reduced-motion` activado.** El clic en `[data-site-intro]` ahora reclama la navegación (`loadClaimedByClick`) para que el cambio de `pathname` no dispare un `BrandLoader` extra. Fix: [`cambios/2026-09-11-fix-loader-admin-role.md`](./cambios/2026-09-11-fix-loader-admin-role.md).
+- [x] 2026-09-11 — **2. `/admin` no tiene control de rol — cualquier cuenta registrada entra.** `AuthUser`/`StoredAccount` tienen `role: "customer" | "admin"`. La primera cuenta del navegador es admin; las siguientes, customer. `/admin` y el enlace del Navbar exigen `role === "admin"`. Fix: misma nota. Pendiente backend real.
+- [x] 2026-09-11 — **3. El carrito recalcula el precio en vivo del catálogo — no guardaba el precio al agregar.** `CartLine` ahora guarda `unitPrice`/`wholesaleUnitPrice` al momento de `addItem`; los totales de `/carrito` y el mensaje de WhatsApp usan ese precio, no el vivo del catálogo. Si el precio cambió, se muestra un aviso ("El precio de este producto cambió desde que lo agregaste"). Carritos viejos (`{productId, qty}` sin precio) se migran solos al leer `chamo-cart-v1`, rellenando con el precio vivo. Verificado en vivo (carrito viejo → migra bien; precio desactualizado → muestra el aviso y usa el precio guardado). Fix: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
+- [x] 2026-09-11 — **4. `npm run build` estaba roto.** Dos errores de TypeScript bloqueaban la build de producción: `app/admin/page.tsx` perdía el tipo tupla `[string,string,string]` de `bullets` al hacer `[...item.bullets]`, y `vitest.config.mts` quedaba dentro del mismo proyecto TS que compila Next (dos versiones de `vite` incompatibles — la de `vitest` y la que jala `@vitejs/plugin-react`). Se encontró corriendo `npm run build` real (no solo `tsc`), con un `npm ci` limpio para descartar que fuera un problema del entorno. Fix: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
 
-- [ ] **8. El cursor personalizado (llave inglesa) no distingue los campos de texto.**
-  - **Problema:** `WrenchCursor.tsx` marca como "interactivo" (mismo ícono de llave rotado/agrandado) cualquier `a, button, input, textarea, select, label, [role='button']` — como el cursor nativo está oculto (`cursor: none !important` en `globals.css`), al pasar sobre el buscador, el email del boletín o los campos de login, el usuario ve una llave inglesa en vez del cursor de texto (I-beam) que indica "aquí se puede escribir". La función no se rompe (el clic sigue poniendo el cursor de texto real), pero se pierde una afordancia visual estándar.
-  - **Solución:** distinguir `input`/`textarea`/`[contenteditable]` con un estado de cursor propio (por ejemplo, una barra vertical delgada en vez de la llave) en lugar de tratarlos igual que un botón.
+## 🏷️ Nombres de variables — aplicado pensando en el backend futuro
 
-**Funciones que existen visualmente pero no cumplen su función (decorativas):**
-- [ ] El **buscador** (desktop y móvil) no busca nada: `handleSearch` en `Navbar.tsx` solo hace `preventDefault()`. El usuario escribe, da enter, y no pasa nada — sin resultados, sin mensaje de "no hay resultados". Para un catálogo mayorista esto es una promesa incumplida grande.
-- [ ] **"Añadir al carrito"** (`FeaturedOffers.tsx`) y **"Agregar a cotización"** (`ProductModal.tsx`) no tienen `onClick`: no hacen nada. El ícono de carrito en el navbar siempre muestra "0" fijo, reforzando que no hay carrito real todavía.
-- [ ] **Login / registro** (`AuthForm.tsx`) es honesto sobre ser un stub — el propio mensaje dice "Conectaremos el inicio de sesión más adelante" — pero vale la pena que el negocio sepa que hoy **no autentica a nadie** ni guarda nada.
-- [ ] Favoritos (ícono corazón, botones en tarjetas) no persiste ni cuenta nada — es visual únicamente.
+Pedido explícito: usar nombres/formas de datos que faciliten conectar un backend real
+más adelante, sin tener que reescribir todo. Aplicado el 2026-09-11
+([`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md)),
+verificado con `npm run build` + `npm run test` en verde después de cada cambio:
+
+- [x] **Cuentas (`lib/auth-local.ts`):** `id: string` en `StoredAccount`/`AuthUser` (antes la clave real era `email`); cuentas viejas sin `id` lo reciben solo al leerlas. `role` ya estaba (bug 2).
+- [x] **Carrito (`CartProvider.tsx`):** `qty` → `quantity`; `setQty` → `setQuantity`; se agregó `unitPrice`/`wholesaleUnitPrice` (bug 3).
+- [x] **Productos (`data/products.ts`):** `discount` → `discountPercent` (con comentario de que es 0-100, no un monto); se quitó el campo `image` (singular) redundante — todo el código ahora usa `images[0]`.
+- [ ] **Favoritos (`FavoritesProvider.tsx`):** sigue siendo `ids: string[]` — **sin aplicar todavía**. Cambiar a `{ productId, addedAt }[]` cuando se necesite ordenar "agregado recientemente" o sincronizar con cuenta real; no había ningún bug detrás, así que se dejó fuera de este cierre para no tocar más de la cuenta antes del backend.
+- [ ] **`categoryLabel` denormalizado** en cada producto — sin tocar, solo documentado: en un backend real normalmente viene de un `JOIN` con una tabla `categories`.
+- [ ] **`CartProvider`/`FavoritesProvider`/`CompareProvider` casi duplicados** (mismo patrón `localStorage` + `ready` + `idsRef`) — sin tocar; unificarlos en un hook genérico reduciría el riesgo de que se desincronicen, pero no es urgente para conectar el backend.
+
+## ✅ Revisión de merge-readiness a `main` (2026-09-11)
+
+`main` no tiene ninguno de los features de esta rama (carrito, favoritos, comparar,
+cuentas, admin) — no hay conflictos de **código**. Sí hay 5 conflictos de **docs**
+(`CLAUDE.md`, `MANUAL.md`, `SUGERENCIAS.md`, `cambios/README.md` y un archivo
+`cambios/*.md` con el mismo nombre en ambas ramas) porque las dos ramas documentaron
+cosas en paralelo — se resuelven a mano, quedándose con el contenido más completo de
+esta rama y sumando lo que `main` tenía de más.
+
+`main` (antes de divergir) había documentado 5 bugs menores que esta rama nunca había
+cerrado del todo. Se revisó cada uno contra el código actual de esta rama antes de
+mergear:
+
+- [x] **`ProductModal` sí vuelve arriba al cambiar de producto relacionado** — resultó que
+  ya estaba resuelto, pero por otra vía: `FeaturedOffers.tsx`/`ProductCatalog.tsx` le
+  pasan `key={selected.id}` al modal, así que React lo **remonta entero** al cambiar de
+  producto (reinicia `activeImage`, cantidad y el scroll del contenedor). Verificado en
+  vivo con un clic real: `scrollTop` pasó de `2871` a `0`. No hacía falta tocar nada —
+  se corrigió la nota vieja para no reportarlo de nuevo.
+- [x] **`CategoriesGrid`: el paso de las flechas ya usa el gap real** (antes, 16px fijo).
+- [x] **`/login`: el comentario ya no promete "página previa"** (nunca lo hacía).
+- [x] **Boletín del footer: ahora confirma la suscripción** con un mensaje.
+- [x] **Cursor personalizado: los campos de texto ya muestran una barra en vez de la llave.**
+
+Los 5 se aplicaron en esta pasada (`npm run build` + `npm run test` + `npm run lint` en
+verde después de cada uno). Detalle: [`cambios/2026-09-11-merge-ready-fixes.md`](./cambios/2026-09-11-merge-ready-fixes.md).
+
+**Veredicto:** el código está listo (build, tests y lint en verde; sin conflictos de
+código con `main`). Falta resolver a mano los 5 conflictos de documentación al mergear.
 
 ## 💡 Recomendaciones de cosas nuevas a agregar
 
-- [ ] **Carrito real** (aunque sea local con `localStorage` mientras no hay backend): contador que sume de verdad, mini-carrito o página `/carrito` funcional. Es el hueco más grande entre "lo que promete la UI" y "lo que hace".
-- [ ] **Búsqueda real** aunque sea client-side contra `data/products.ts` al inicio (filtrar por nombre/marca/SKU) — no hace falta backend para dar ya valor.
-- [ ] **Página de catálogo completo** (`/catalogo`) con filtros por categoría/marca/precio — hoy solo existen 8 productos "destacados" en el home, no hay forma de ver el catálogo completo.
-- [ ] **Estado vacío / mensaje de error** cuando una búsqueda o filtro no encuentra nada (hoy no existe ningún patrón de "no encontramos resultados").
-- [ ] **WhatsApp prellenado por categoría** en las tarjetas de `CategoriesGrid` (hoy el botón "Explorar" solo navega a una ruta que da 404) — mientras no exista `/categorias`, que "Explorar" abra WhatsApp con el nombre de la categoría, igual que ya hace el modal de producto.
-- [ ] **Reseñas / testimonios** de clientes mayoristas (distribuidores) — ayuda a la confianza B2B, hoy no hay ninguna prueba social en el sitio.
-- [ ] **Indicador de "guardado"/confirmación** cuando se usa favoritos o se cambia cantidad en el modal (hoy el corazón se puede clickear pero no da ningún feedback de que pasó algo).
-- [ ] **Breadcrumbs** en páginas internas (`/nosotros`, `/contacto`, futura `/categorias/[slug]`) para orientar en un catálogo con muchas categorías.
+- [x] 2026-09-09 — **Carrito real** en `localStorage` + página `/carrito`
+- [x] 2026-09-09 — **Búsqueda** client-side / API contra `data/products.ts`
+- [x] 2026-09-09 — **Página de catálogo** (`/catalogo`) con filtros
+- [x] 2026-09-09 — **Estado vacío** cuando búsqueda o filtro no encuentra nada
+- [x] 2026-09-10 — **WhatsApp prellenado por categoría** (home, listado y banner de detalle)
+- [x] 2026-09-10 — **Reseñas / testimonios** de ejemplo en la home (`data/testimonials.ts`) — sustituir por casos reales del cliente
+- [x] 2026-09-10 — **Indicador de guardado** al marcar favoritos (aviso fijo «Guardado en favoritos»)
+- [x] 2026-09-10 — **Breadcrumbs** en páginas internas (Inicio / sección)
 
 ## Prioridad alta
 
-- [ ] Reemplazar imágenes Unsplash de categorías por fotos propias en `public/images/categorias/`
-- [ ] Completar logos reales en `public/images/marcas/` (hoy 404 — y además el fallback de texto no se ve, ver bug arriba)
-- [ ] Renombrar banners del slider sin espacios (`baner-1.png`) para evitar encoding
-- [ ] Páginas que hoy dan 404 real: `/categorias` (y detalle por categoría), `/carrito`, `/favoritos`, `/catalogo` — el CTA "Explorar" / "Ver todas" / nav principal ya apuntan ahí
+- [x] 2026-09-09 — Imágenes de categorías en `public/images/categorias/` (ya no se hotlinkea Unsplash)
+- [x] 2026-09-09 — Logos en `public/images/marcas/` (wordmarks SVG; el carrusel deja de dar 404)
+- [x] 2026-09-09 — Renombrar banners del slider sin espacios (`baner-1.png`)
+- [x] 2026-09-09 — Página `/categorias` (y detalle `/categorias/[slug]`)
+- [x] 2026-09-09 — Página `/carrito` (localStorage + badge del Navbar)
+- [x] 2026-09-10 — Página `/favoritos` (localStorage + badge + corazón funcional)
 
 ## Producto / UX
 
-- [ ] Unificar lista de categorías del **Navbar** con `mainCategories` (una sola fuente)
-- [ ] Filtros y búsqueda real contra catálogo / API (ver recomendaciones arriba)
-- [ ] Cotización mayorista con formulario + WhatsApp prellenado por producto
-- [ ] Modo oscuro: revisar contraste en tarjetas pastel de categorías
-- [ ] Sumar más productos por categoría en `data/products.ts` (hoy "Seguridad" tiene solo 1 → el modal no muestra "Productos relacionados" para ese ítem)
+- [x] 2026-09-09 — Unificar lista de categorías del **Navbar** con `mainCategories`
+- [x] 2026-09-09 — Filtros y búsqueda contra catálogo / API (`/catalogo` + `GET /api/productos`)
+- [x] 2026-09-09 — Cotización mayorista con formulario + WhatsApp prellenado por producto/carrito
+- [x] 2026-09-09 — Modo oscuro: contraste en tarjetas de categorías (fondo `#102a40` + texto claro)
+- [x] 2026-09-09 — Sumar más productos por categoría (mín. 3 en cada una → el modal muestra relacionados)
 
 ## Técnico
 
-- [ ] Conectar backend / API de productos (dejar de hardcodear `data/products.ts`)
-- [ ] Completar specs técnicas reales por SKU (material, voltaje, dimensiones, país de origen, etc.) cuando el cliente envíe fichas oficiales — hoy son de ejemplo
-- [ ] CMS o admin liviano para banners y categorías
-- [ ] `allowedDevOrigins` en `next.config` si se prueba por IP LAN (`192.168.x.x`)
-- [ ] Tests básicos de smoke (home carga, slider tiene N slides, rutas del nav responden 200)
+- [x] 2026-09-09 — API interna de productos (`app/api/productos`) — el catálogo ya no se consulta solo hardcodeado en la UI
+- [x] 2026-09-10 — Completar specs de **ejemplo** por SKU (origen, material/dimensiones, peso, garantía).
+- [ ] Fichas técnicas **oficiales** por SKU cuando el cliente las envíe
+- [x] 2026-09-11 — CMS / admin liviano en `/admin` (banners y categorías en `chamo-cms-v1`). El panel tiene sidebar, login propio y mock API (`types/admin.ts`, `services/adminApi.ts`, `API_CONTRACT.md`).
+- [ ] Conectar `services/adminApi.ts` al backend real (`/api/v1/...` según `API_CONTRACT.md`) y pasar la cookie a httpOnly.
+- [x] 2026-09-09 — `allowedDevOrigins` en `next.config` (LAN vía `ALLOWED_DEV_ORIGINS`)
+- [x] 2026-09-09 — Tests básicos de smoke (slider N slides, categorías, búsqueda, home HTTP si el server está arriba)
 
 ## Contenido
 
-- [ ] Reemplazar el teléfono placeholder `+51 999 999 999` por el oficial `+51 959 723 602` en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx` (`ProductModal.tsx` ya está correcto, usarlo de referencia)
+- [x] 2026-09-09 — Teléfono oficial `+51 959 723 602` en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx`
 - [ ] Confirmar correo de contacto oficial (footer y `/contacto` usan `ventas@chamoimport.com` como provisional)
-- [ ] Políticas (términos, privacidad) enlazadas desde el footer
+- [ ] Reemplazar textos placeholder de `/nosotros` (`data/company.ts`: año 2016, misión/visión de ejemplo) por ficha oficial del cliente
+- [x] 2026-09-09 — Políticas (términos, privacidad) enlazadas desde el footer
+- [ ] Sustituir testimonios de ejemplo (`data/testimonials.ts`) por casos reales de distribuidores
+
+## Ideas nuevas de este bloque
+
+- [x] 2026-09-09 — Banner de detalle de categoría: imagen ancha + título centrado (ELÉCTRICOS, FERRETERÍA, …)
+- [x] 2026-09-09 — `/nosotros` con banner **NOSOTROS**, historia Chamo Import, misión y visión
+- [x] 2026-09-09 — Animación de entrada al scroll (Reveal) en home y páginas; banners con fade-in
+- [x] 2026-09-09 — Intro de entrada: puertas azules + engranaje Lucide
+- [x] 2026-09-10 — Intro de puertas al entrar, refrescar o clic en el logo (no en cada sección)
+- [x] 2026-09-10 — Intro del carrito: mismas puertas, carrito que frena al centro y sigue al abrir
+- [x] 2026-09-10 — Preloader Framer Motion en la carga inicial (nombre + engranaje + barra)
+- [x] 2026-09-10 — Preloader con `/logo.png` y `/engranaje.png` oficiales
+- [x] 2026-09-10 — Página `/contacto` completa (canales, formulario WhatsApp, mapa)
+- [x] 2026-09-10 — Corrección de bugs: intro no scrolleable, formularios WhatsApp sin popup blocker, toast de favoritos a tono
+- [x] 2026-09-10 — Collages de marcas/productos de cada línea en tarjetas y banners de categoría (`CategoryCollage`). Los JPEG de `public/images/categorias/` quedan de fallback.
+- [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
+- [ ] Unificar la sesión del panel (`chamo_admin_session`) con `role: "admin"` de la tienda cuando exista un único backend de usuarios.
+- [x] 2026-09-10 — Comparar productos (hasta 3 SKUs, `/comparar`, badge en Navbar)
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-11 — Contrato API del panel admin (`types/admin.ts`, mock `services/adminApi.ts`, login `/admin/login`, `API_CONTRACT.md`). Nota: [`cambios/2026-09-11-admin-api-contract.md`](./cambios/2026-09-11-admin-api-contract.md).
+- [x] 2026-09-11 — Diseño base del **panel de administración** (sidebar corporativa, header, dashboard KPI). Nota: [`cambios/2026-09-11-admin-panel-layout.md`](./cambios/2026-09-11-admin-panel-layout.md).
+- [x] 2026-09-11 — **Listo para backend:** `npm run build` roto (2 errores de TS) → arreglado; carrito guarda `unitPrice`/`quantity` y migra el formato viejo; cuentas con `id`; productos con `discountPercent` y sin `image` redundante. `npm run build` + `npm run test` en verde. Nota: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
+- [x] 2026-09-11 — Fix doble loader del logo con reduced-motion + rol admin en `/admin` (bug 3 del carrito sin tocar). Nota: [`cambios/2026-09-11-fix-loader-admin-role.md`](./cambios/2026-09-11-fix-loader-admin-role.md).
+- [x] 2026-09-11 — Navegación interna (Catálogo, Categorías, Ofertas, etc.) usa el **mismo loader** de entrada a la web. Intro del carrito: ícono detrás de la costura al entrar, recorrido normal al salir. Nota: [`cambios/2026-09-11-loader-nav-carrito-costura.md`](./cambios/2026-09-11-loader-nav-carrito-costura.md).
+- [x] 2026-09-11 — Preloader según brief: `/logo.png` entra de izquierda a derecha, `/engranaje.png` gira, **CARGANDO...** en oro, fade-out a los 2.5 s (`z-[90]`). Nota: [`cambios/2026-09-11-preloader-2-5s-logo-engranaje.md`](./cambios/2026-09-11-preloader-2-5s-logo-engranaje.md).
+- [x] 2026-09-10 — Login/comparar/admin liviano/collages/specs de ejemplo (`docs/cambios/2026-09-10-sugerencias-login-comparar-admin.md`)
+- [x] 2026-09-10 — Bugs intro/preloader: un solo play al clic de Carrito, ícono a la izquierda de la costura, preloader espera `window.load`
+- [x] 2026-09-10 — Preloader con logo y engranaje oficiales (`/logo.png`, `/engranaje.png`)
+- [x] 2026-09-10 — Preloader Framer Motion (carga inicial)
+- [x] 2026-09-10 — Intro del carrito (puertas + carrito que frena y sigue su camino)
+- [x] 2026-09-10 — Bugs de intro / WhatsApp / favoritos (scroll lock, openWhatsApp, idsRef)
+- [x] 2026-09-10 — Intro de puertas solo al entrar, refrescar o clic en el logo
+- [x] 2026-09-10 — Página de contacto completa (formulario WhatsApp + mapa)
+- [x] 2026-09-10 — Intro de puertas también al navegar (Categorías, etc.) + responsive
+- [x] 2026-09-10 — Cierre de la auditoría UX: favoritos, fallback de marcas, testimonios, WhatsApp por categoría, breadcrumbs
+- [x] 2026-09-10 — Auditoría UX/UI y funcional con el sitio corriendo (bugs confirmados + recomendaciones)
+- [x] 2026-09-09 — Intro de entrada (puertas azules + engranaje)
+- [x] 2026-09-09 — Iconos Lucide (carrito, categorías, productos)
+- [x] 2026-09-09 — Productos destacados en una fila (carrusel como categorías)
+- [x] 2026-09-09 — Encabezados sticker Catálogo / Nosotros / Ofertas / Contacto
+- [x] 2026-09-09 — Slider sin recuadro de ejemplo; fade-in al scroll en banners y bloques
+- [x] 2026-09-09 — Banner Nosotros + misión/visión + animaciones de scroll en el sitio
+- [x] 2026-09-09 — Banner de detalle de categoría (imagen + título centrado)
+- [x] 2026-09-09 — Bloque SUGERENCIAS.md en orden (categorías, carrito, catálogo, cotizar, teléfono, tests)
 - [x] 2026-09-08 — Slider full-bleed y sin recorte
 - [x] 2026-09-08 — Marcas debajo del slider
 - [x] 2026-09-08 — Categorías layout Explorar + glow
@@ -112,6 +220,3 @@ reales en el DOM, no solo lectura. Detalle completo en las notas de auditoría:
 - [x] 2026-09-08 — 7 categorías en home (se añadieron 3)
 - [x] 2026-09-08 — Navbar: hover solo en texto + barra dorada animada bajo el ítem activo
 - [x] 2026-09-08 — Auditoría de docs: sincronizar CLAUDE.md/MANUAL.md con el código real (carrusel, modal, navbar)
-- [x] 2026-09-10 — Auditoría UX/UI y funcional con el sitio corriendo (bugs confirmados + recomendaciones nuevas)
-- [x] 2026-09-10 — Auditoría de bugs en Navbar/CategoriesGrid/ProductModal (2 bugs + 1 descartado)
-- [x] 2026-09-10 — Barrido del resto del proyecto: 4 bugs/mejoras nuevos (`/login`, boletín, favoritos/comparar, cursor)

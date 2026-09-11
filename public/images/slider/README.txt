@@ -1,9 +1,7 @@
-Banners del hero slider.
+Banners del hero slider (solo estos archivos; no hay placeholder).
 
-Nombres de archivo (con espacio, como estánaste):
-  baner 1.png
-  baner 2.png
-  baner 3.png
+  baner-1.png
+  baner-2.png
+  baner-3.png
 
-Colócalos en esta carpeta. El slide 1 ya está referenciado;
-cuando subas 2 y 3 se mostrarán automáticamente.
+Rutas y medidas en `data/media.ts`.
