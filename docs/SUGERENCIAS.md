@@ -39,6 +39,36 @@ en [`cambios/2026-09-10-bugs-intro-preloader.md`](./cambios/2026-09-10-bugs-intr
 - [x] 2026-09-11 — Preloader con fade-out fijo a **2.5 s** (brief de logo + engranaje). Cubrir Navbar/WhatsApp con `z-[90]`.
 - [x] 2026-09-10 — **3. El preloader ignoraba si la página realmente cargó.** Se implementó `window.load` + mínimo 1.2 s; el 2026-09-11 el brief volvió al timer de 2.5 s. Misma nota de intro + [`cambios/2026-09-11-preloader-2-5s-logo-engranaje.md`](./cambios/2026-09-11-preloader-2-5s-logo-engranaje.md).
 
+## 🐛 Bugs nuevos (2026-09-11, revisión de Claude Code)
+
+Revisión del estado actual de esta rama (tip `0e78c52`), centrada en `IntroSplash.tsx`
+(loader de navegación interna, nuevo ese mismo día) y en las áreas que más importan de
+cara a un backend real (cuentas, carrito, admin). Detalle completo:
+[`cambios/2026-09-11-bugs-admin-loader-carrito.md`](./cambios/2026-09-11-bugs-admin-loader-carrito.md).
+
+- [ ] **1. Doble pantalla de carga al hacer clic en el logo con `prefers-reduced-motion` activado.** En `IntroSplash.tsx`, el clic en `[data-site-intro]` llama `play("brand")` pero **no** marca `loadClaimedByClick.current = true` (a diferencia de la rama de carrito y la de links internos genéricos, que sí lo hacen). Con movimiento reducido, `play("brand")` se salta al instante (`setTimeout(hide, 0)`), así que cuando cambia el `pathname` un momento después, el `useEffect` que vigila la ruta no encuentra ningún "reclamo" y dispara **también** `play("load")` — un `BrandLoader` completo de 2.5s justo después del intro saltado. Doble pantalla de carga, y justo para el grupo de usuarios al que menos se le debería hacer esperar.
+  - **Solución:** marcar `loadClaimedByClick.current = true` también en la rama `[data-site-intro]` (o, mejor, unificar los tres refs de "reclamo" en uno solo que registre qué variante ya quedó cubierta para la próxima navegación).
+- [ ] **2. `/admin` no tiene control de rol — cualquier cuenta registrada entra.** `app/admin/page.tsx` solo verifica `if (!user)`; no existe ningún campo `role`/`isAdmin` en `AuthUser` ni en `StoredAccount` (`lib/auth-local.ts`). Como el registro es autoservicio (cualquiera crea una cuenta desde `/login`), cualquier visitante que se registre puede entrar a una página que dice "Admin de contenido". Hoy el impacto es bajo porque el CMS (`chamo-cms-v1`) también vive en `localStorage` de ese mismo navegador — no afecta a otros visitantes — pero es exactamente el tipo de hueco que se vuelve serio en cuanto haya un backend real detrás.
+  - **Solución:** agregar `role: "customer" | "admin"` a `AuthUser`/`StoredAccount` desde ya, y cambiar la condición de `app/admin/page.tsx` a `user?.role === "admin"`. Ver también la recomendación de nombres para backend, abajo.
+- [ ] **3. El carrito recalcula el precio en vivo del catálogo — no guarda el precio al agregar.** `CartLine` es solo `{ productId, qty }`; el total en `app/carrito/page.tsx` se calcula con `line.product.price` (el precio ACTUAL de `data/products.ts`), no con el precio que tenía el producto cuando se agregó. Si mañana el admin cambia un precio, el total del carrito de alguien que ya lo tenía agregado cambia solo, sin aviso.
+  - **Solución:** guardar `unitPrice` (y opcionalmente `wholesaleUnitPrice`) en `CartLine` en el momento de `addItem`, y usar ese valor para el total — mostrando un aviso si el precio actual del catálogo difiere.
+
+## 🏷️ Nombres de variables pensando en el backend futuro
+
+Pedido explícito: usar nombres/formas de datos que faciliten conectar un backend real
+más adelante, sin tener que reescribir todo. Los tipos actuales (`data/products.ts`,
+`CartLine`, `AuthUser`) ya están bastante bien pensados — esto es más bien pulir
+detalles antes de que haya más código escrito encima:
+
+- **Cuentas (`lib/auth-local.ts`):** agregar `id: string` a `StoredAccount`/`AuthUser` — hoy la clave real es `email`, y un backend real siempre va a asignar su propio `id` primario. Agregar `role: "customer" | "admin"` (ver bug 2). Considerar `createdAt` para poder ordenar/auditar cuentas más adelante.
+- **Carrito (`CartProvider.tsx`):** `qty` → `quantity` (más explícito, más común en APIs REST/GraphQL). Agregar `unitPrice` al agregar el ítem (ver bug 3) y `addedAt` si se quiere ordenar el carrito.
+- **Favoritos (`FavoritesProvider.tsx`):** hoy es `ids: string[]` — si más adelante se sincroniza con una cuenta real o se quiere ordenar "agregado recientemente", va a hacer falta `{ productId: string; addedAt: string }[]` en vez de un array plano de ids.
+- **Productos (`data/products.ts`):**
+  - `discount` → `discountPercent` (el nombre no dice la unidad; hoy se asume "%" por convención, no por el tipo).
+  - `image` (singular) es redundante con `images[0]` y puede desincronizarse — quitarlo y derivar siempre del array.
+  - `categoryLabel` está denormalizado (duplica el nombre de la categoría en cada producto). En un backend real esto normalmente viene de un `JOIN` con una tabla `categories` — documentar esa intención para que quien conecte el backend no intente "sincronizar" el texto a mano.
+- **General:** `CartProvider`, `FavoritesProvider` y `CompareProvider` son casi el mismo código tres veces (persistencia en `localStorage`, flag `ready`, patrón `idsRef`). No es un bug, pero un solo hook genérico (`useLocalIdSet(key)`) del que salgan los tres reduciría el riesgo de que se desincronicen al conectar el backend (hoy, si se corrige un bug en uno, hay que acordarse de replicarlo en los otros dos).
+
 ## 💡 Recomendaciones de cosas nuevas a agregar
 
 - [x] 2026-09-09 — **Carrito real** en `localStorage` + página `/carrito`
