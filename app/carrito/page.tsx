@@ -11,23 +11,26 @@ import { formatPrice } from "@/lib/format";
 import { whatsappUrl } from "@/data/contact";
 
 export default function CarritoPage() {
-  const { lines, count, setQty, removeItem, clear } = useCart();
+  const { lines, count, setQuantity, removeItem, clear } = useCart();
 
+  // Se usa el precio guardado al agregar (no el vivo del catálogo) para que el
+  // total no cambie solo si el precio de un producto cambia después.
   const unitTotal = lines.reduce(
-    (sum, line) => sum + line.product.price * line.qty,
+    (sum, line) => sum + line.unitPrice * line.quantity,
     0,
   );
   const wholesaleTotal = lines.reduce(
-    (sum, line) => sum + line.product.wholesalePrice * line.qty,
+    (sum, line) => sum + line.wholesaleUnitPrice * line.quantity,
     0,
   );
+  const hasPriceChanges = lines.some((line) => line.priceChanged);
 
   const whatsappHref = whatsappUrl(
     [
       "Hola, quiero cotizar estos productos del carrito:",
       ...lines.map(
         (line) =>
-          `- ${line.product.name} (${line.product.sku}) x${line.qty}`,
+          `- ${line.product.name} (${line.product.sku}) x${line.quantity}`,
       ),
       "",
       `Subtotal referencial mayorista: ${formatPrice(wholesaleTotal)}`,
@@ -81,7 +84,7 @@ export default function CarritoPage() {
                 >
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-brand-gray sm:h-24 sm:w-24">
                     <Image
-                      src={line.product.image}
+                      src={line.product.images[0]}
                       alt={line.product.name}
                       fill
                       className="object-cover"
@@ -99,24 +102,34 @@ export default function CarritoPage() {
                       SKU {line.product.sku}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-brand-primary">
-                      {formatPrice(line.product.wholesalePrice)} mayorista
+                      {formatPrice(line.wholesaleUnitPrice)} mayorista
                     </p>
+                    {line.priceChanged ? (
+                      <p className="mt-0.5 text-xs text-brand-gold">
+                        El precio de este producto cambió desde que lo agregaste
+                        (ahora {formatPrice(line.product.wholesalePrice)} mayorista).
+                      </p>
+                    ) : null}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <div className="inline-flex overflow-hidden rounded-lg border border-brand-dark/12">
                         <button
                           type="button"
-                          onClick={() => setQty(line.productId, line.qty - 1)}
+                          onClick={() =>
+                            setQuantity(line.productId, line.quantity - 1)
+                          }
                           className="inline-flex h-8 w-8 items-center justify-center"
                           aria-label="Disminuir"
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </button>
                         <span className="min-w-8 px-1 text-center text-sm font-semibold leading-8">
-                          {line.qty}
+                          {line.quantity}
                         </span>
                         <button
                           type="button"
-                          onClick={() => setQty(line.productId, line.qty + 1)}
+                          onClick={() =>
+                            setQuantity(line.productId, line.quantity + 1)
+                          }
                           className="inline-flex h-8 w-8 items-center justify-center"
                           aria-label="Aumentar"
                         >
@@ -141,6 +154,12 @@ export default function CarritoPage() {
               <p className="text-sm text-brand-dark/60 dark:text-white/60">
                 {count} unidad{count === 1 ? "" : "es"}
               </p>
+              {hasPriceChanges ? (
+                <p className="mt-2 rounded-lg bg-brand-gold/15 px-2.5 py-1.5 text-xs text-brand-dark dark:text-white">
+                  Algunos precios cambiaron desde que agregaste el producto — el
+                  total de abajo usa el precio guardado en tu carrito.
+                </p>
+              ) : null}
               <p className="mt-3 flex justify-between text-sm">
                 <span>Referencial unitario</span>
                 <span>{formatPrice(unitTotal)}</span>

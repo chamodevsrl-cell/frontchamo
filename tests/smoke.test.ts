@@ -123,7 +123,10 @@ describe("smoke de catálogo y home", () => {
       password: "secret1",
     });
     expect(created.ok).toBe(true);
-    if (created.ok) expect(created.account.role).toBe("admin");
+    if (created.ok) {
+      expect(created.account.role).toBe("admin");
+      expect(created.account.id).toBeTruthy();
+    }
 
     const customer = await createAccount(
       created.ok ? [created.account] : [],
@@ -134,7 +137,11 @@ describe("smoke de catálogo y home", () => {
       },
     );
     expect(customer.ok).toBe(true);
-    if (customer.ok) expect(customer.account.role).toBe("customer");
+    if (customer.ok && created.ok) {
+      expect(customer.account.role).toBe("customer");
+      expect(customer.account.id).toBeTruthy();
+      expect(customer.account.id).not.toBe(created.account.id);
+    }
   });
 
   it("migra cuentas viejas sin role: la primera es admin", async () => {
@@ -158,10 +165,16 @@ describe("smoke de catálogo y home", () => {
     expect(migrated[0]?.role).toBe("admin");
     expect(migrated[1]?.role).toBe("customer");
     const session = hydrateSessionUser(
-      { name: "Chamo", email: "chamo@example.com", role: "customer" },
+      {
+        id: "stale-id-from-before-the-id-field-existed",
+        name: "Chamo",
+        email: "chamo@example.com",
+        role: "customer",
+      },
       migrated,
     );
     expect(session?.role).toBe("admin");
+    expect(session?.id).toBe(migrated[0]?.id);
   });
 
   it("contacto oficial tiene teléfono, horario y WhatsApp", () => {

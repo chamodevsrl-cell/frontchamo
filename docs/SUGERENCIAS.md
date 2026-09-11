@@ -48,23 +48,22 @@ cara a un backend real (cuentas, carrito, admin). Detalle completo:
 
 - [x] 2026-09-11 — **1. Doble pantalla de carga al hacer clic en el logo con `prefers-reduced-motion` activado.** El clic en `[data-site-intro]` ahora reclama la navegación (`loadClaimedByClick`) para que el cambio de `pathname` no dispare un `BrandLoader` extra. Fix: [`cambios/2026-09-11-fix-loader-admin-role.md`](./cambios/2026-09-11-fix-loader-admin-role.md).
 - [x] 2026-09-11 — **2. `/admin` no tiene control de rol — cualquier cuenta registrada entra.** `AuthUser`/`StoredAccount` tienen `role: "customer" | "admin"`. La primera cuenta del navegador es admin; las siguientes, customer. `/admin` y el enlace del Navbar exigen `role === "admin"`. Fix: misma nota. Pendiente backend real.
-- [ ] **3. El carrito recalcula el precio en vivo del catálogo — no guarda el precio al agregar.** `CartLine` es solo `{ productId, qty }`; el total en `app/carrito/page.tsx` se calcula con `line.product.price` (el precio ACTUAL de `data/products.ts`), no con el precio que tenía el producto cuando se agregó. Si mañana el admin cambia un precio, el total del carrito de alguien que ya lo tenía agregado cambia solo, sin aviso. **Sin aplicar aún:** cambia el formato persistido en `chamo-cart-v1`; confirmar antes de migrar.
+- [x] 2026-09-11 — **3. El carrito recalcula el precio en vivo del catálogo — no guardaba el precio al agregar.** `CartLine` ahora guarda `unitPrice`/`wholesaleUnitPrice` al momento de `addItem`; los totales de `/carrito` y el mensaje de WhatsApp usan ese precio, no el vivo del catálogo. Si el precio cambió, se muestra un aviso ("El precio de este producto cambió desde que lo agregaste"). Carritos viejos (`{productId, qty}` sin precio) se migran solos al leer `chamo-cart-v1`, rellenando con el precio vivo. Verificado en vivo (carrito viejo → migra bien; precio desactualizado → muestra el aviso y usa el precio guardado). Fix: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
+- [x] 2026-09-11 — **4. `npm run build` estaba roto.** Dos errores de TypeScript bloqueaban la build de producción: `app/admin/page.tsx` perdía el tipo tupla `[string,string,string]` de `bullets` al hacer `[...item.bullets]`, y `vitest.config.mts` quedaba dentro del mismo proyecto TS que compila Next (dos versiones de `vite` incompatibles — la de `vitest` y la que jala `@vitejs/plugin-react`). Se encontró corriendo `npm run build` real (no solo `tsc`), con un `npm ci` limpio para descartar que fuera un problema del entorno. Fix: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
 
-## 🏷️ Nombres de variables pensando en el backend futuro
+## 🏷️ Nombres de variables — aplicado pensando en el backend futuro
 
 Pedido explícito: usar nombres/formas de datos que faciliten conectar un backend real
-más adelante, sin tener que reescribir todo. Los tipos actuales (`data/products.ts`,
-`CartLine`, `AuthUser`) ya están bastante bien pensados — esto es más bien pulir
-detalles antes de que haya más código escrito encima:
+más adelante, sin tener que reescribir todo. Aplicado el 2026-09-11
+([`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md)),
+verificado con `npm run build` + `npm run test` en verde después de cada cambio:
 
-- **Cuentas (`lib/auth-local.ts`):** agregar `id: string` a `StoredAccount`/`AuthUser` — hoy la clave real es `email`, y un backend real siempre va a asignar su propio `id` primario. Agregar `role: "customer" | "admin"` (ver bug 2). Considerar `createdAt` para poder ordenar/auditar cuentas más adelante.
-- **Carrito (`CartProvider.tsx`):** `qty` → `quantity` (más explícito, más común en APIs REST/GraphQL). Agregar `unitPrice` al agregar el ítem (ver bug 3) y `addedAt` si se quiere ordenar el carrito.
-- **Favoritos (`FavoritesProvider.tsx`):** hoy es `ids: string[]` — si más adelante se sincroniza con una cuenta real o se quiere ordenar "agregado recientemente", va a hacer falta `{ productId: string; addedAt: string }[]` en vez de un array plano de ids.
-- **Productos (`data/products.ts`):**
-  - `discount` → `discountPercent` (el nombre no dice la unidad; hoy se asume "%" por convención, no por el tipo).
-  - `image` (singular) es redundante con `images[0]` y puede desincronizarse — quitarlo y derivar siempre del array.
-  - `categoryLabel` está denormalizado (duplica el nombre de la categoría en cada producto). En un backend real esto normalmente viene de un `JOIN` con una tabla `categories` — documentar esa intención para que quien conecte el backend no intente "sincronizar" el texto a mano.
-- **General:** `CartProvider`, `FavoritesProvider` y `CompareProvider` son casi el mismo código tres veces (persistencia en `localStorage`, flag `ready`, patrón `idsRef`). No es un bug, pero un solo hook genérico (`useLocalIdSet(key)`) del que salgan los tres reduciría el riesgo de que se desincronicen al conectar el backend (hoy, si se corrige un bug en uno, hay que acordarse de replicarlo en los otros dos).
+- [x] **Cuentas (`lib/auth-local.ts`):** `id: string` en `StoredAccount`/`AuthUser` (antes la clave real era `email`); cuentas viejas sin `id` lo reciben solo al leerlas. `role` ya estaba (bug 2).
+- [x] **Carrito (`CartProvider.tsx`):** `qty` → `quantity`; `setQty` → `setQuantity`; se agregó `unitPrice`/`wholesaleUnitPrice` (bug 3).
+- [x] **Productos (`data/products.ts`):** `discount` → `discountPercent` (con comentario de que es 0-100, no un monto); se quitó el campo `image` (singular) redundante — todo el código ahora usa `images[0]`.
+- [ ] **Favoritos (`FavoritesProvider.tsx`):** sigue siendo `ids: string[]` — **sin aplicar todavía**. Cambiar a `{ productId, addedAt }[]` cuando se necesite ordenar "agregado recientemente" o sincronizar con cuenta real; no había ningún bug detrás, así que se dejó fuera de este cierre para no tocar más de la cuenta antes del backend.
+- [ ] **`categoryLabel` denormalizado** en cada producto — sin tocar, solo documentado: en un backend real normalmente viene de un `JOIN` con una tabla `categories`.
+- [ ] **`CartProvider`/`FavoritesProvider`/`CompareProvider` casi duplicados** (mismo patrón `localStorage` + `ready` + `idsRef`) — sin tocar; unificarlos en un hook genérico reduciría el riesgo de que se desincronicen, pero no es urgente para conectar el backend.
 
 ## 💡 Recomendaciones de cosas nuevas a agregar
 
@@ -130,6 +129,7 @@ detalles antes de que haya más código escrito encima:
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-11 — **Listo para backend:** `npm run build` roto (2 errores de TS) → arreglado; carrito guarda `unitPrice`/`quantity` y migra el formato viejo; cuentas con `id`; productos con `discountPercent` y sin `image` redundante. `npm run build` + `npm run test` en verde. Nota: [`cambios/2026-09-11-backend-ready-fixes.md`](./cambios/2026-09-11-backend-ready-fixes.md).
 - [x] 2026-09-11 — Fix doble loader del logo con reduced-motion + rol admin en `/admin` (bug 3 del carrito sin tocar). Nota: [`cambios/2026-09-11-fix-loader-admin-role.md`](./cambios/2026-09-11-fix-loader-admin-role.md).
 - [x] 2026-09-11 — Navegación interna (Catálogo, Categorías, Ofertas, etc.) usa el **mismo loader** de entrada a la web. Intro del carrito: ícono detrás de la costura al entrar, recorrido normal al salir. Nota: [`cambios/2026-09-11-loader-nav-carrito-costura.md`](./cambios/2026-09-11-loader-nav-carrito-costura.md).
 - [x] 2026-09-11 — Preloader según brief: `/logo.png` entra de izquierda a derecha, `/engranaje.png` gira, **CARGANDO...** en oro, fade-out a los 2.5 s (`z-[90]`). Nota: [`cambios/2026-09-11-preloader-2-5s-logo-engranaje.md`](./cambios/2026-09-11-preloader-2-5s-logo-engranaje.md).

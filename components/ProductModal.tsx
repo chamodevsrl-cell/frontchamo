@@ -58,7 +58,7 @@ export default function ProductModal({
           Array.from(
             { length: 5 - product.images.length },
             (_, i) =>
-              product.images[i % product.images.length] ?? product.image,
+              product.images[i % product.images.length] ?? product.images[0],
           ),
         );
 
@@ -154,10 +154,10 @@ export default function ProductModal({
                 <span className="text-xs text-brand-dark/50">
                   SKU: {product.sku}
                 </span>
-                {product.discount ? (
+                {product.discountPercent ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[#cfe8f8] px-2.5 py-0.5 text-[11px] font-extrabold text-brand-primary">
                     <BadgePercent className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
-                    -{product.discount}% OFF
+                    -{product.discountPercent}% OFF
                   </span>
                 ) : null}
               </div>
@@ -342,7 +342,7 @@ export default function ProductModal({
                       >
                         <div className="relative aspect-square overflow-hidden bg-brand-gray">
                           <Image
-                            src={item.image}
+                            src={item.images[0]}
                             alt={item.name}
                             fill
                             className="object-cover transition duration-300 group-hover:scale-[1.03]"

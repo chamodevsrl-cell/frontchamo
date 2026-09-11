@@ -41,7 +41,7 @@ export default function QuoteForm() {
     const linesText = [
       ...lines.map(
         (line) =>
-          `- ${line.product.name} (${line.product.sku}) x${line.qty} · mayorista ${formatPrice(line.product.wholesalePrice)}`,
+          `- ${line.product.name} (${line.product.sku}) x${line.quantity} · mayorista ${formatPrice(line.wholesaleUnitPrice)}`,
       ),
       extraProduct && !lines.some((line) => line.productId === extraProduct.id)
         ? `- ${extraProduct.name} (${extraProduct.sku}) x${qty} · mayorista ${formatPrice(extraProduct.wholesalePrice)}`

@@ -14,10 +14,11 @@ export type FeaturedProduct = {
   price: number;
   oldPrice: number;
   wholesalePrice: number;
-  discount?: number;
+  /** Porcentaje de descuento (0-100), no un monto. */
+  discountPercent?: number;
   badge: "oferta" | "destacado";
   stock: number;
-  image: string;
+  /** Galería completa; `images[0]` es la imagen principal (no hay campo `image` aparte). */
   images: string[];
   description: string;
   features: string[];
@@ -59,7 +60,7 @@ function gallery(seed: number): string[] {
   );
 }
 
-type ProductDraft = Omit<FeaturedProduct, "image" | "images" | "warning"> & {
+type ProductDraft = Omit<FeaturedProduct, "images" | "warning"> & {
   imageIndex: number;
   warning?: string;
 };
@@ -98,7 +99,6 @@ function makeProduct(draft: ProductDraft): FeaturedProduct {
   return {
     ...rest,
     specs: fillExampleSpecs(rest.specs),
-    image: TOOL_IMAGES[imageIndex % TOOL_IMAGES.length],
     images: gallery(imageIndex),
     warning: warning ?? DEFAULT_WARNING,
   };
@@ -115,7 +115,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 89.9,
     oldPrice: 105.0,
     wholesalePrice: 79.9,
-    discount: 14,
+    discountPercent: 14,
     badge: "oferta",
     stock: 45,
     imageIndex: 0,
@@ -151,7 +151,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 219.9,
     oldPrice: 274.9,
     wholesalePrice: 199.9,
-    discount: 20,
+    discountPercent: 20,
     badge: "oferta",
     stock: 32,
     imageIndex: 1,
@@ -187,7 +187,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 149.9,
     oldPrice: 179.9,
     wholesalePrice: 132.0,
-    discount: 17,
+    discountPercent: 17,
     badge: "destacado",
     stock: 60,
     imageIndex: 2,
@@ -223,7 +223,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 12.5,
     oldPrice: 15.9,
     wholesalePrice: 9.9,
-    discount: 21,
+    discountPercent: 21,
     badge: "oferta",
     stock: 500,
     imageIndex: 3,
@@ -294,7 +294,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 18.9,
     oldPrice: 22.0,
     wholesalePrice: 15.5,
-    discount: 14,
+    discountPercent: 14,
     badge: "oferta",
     stock: 180,
     imageIndex: 5,
@@ -330,7 +330,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 189.0,
     oldPrice: 220.0,
     wholesalePrice: 175.0,
-    discount: 14,
+    discountPercent: 14,
     badge: "oferta",
     stock: 28,
     imageIndex: 6,
@@ -401,7 +401,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 259.0,
     oldPrice: 299.0,
     wholesalePrice: 239.0,
-    discount: 13,
+    discountPercent: 13,
     badge: "destacado",
     stock: 22,
     imageIndex: 0,
@@ -437,7 +437,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 39.9,
     oldPrice: 49.9,
     wholesalePrice: 34.5,
-    discount: 20,
+    discountPercent: 20,
     badge: "oferta",
     stock: 110,
     imageIndex: 2,
@@ -473,7 +473,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 54.9,
     oldPrice: 64.9,
     wholesalePrice: 47.0,
-    discount: 15,
+    discountPercent: 15,
     badge: "destacado",
     stock: 70,
     imageIndex: 1,
@@ -509,7 +509,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 32.9,
     oldPrice: 39.9,
     wholesalePrice: 27.5,
-    discount: 18,
+    discountPercent: 18,
     badge: "oferta",
     stock: 150,
     imageIndex: 6,
@@ -545,7 +545,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 14.5,
     oldPrice: 18.0,
     wholesalePrice: 11.9,
-    discount: 19,
+    discountPercent: 19,
     badge: "destacado",
     stock: 320,
     imageIndex: 7,
@@ -581,7 +581,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 69.9,
     oldPrice: 84.9,
     wholesalePrice: 61.0,
-    discount: 18,
+    discountPercent: 18,
     badge: "oferta",
     stock: 40,
     imageIndex: 4,
@@ -617,7 +617,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 44.9,
     oldPrice: 54.9,
     wholesalePrice: 38.0,
-    discount: 18,
+    discountPercent: 18,
     badge: "destacado",
     stock: 85,
     imageIndex: 5,
@@ -653,7 +653,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 79.9,
     oldPrice: 95.0,
     wholesalePrice: 69.0,
-    discount: 16,
+    discountPercent: 16,
     badge: "oferta",
     stock: 54,
     imageIndex: 3,
@@ -689,7 +689,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 6.9,
     oldPrice: 8.5,
     wholesalePrice: 5.2,
-    discount: 19,
+    discountPercent: 19,
     badge: "oferta",
     stock: 400,
     imageIndex: 1,
@@ -725,7 +725,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 42.9,
     oldPrice: 52.0,
     wholesalePrice: 37.5,
-    discount: 17,
+    discountPercent: 17,
     badge: "destacado",
     stock: 66,
     imageIndex: 0,
@@ -761,7 +761,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 18.9,
     oldPrice: 23.5,
     wholesalePrice: 15.9,
-    discount: 20,
+    discountPercent: 20,
     badge: "oferta",
     stock: 210,
     imageIndex: 2,
@@ -797,7 +797,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 16.9,
     oldPrice: 21.0,
     wholesalePrice: 13.5,
-    discount: 20,
+    discountPercent: 20,
     badge: "oferta",
     stock: 175,
     imageIndex: 7,
@@ -833,7 +833,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 64.9,
     oldPrice: 74.9,
     wholesalePrice: 57.0,
-    discount: 13,
+    discountPercent: 13,
     badge: "destacado",
     stock: 90,
     imageIndex: 5,
@@ -869,7 +869,7 @@ export const featuredProducts: FeaturedProduct[] = [
     price: 28.9,
     oldPrice: 34.0,
     wholesalePrice: 24.5,
-    discount: 15,
+    discountPercent: 15,
     badge: "oferta",
     stock: 120,
     imageIndex: 4,
@@ -911,7 +911,7 @@ export function getCategoryCollage(slug: string, limit = 4) {
   const products = getProductsByCategory(slug);
   return {
     images: products.slice(0, limit).map((product) => ({
-      src: product.image,
+      src: product.images[0],
       alt: product.name,
     })),
     brands: [...new Set(products.map((product) => product.brand))],

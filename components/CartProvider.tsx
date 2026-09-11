@@ -15,37 +15,70 @@ const STORAGE_KEY = "chamo-cart-v1";
 
 export type CartLine = {
   productId: string;
-  qty: number;
+  quantity: number;
+  /** Precio unitario referencial al momento de agregar (no se recalcula solo). */
+  unitPrice: number;
+  /** Precio mayorista al momento de agregar. */
+  wholesaleUnitPrice: number;
 };
 
 export type CartResolvedLine = CartLine & {
   product: FeaturedProduct;
+  /** true si el precio vivo del catálogo ya no coincide con el guardado. */
+  priceChanged: boolean;
 };
 
 type CartContextValue = {
   items: CartLine[];
   lines: CartResolvedLine[];
   count: number;
-  addItem: (productId: string, qty?: number) => void;
-  setQty: (productId: string, qty: number) => void;
+  addItem: (productId: string, quantity?: number) => void;
+  setQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clear: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+/** Acepta el formato viejo (`qty`, sin precio) y lo migra al nuevo en la lectura. */
 function parseCart(raw: string | null): CartLine[] {
   if (!raw) return [];
   try {
-    const parsed = JSON.parse(raw) as CartLine[];
+    const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (line) =>
-        line &&
-        typeof line.productId === "string" &&
-        Number.isFinite(line.qty) &&
-        line.qty > 0,
-    );
+    return parsed.flatMap((row): CartLine[] => {
+      if (!row || typeof row !== "object") return [];
+      const line = row as Record<string, unknown>;
+      const productId =
+        typeof line.productId === "string" ? line.productId : null;
+      const rawQuantity =
+        typeof line.quantity === "number"
+          ? line.quantity
+          : typeof line.qty === "number" // formato viejo
+            ? line.qty
+            : NaN;
+      if (!productId || !Number.isFinite(rawQuantity) || rawQuantity <= 0) {
+        return [];
+      }
+      const quantity = Math.floor(rawQuantity);
+
+      let unitPrice =
+        typeof line.unitPrice === "number" ? line.unitPrice : null;
+      let wholesaleUnitPrice =
+        typeof line.wholesaleUnitPrice === "number"
+          ? line.wholesaleUnitPrice
+          : null;
+
+      if (unitPrice === null || wholesaleUnitPrice === null) {
+        // Línea del formato viejo: no traía precio, se rellena con el vivo del catálogo.
+        const product = getProductById(productId);
+        if (!product) return [];
+        unitPrice ??= product.price;
+        wholesaleUnitPrice ??= product.wholesalePrice;
+      }
+
+      return [{ productId, quantity, unitPrice, wholesaleUnitPrice }];
+    });
   } catch {
     return [];
   }
@@ -67,27 +100,40 @@ export function CartProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, ready]);
 
-  const addItem = useCallback((productId: string, qty = 1) => {
-    const amount = Math.max(1, Math.floor(qty));
+  const addItem = useCallback((productId: string, quantity = 1) => {
+    const product = getProductById(productId);
+    if (!product) return;
+    const amount = Math.max(1, Math.floor(quantity));
     setItems((current) => {
       const existing = current.find((line) => line.productId === productId);
-      if (!existing) return [...current, { productId, qty: amount }];
+      if (!existing) {
+        return [
+          ...current,
+          {
+            productId,
+            quantity: amount,
+            // Precio al momento de agregar; no se toca aunque el catálogo cambie después.
+            unitPrice: product.price,
+            wholesaleUnitPrice: product.wholesalePrice,
+          },
+        ];
+      }
       return current.map((line) =>
         line.productId === productId
-          ? { ...line, qty: line.qty + amount }
+          ? { ...line, quantity: line.quantity + amount }
           : line,
       );
     });
   }, []);
 
-  const setQty = useCallback((productId: string, qty: number) => {
-    const amount = Math.floor(qty);
+  const setQuantity = useCallback((productId: string, quantity: number) => {
+    const amount = Math.floor(quantity);
     setItems((current) => {
       if (amount < 1) {
         return current.filter((line) => line.productId !== productId);
       }
       return current.map((line) =>
-        line.productId === productId ? { ...line, qty: amount } : line,
+        line.productId === productId ? { ...line, quantity: amount } : line,
       );
     });
   }, []);
@@ -102,19 +148,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () =>
       items.flatMap((line) => {
         const product = getProductById(line.productId);
-        return product ? [{ ...line, product }] : [];
+        if (!product) return [];
+        const priceChanged =
+          product.price !== line.unitPrice ||
+          product.wholesalePrice !== line.wholesaleUnitPrice;
+        return [{ ...line, product, priceChanged }];
       }),
     [items],
   );
 
   const count = useMemo(
-    () => lines.reduce((sum, line) => sum + line.qty, 0),
+    () => lines.reduce((sum, line) => sum + line.quantity, 0),
     [lines],
   );
 
   const value = useMemo(
-    () => ({ items, lines, count, addItem, setQty, removeItem, clear }),
-    [items, lines, count, addItem, setQty, removeItem, clear],
+    () => ({ items, lines, count, addItem, setQuantity, removeItem, clear }),
+    [items, lines, count, addItem, setQuantity, removeItem, clear],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

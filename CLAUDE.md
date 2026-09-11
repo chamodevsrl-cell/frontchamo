@@ -185,11 +185,17 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-11): loader de nav interna = preloader; `/admin` exige `role: "admin"`; clic del logo no encadena BrandLoader con reduced-motion.
+Último avance (2026-09-11): `npm run build` estaba roto (2 errores de TS) → arreglado;
+`CartLine` ahora guarda `quantity`/`unitPrice`/`wholesaleUnitPrice` (con migración del
+formato viejo) en vez de recalcular el precio en vivo; cuentas con `id`; productos con
+`discountPercent` y sin el campo `image` redundante. Detalle:
+[`docs/cambios/2026-09-11-backend-ready-fixes.md`](docs/cambios/2026-09-11-backend-ready-fixes.md).
 
 ## 10. Pendientes conocidos
 
-- Backend real de autenticación e inventario (hoy cuentas, carrito, comparar y admin viven en este navegador).
+- Backend real de autenticación e inventario (hoy cuentas, carrito, comparar y admin viven en este navegador; los nombres ya están pensados para esa migración — ver la nota de arriba).
+- `FavoritesProvider` sigue en `ids: string[]` (sin `addedAt`) — cambiar a `{productId, addedAt}[]` si se necesita ordenar u sincronizar con cuenta real.
+- `categoryLabel` sigue denormalizado en cada producto (documentado, no corregido).
 - Confirmar correo de contacto oficial (footer y `/contacto`).
 - Reemplazar textos placeholder de `/nosotros` (`data/company.ts`) por ficha oficial.
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).

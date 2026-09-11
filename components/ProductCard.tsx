@@ -47,7 +47,7 @@ export default function ProductCard({
     >
       <div className="relative aspect-square overflow-hidden bg-brand-gray sm:aspect-[4/3]">
         <Image
-          src={product.image}
+          src={product.images[0]}
           alt={product.name}
           fill
           className="object-cover transition duration-500 group-hover:scale-[1.03]"
@@ -66,8 +66,8 @@ export default function ProductCard({
           ) : (
             <Star className="h-3 w-3" strokeWidth={2.5} aria-hidden />
           )}
-          {product.badge === "oferta" && product.discount
-            ? `-${product.discount}% OFERTA`
+          {product.badge === "oferta" && product.discountPercent
+            ? `-${product.discountPercent}% OFERTA`
             : "DESTACADO"}
         </span>
 

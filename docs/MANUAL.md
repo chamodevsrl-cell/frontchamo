@@ -137,7 +137,10 @@ Cada producto incluye `category` / `categoryLabel`, `specs[]` (ficha técnica) y
 Hay **al menos 3 productos por categoría** (22 SKUs de ejemplo).
 
 El listado público pasa por `GET /api/productos?q=&category=&brand=`.
-`CartProvider` guarda líneas `{ productId, qty }` en `localStorage` (`chamo-cart-v1`).
+`CartProvider` guarda líneas `{ productId, quantity, unitPrice, wholesaleUnitPrice }`
+en `localStorage` (`chamo-cart-v1`) — el precio se guarda al agregar, no se recalcula
+solo si el catálogo cambia de precio después; `/carrito` avisa si detecta que cambió.
+Líneas del formato viejo (`{productId, qty}`, sin precio) se migran solas al leer.
 `FavoritesProvider` guarda IDs en `chamo-favorites-v1`; el corazón de la tarjeta y del
 modal persiste, muestra el aviso fijo **Guardado en favoritos** y el Navbar lleva el contador.
 

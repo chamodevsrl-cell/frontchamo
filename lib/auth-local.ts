@@ -4,6 +4,8 @@ export const SESSION_KEY = "chamo-session-v1";
 export type AuthRole = "customer" | "admin";
 
 export type StoredAccount = {
+  /** Identificador estable de la cuenta (no depende del email, que se puede cambiar). */
+  id: string;
   name: string;
   email: string;
   salt: string;
@@ -12,6 +14,7 @@ export type StoredAccount = {
 };
 
 export type AuthUser = {
+  id: string;
   name: string;
   email: string;
   role: AuthRole;
@@ -26,7 +29,20 @@ export function isAdminUser(user: AuthUser | null | undefined): boolean {
 }
 
 export function toAuthUser(account: StoredAccount): AuthUser {
-  return { name: account.name, email: account.email, role: account.role };
+  return {
+    id: account.id,
+    name: account.name,
+    email: account.email,
+    role: account.role,
+  };
+}
+
+/** UUID v4 si el navegador lo soporta; si no, un hex aleatorio del mismo largo. */
+export function randomId() {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return bytesToHex(bytes);
 }
 
 export function normalizeEmail(email: string) {
@@ -55,7 +71,10 @@ export async function hashPassword(password: string, salt: string) {
   return bytesToHex(new Uint8Array(buffer));
 }
 
-function isStoredAccountShape(account: unknown): account is Omit<StoredAccount, "role"> & {
+function isStoredAccountShape(
+  account: unknown,
+): account is Omit<StoredAccount, "id" | "role"> & {
+  id?: unknown;
   role?: unknown;
 } {
   if (!account || typeof account !== "object") return false;
@@ -75,6 +94,7 @@ export function parseAccounts(raw: string | null): StoredAccount[] {
     if (!Array.isArray(parsed)) return [];
     const rows = parsed.filter(isStoredAccountShape);
     return rows.map((account, index) => ({
+      id: typeof account.id === "string" && account.id ? account.id : randomId(),
       name: account.name,
       email: normalizeEmail(account.email),
       salt: account.salt,
@@ -100,6 +120,7 @@ export function parseSession(raw: string | null): AuthUser | null {
       parsed.email.includes("@")
     ) {
       return {
+        id: typeof parsed.id === "string" && parsed.id ? parsed.id : randomId(),
         name: parsed.name,
         email: normalizeEmail(parsed.email),
         role: isAuthRole(parsed.role) ? parsed.role : "customer",
@@ -139,6 +160,7 @@ export async function createAccount(
   return {
     ok: true,
     account: {
+      id: randomId(),
       name,
       email,
       salt,

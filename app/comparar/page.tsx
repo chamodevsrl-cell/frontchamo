@@ -128,7 +128,7 @@ export default function CompararPage() {
                         <th key={product.id} className="px-3 py-3 align-top">
                           <div className="relative mx-auto mb-2 aspect-square w-24 overflow-hidden rounded-lg bg-brand-gray">
                             <Image
-                              src={product.image}
+                              src={product.images[0]}
                               alt={product.name}
                               fill
                               className="object-cover"

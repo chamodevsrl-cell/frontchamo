@@ -343,7 +343,9 @@ function AdminEditor({ cms }: { cms: CmsState }) {
                         setCategories((current) =>
                           current.map((item, i) => {
                             if (i !== index) return item;
-                            const bullets = [...item.bullets];
+                            const bullets: [string, string, string] = [
+                              ...item.bullets,
+                            ];
                             bullets[bulletIndex] = event.target.value;
                             return { ...item, bullets };
                           }),
