@@ -46,6 +46,7 @@ export default function WrenchCursor() {
   const [pressed, setPressed] = useState(false);
   const [interactive, setInteractive] = useState(false);
   const [isTextField, setIsTextField] = useState(false);
+  const [overImage, setOverImage] = useState(false);
 
   useEffect(() => {
     if (!enabled) return;
@@ -63,6 +64,7 @@ export default function WrenchCursor() {
         ),
       );
       setInteractive(isInteractive);
+      setOverImage(Boolean(target?.closest("img")));
     }
 
     function onLeave() {
@@ -108,15 +110,19 @@ export default function WrenchCursor() {
         // Barra de texto (I-beam): el cursor nativo está oculto, así que hay que
         // marcar de otra forma que el campo bajo el mouse acepta escribir.
         <span className="relative flex h-8 w-8 items-center justify-center">
-          <span className="h-5 w-[2.5px] rounded-full bg-brand-primary dark:bg-brand-gold" />
+          <span className="h-5 w-[2.5px] rounded-full bg-black" />
         </span>
       ) : (
-        <span className="relative flex h-8 w-8 items-center justify-center drop-shadow-[0_2px_4px_rgba(11,53,84,0.35)]">
+        <span className="relative flex h-8 w-8 items-center justify-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]">
           <Wrench
-            className="h-7 w-7 text-brand-dark dark:text-brand-gold"
+            className={overImage ? "h-7 w-7 text-white" : "h-7 w-7 text-black"}
             strokeWidth={2.25}
           />
-          <span className="absolute inset-0 -z-10 rounded-full bg-brand-gold/25 blur-[2px]" />
+          <span
+            className={`absolute inset-0 -z-10 rounded-full blur-[2px] ${
+              overImage ? "bg-black/25" : "bg-white/40"
+            }`}
+          />
         </span>
       )}
     </div>
