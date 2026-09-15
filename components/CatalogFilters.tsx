@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSiteContent } from "@/components/ContentProvider";
 import { mainCategories } from "@/data/home";
 import { getCatalogBrands } from "@/data/products";
 
@@ -19,6 +20,8 @@ export default function CatalogFilters({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const brands = getCatalogBrands();
+  const { categories } = useSiteContent();
+  const categoryOptions = categories.length > 0 ? categories : mainCategories;
 
   function updateFilter(key: "q" | "category" | "brand", value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -62,7 +65,7 @@ export default function CatalogFilters({
           className="w-full rounded-lg border border-brand-dark/15 bg-white px-3 py-2 text-sm text-brand-dark outline-none focus:border-brand-primary dark:bg-brand-dark dark:text-white"
         >
           <option value="">Todas</option>
-          {mainCategories.map((item) => (
+          {categoryOptions.map((item) => (
             <option key={item.slug} value={item.slug}>
               {item.label}
             </option>

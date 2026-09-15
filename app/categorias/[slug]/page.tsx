@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import CategoryBanner from "@/components/CategoryBanner";
+import CategoryDetailLive from "@/components/CategoryDetailLive";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
 import { getCategoryBySlug, mainCategories } from "@/data/home";
@@ -32,7 +32,9 @@ export default async function CategoriaDetallePage({
 }) {
   const { slug } = await params;
   const category = getCategoryBySlug(slug);
-  if (!category) notFound();
+  if (!category) {
+    return <CategoryDetailLive slug={slug} />;
+  }
 
   const products = getProductsByCategory(category.slug);
   const brands = [...new Set(products.map((product) => product.brand))];

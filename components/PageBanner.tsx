@@ -1,4 +1,4 @@
-import Image from "next/image";
+import CmsImage from "@/components/CmsImage";
 import Reveal from "@/components/Reveal";
 import StampHeading from "@/components/StampHeading";
 import Breadcrumbs, { type Crumb } from "@/components/Breadcrumbs";
@@ -64,7 +64,7 @@ export default function PageBanner({
             sizes="(max-width: 1600px) 100vw, 1600px"
           />
         ) : (
-          <Image
+          <CmsImage
             src={image}
             alt={imageAlt}
             fill

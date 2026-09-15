@@ -1,7 +1,7 @@
-"use client";
+import AdminCategoriesCards from "@/components/admin/AdminCategoriesCards";
+import { getProducts } from "@/services/adminApi";
 
-import SiteContentEditor from "@/components/admin/SiteContentEditor";
-
-export default function AdminCategoriasPage() {
-  return <SiteContentEditor section="categories" />;
+export default async function AdminCategoriasPage() {
+  const products = await getProducts();
+  return <AdminCategoriesCards products={products} />;
 }

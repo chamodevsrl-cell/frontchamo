@@ -7,7 +7,7 @@ import {
   useState,
   type TouchEvent,
 } from "react";
-import Image from "next/image";
+import CmsImage from "@/components/CmsImage";
 import { slides as defaultSlides } from "@/data/media";
 import { useSiteContent } from "@/components/ContentProvider";
 
@@ -82,7 +82,7 @@ export default function HeroSlider() {
               }`}
               aria-hidden={!active}
             >
-              <Image
+              <CmsImage
                 src={slide.src}
                 alt={slide.alt}
                 width={slide.width}
@@ -91,6 +91,7 @@ export default function HeroSlider() {
                 loading={i === 0 ? "eager" : "lazy"}
                 draggable={false}
                 sizes="100vw"
+                objectFit="contain"
                 className={`block w-full select-none object-contain ${
                   active ? "relative h-auto" : "absolute inset-0 h-full"
                 }`}

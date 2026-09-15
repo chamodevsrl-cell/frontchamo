@@ -1,7 +1,5 @@
-"use client";
-
-import SiteContentEditor from "@/components/admin/SiteContentEditor";
+import AdminBannersStudio from "@/components/admin/AdminBannersStudio";
 
 export default function AdminBannersPage() {
-  return <SiteContentEditor section="banners" />;
+  return <AdminBannersStudio />;
 }

@@ -58,7 +58,7 @@ function SiteContentEditorForm({
   section: "banners" | "categories";
   cms: CmsState;
 }) {
-  const { saveCms, resetCms } = useSiteContent();
+  const { saveCms } = useSiteContent();
   const [notice, setNotice] = useState("");
   const [slides, setSlides] = useState(() => slidesFromCms(cms));
   const [categories, setCategories] = useState(() => categoriesFromCms(cms));
@@ -85,7 +85,7 @@ function SiteContentEditorForm({
   }
 
   function handleReset() {
-    resetCms();
+    saveCms({ slides: [], categories: [] });
     setSlides(slidesFromCms(emptyCmsState));
     setCategories(categoriesFromCms(emptyCmsState));
     setNotice("Volviste a los banners y categorías del código.");
@@ -94,16 +94,11 @@ function SiteContentEditorForm({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-brand-dark">
-            {section === "banners" ? "Banners" : "Categorías"}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-brand-dark/70">
-            {section === "banners"
-              ? "Edita los banners del slider de este navegador."
-              : "Edita nombres y textos de las líneas de este navegador."}
-          </p>
-        </div>
+        <p className="max-w-2xl text-sm text-brand-dark/70">
+          {section === "banners"
+            ? "Edita los banners del slider de este navegador."
+            : "Edita nombres y textos de las líneas de este navegador."}
+        </p>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"

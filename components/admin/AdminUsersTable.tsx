@@ -79,14 +79,11 @@ export default function AdminUsersTable({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-brand-dark">Usuarios</h1>
-        <p className="mt-1 text-sm text-brand-dark/65">
-          Staff con acceso a este panel. El login de &quot;Mi cuenta&quot; en la
-          tienda valida contra esta lista. Distinto de &quot;Clientes&quot;, que son
-          cuentas de la tienda.
-        </p>
-      </div>
+      <p className="text-sm text-brand-dark/65">
+        Staff con acceso a este panel. El login de &quot;Mi cuenta&quot; en la
+        tienda valida contra esta lista. Distinto de &quot;Clientes&quot;, que son
+        cuentas de la tienda.
+      </p>
 
       {error ? (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
@@ -144,8 +141,9 @@ export default function AdminUsersTable({
       </div>
 
       <form
+        id="nuevo-usuario"
         onSubmit={handleCreate}
-        className="max-w-xl space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm"
+        className="max-w-xl scroll-mt-6 space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm"
       >
         <div>
           <h2 className="font-display text-lg font-bold text-brand-dark">Nuevo usuario</h2>

@@ -65,7 +65,7 @@ probablemente los unifica en una sola tabla — ver [§5.4](#54-unificar-los-dos
 | Comparar (máx. 3) | `localStorage: chamo-compare-v1` | `string[]` (ids) | ❌ |
 | Cuentas de la tienda | `localStorage: chamo-accounts-v1` | `StoredAccount[]` (`lib/auth-local.ts`) | ❌ |
 | Sesión de la tienda | `localStorage: chamo-session-v1` | `AuthUser` | ❌ |
-| CMS de banners/categorías (home) | `localStorage: chamo-cms-v1` | `CmsState` (`lib/cms.ts`) | ❌ |
+| CMS local (slider, categorías, footer, banners de página, equipo) | `localStorage: chamo-cms-v1` | `CmsState` (`lib/cms.ts`) | ❌ |
 | Sesión del panel admin | Cookie `chamo_admin_session` + `localStorage: chamo-admin-session-v1` | `AuthSession` (`types/admin.ts`) | 🟡 mock, ver §5 |
 | Productos del panel | En memoria (`services/adminApi.ts`, se reinicia con el server) | `Product[]` | 🟡 mock |
 | Pedidos del panel | En memoria (`services/adminApi.ts`) | `Order[]` | 🟡 mock |
@@ -207,8 +207,8 @@ solo WhatsApp), hay que diseñar ese endpoint desde cero; no hay contrato previo
 | `AdminNewProductForm.tsx` | `categories: Category[]` | `app/admin/(panel)/productos/nuevo/page.tsx` awaits `getCategories()` |
 | `AdminOrdersTable.tsx` | `orders: Order[]`, `statusFilter: string` | `app/admin/(panel)/pedidos/page.tsx` awaits `getOrders(statusFilter)` |
 | `app/admin/(panel)/productos/page.tsx` | (server) lee `?q=` y awaits `getProducts({ q })` | — |
-| `SiteContentEditor.tsx` | `section: "banners" \| "categories"` | `useSiteContent()` → `chamo-cms-v1` (esto **no** es del backend, es el CMS local del home) |
-| `AdminPlaceholder.tsx` | `title: string`, `description: string` | usado por Marcas/Clientes/Inventario/Ofertas/Reportes/Configuración — sin datos reales aún |
+| `SiteContentEditor.tsx` | `section: "banners" \| "categories"` | textos de categorías (los banners del home pasaron a `AdminBannersStudio`) |
+| `AdminPlaceholder.tsx` | `title: string`, `description: string` | usado por Marcas/Clientes/Inventario/Ofertas/Reportes — sin datos reales aún |
 
 Todas las funciones de datos (`getDashboardKPIs`, `getProducts`, `createProduct`,
 `getOrders`, `updateOrderStatus`, `getCategories`, `loginAdmin`) viven en

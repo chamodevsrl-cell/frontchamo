@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Eye, Target } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import PageBanner from "@/components/PageBanner";
+import SitePageBanner from "@/components/SitePageBanner";
+import TeamGrid from "@/components/TeamGrid";
 import Reveal from "@/components/Reveal";
 import {
   COMPANY_NAME,
@@ -10,8 +11,6 @@ import {
   PHONE_DISPLAY,
 } from "@/data/contact";
 import {
-  NOSOTROS_BANNER_ALT,
-  NOSOTROS_BANNER_SRC,
   companyMission,
   companyProfile,
   companyValues,
@@ -28,12 +27,11 @@ export default function NosotrosPage() {
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 space-y-10 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 xl:px-10">
-        <PageBanner
+        <SitePageBanner
+          pageId="nosotros"
           title="NOSOTROS"
           eyebrow="Empresa"
           subtitle={companyProfile.headline}
-          image={NOSOTROS_BANNER_SRC}
-          imageAlt={NOSOTROS_BANNER_ALT}
           stamp={{ lead: "SOBRE", accent: "NOSOTROS" }}
           crumbs={[
             { href: "/", label: "Inicio" },
@@ -101,6 +99,8 @@ export default function NosotrosPage() {
             </article>
           </section>
         </Reveal>
+
+        <TeamGrid />
 
         <Reveal delayMs={160}>
           <section>

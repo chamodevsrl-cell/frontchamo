@@ -8,7 +8,7 @@ import Reveal from "@/components/Reveal";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useCompare } from "@/components/CompareProvider";
 import { formatPrice } from "@/lib/format";
-import { whatsappUrl } from "@/data/contact";
+import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 import type { FeaturedProduct, ProductSpec } from "@/data/products";
 
 function specMap(product: FeaturedProduct) {
@@ -35,9 +35,10 @@ function SpecValue({ spec }: { spec?: ProductSpec["value"] }) {
 
 export default function CompararPage() {
   const { products, count, remove, clear } = useCompare();
+  const whatsappHrefFor = useCmsWhatsappHref();
   const labels = unionSpecLabels(products);
   const maps = products.map(specMap);
-  const whatsappHref = whatsappUrl(
+  const whatsappHref = whatsappHrefFor(
     [
       "Hola, quiero comparar y cotizar estos productos:",
       ...products.map(

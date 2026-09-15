@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Bell,
+  Briefcase,
   ChevronDown,
   Flame,
   FolderTree,
@@ -27,12 +28,14 @@ import {
   X,
 } from "lucide-react";
 import { firstName } from "@/lib/auth-local";
+import { heroForAdminPath } from "@/lib/admin-hero";
 import {
   firstAllowedAdminHref,
   hasAdminPermission,
   permissionForAdminPath,
 } from "@/lib/admin-permissions";
 import { useAuth } from "@/components/AuthProvider";
+import AdminPageHero from "@/components/admin/AdminPageHero";
 import type { AdminPermission, AuthSession } from "@/types/admin";
 
 type NavChild = { href: string; label: string };
@@ -63,10 +66,20 @@ const NAV: NavItem[] = [
   { href: "/admin/inventario", label: "Inventario", icon: Warehouse, permission: "inventario" },
   { href: "/admin/ofertas", label: "Ofertas", icon: Flame, permission: "ofertas" },
   { href: "/admin/banners", label: "Banners", icon: ImageIcon, permission: "banners" },
+  { href: "/admin/equipo", label: "Equipo", icon: Briefcase, permission: "configuracion" },
   { href: "/admin/reportes", label: "Reportes", icon: BarChart3, permission: "reportes" },
   { href: "/admin/usuarios", label: "Usuarios", icon: UserCog, permission: "usuarios" },
   { href: "/admin/roles", label: "Roles", icon: ShieldCheck, permission: "roles" },
-  { href: "/admin/configuracion", label: "Configuración", icon: Settings, permission: "configuracion" },
+  {
+    href: "/admin/ajustes",
+    label: "Ajustes",
+    icon: Settings,
+    permission: "configuracion",
+    children: [
+      { href: "/admin/ajustes/footer", label: "Footer" },
+      { href: "/admin/ajustes/canales", label: "Canales de atención" },
+    ],
+  },
 ];
 
 function isActivePath(pathname: string, href: string) {
@@ -86,11 +99,8 @@ export default function AdminShell({
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [productsOpen, setProductsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [loggingOut, setLoggingOut] = useState(false);
-  const onProductos = pathname.startsWith("/admin/productos");
-  const showProductosSub = onProductos || productsOpen;
   const visibleNav = NAV.filter((item) => hasAdminPermission(session, item.permission));
 
   useEffect(() => {
@@ -161,26 +171,27 @@ export default function AdminShell({
             const Icon = item.icon;
             const active = isActivePath(pathname, item.href);
             if (item.children) {
+              const expanded = isActivePath(pathname, item.href);
               return (
                 <div key={item.href}>
-                  <button
-                    type="button"
-                    onClick={() => setProductsOpen((open) => !open)}
+                  <Link
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold ${
                       active
                         ? "bg-white/10 text-brand-gold"
                         : "text-white/80 hover:bg-white/10 hover:text-brand-gold"
                     }`}
-                    aria-expanded={showProductosSub}
+                    aria-expanded={expanded}
                   >
                     <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
                     <span className="flex-1">{item.label}</span>
                     <ChevronDown
-                      className={`h-4 w-4 transition ${showProductosSub ? "rotate-180" : ""}`}
+                      className={`h-4 w-4 transition ${expanded ? "rotate-180" : ""}`}
                       strokeWidth={2}
                     />
-                  </button>
-                  {showProductosSub ? (
+                  </Link>
+                  {expanded ? (
                     <div className="mt-0.5 ml-4 space-y-0.5 border-l border-white/15 pl-3">
                       {item.children.map((child) => {
                         const childActive = pathname === child.href;
@@ -302,7 +313,10 @@ export default function AdminShell({
           </div>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+          <AdminPageHero {...heroForAdminPath(pathname)} />
+          <div className="mt-6">{children}</div>
+        </main>
       </div>
     </div>
   );

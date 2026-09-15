@@ -6,11 +6,12 @@ import Reveal from "@/components/Reveal";
 import CategoryIcon from "@/components/CategoryIcon";
 import CategoryCollage from "@/components/CategoryCollage";
 import { useSiteContent } from "@/components/ContentProvider";
+import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 import { mainCategories } from "@/data/home";
-import { categoryWhatsappUrl } from "@/data/contact";
 
 export default function CategoriesDirectory() {
   const { categories } = useSiteContent();
+  const whatsappHref = useCmsWhatsappHref();
   const list = categories.length > 0 ? categories : mainCategories;
 
   return (
@@ -48,7 +49,9 @@ export default function CategoriesDirectory() {
                     Explorar
                   </Link>
                   <a
-                    href={categoryWhatsappUrl(category.label)}
+                    href={whatsappHref(
+                      `Hola, quiero cotizar productos de la línea ${category.label} al por mayor.`,
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-sm font-semibold text-brand-dark/70 hover:text-brand-whatsapp dark:text-white/70"

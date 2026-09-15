@@ -19,7 +19,7 @@ const PERMISSIONS: { id: AdminPermission; label: string }[] = [
   { id: "reportes", label: "Reportes" },
   { id: "usuarios", label: "Usuarios" },
   { id: "roles", label: "Roles" },
-  { id: "configuracion", label: "Configuración" },
+  { id: "configuracion", label: "Ajustes" },
 ];
 
 const PERMISSION_LABEL = new Map(PERMISSIONS.map((item) => [item.id, item.label]));
@@ -56,14 +56,11 @@ export default function AdminRolesView({ roles }: { roles: PanelRole[] }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-brand-dark">Roles</h1>
-        <p className="mt-1 text-sm text-brand-dark/65">
-          Permisos por sección del panel. Mock <code>getRoles()</code> /{" "}
-          <code>createRole()</code>. Administrador y Editor son roles base (no se pueden
-          borrar).
-        </p>
-      </div>
+      <p className="text-sm text-brand-dark/65">
+        Permisos por sección del panel. Mock <code>getRoles()</code> /{" "}
+        <code>createRole()</code>. Administrador y Editor son roles base (no se pueden
+        borrar).
+      </p>
 
       {error ? (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
@@ -106,8 +103,9 @@ export default function AdminRolesView({ roles }: { roles: PanelRole[] }) {
       </div>
 
       <form
+        id="nuevo-rol"
         onSubmit={handleCreate}
-        className="max-w-2xl space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm"
+        className="max-w-2xl scroll-mt-6 space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm"
       >
         <div>
           <h2 className="font-display text-lg font-bold text-brand-dark">Nuevo rol</h2>

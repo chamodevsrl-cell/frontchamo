@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-11**
+Última actualización: **2026-09-15**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -49,11 +49,17 @@ components/
   CartProvider.tsx        # Carrito en localStorage
   FavoritesProvider.tsx   # Favoritos en localStorage
   CompareProvider.tsx     # Comparar (máx. 3) en localStorage
-  ContentProvider.tsx     # Overlay CMS local de banners/categorías
+  ContentProvider.tsx     # Overlay CMS local (slider, categorías, footer, banners de página, equipo)
   AuthProvider.tsx        # Cuentas locales + sesión de la tienda (`role` admin/customer)
-  admin/AdminShell.tsx    # Sidebar + header; recibe `AuthSession` del layout
+  admin/AdminShell.tsx    # Sidebar + header + banner de pestaña (azul/oro)
+  admin/AdminPageHero.tsx # Franja de título de cada sección del panel
   admin/AdminLoginForm.tsx
-  admin/SiteContentEditor.tsx  # CMS local de banners/categorías
+  admin/AdminFooterSettings.tsx  # Ajustes → Footer (dirección, mapa, pagos)
+  admin/AdminChannelsSettings.tsx # Ajustes → Canales (WhatsApp, teléfono, correo, redes)
+  admin/AdminBannersStudio.tsx   # Banners del home y de otras páginas (cartas)
+  admin/AdminTeamCards.tsx       # Equipo de /nosotros en cartas
+  admin/AdminCategoriesCards.tsx # Categorías en cartas + modal (nombre, descripción, imagen)
+  admin/CmsImageField.tsx        # Imagen por URL o galería/carpetas (CMS)
   CategoryCollage.tsx     # Grilla 2×2 de productos/marcas de la línea
   CatalogFilters.tsx      # Filtros de /catalogo
   CategoryBanner.tsx      # Detalle de categoría → PageBanner
@@ -68,6 +74,8 @@ components/
   FavoriteButton.tsx / Testimonials.tsx / Breadcrumbs.tsx
   QuoteForm.tsx
   ContactForm.tsx           # /contacto → WhatsApp
+  WrenchCursor.tsx          # Cursor a medida (desktop, hover: hover): negro puro,
+                            # blanco sobre cualquier <img> (target.closest("img"))
 data/
   contact.ts               # Teléfono, WhatsApp, correo, horario, Maps
   company.ts               # Historia / misión / visión (placeholder)
@@ -261,7 +269,8 @@ Se construyó en dos etapas, documentadas en `docs/cambios/`:
    [`2026-09-10-sugerencias-login-comparar-admin.md`](./cambios/2026-09-10-sugerencias-login-comparar-admin.md)):
    una sola página `/admin` protegida con la **cuenta de la tienda**
    (`role: "admin"` en `lib/auth-local.ts`, la primera cuenta creada en el navegador),
-   solo para editar banners y textos de categorías (`chamo-cms-v1`).
+   CMS local (`chamo-cms-v1`) para slider, textos de categorías, footer, banners de
+   página y equipo de `/nosotros`.
 2. **v2 — panel completo, listo para backend** (2026-09-11,
    [`2026-09-11-admin-api-contract.md`](./cambios/2026-09-11-admin-api-contract.md)):
    se reestructuró en un panel de verdad, con **sesión propia** (no la de la tienda),
@@ -276,11 +285,12 @@ Piezas clave (v2):
 | `types/admin.ts` | Contrato de datos en TypeScript: `AuthSession`, `Product`, `Order`, `DashboardKPIs`, `LoginCredentials`, etc. — 1:1 con lo que describe `API_CONTRACT.md` |
 | `services/adminApi.ts` | Cliente **mock**: cada función simula un endpoint real con 300 ms de latencia y trae en un comentario la ruta HTTP que debe reemplazarla (`// TODO Backend: Reemplazar mock con fetch('/api/v1/...')`) |
 | `lib/auth.ts` | Sesión del panel: lee/escribe la cookie `chamo_admin_session` (+ copia en `localStorage` para el cliente) |
-| `app/admin/actions.ts` | Server Actions: `loginAdminAction`, `createProductAction`, `updateOrderStatusAction` — hacen de puente entre los componentes cliente y `lib/auth.ts`/`services/adminApi.ts` |
+| `app/admin/actions.ts` | Server Actions: `loginAdminAction`, `createProductAction`, `createCategoryAction`, `updateCategoryAction`, `updateOrderStatusAction` |
 | `app/admin/login/page.tsx` | Redirige a `/login` (modal de Mi cuenta) o a `/admin` si ya hay cookie |
 | `app/admin/(panel)/layout.tsx` | Layout protegido: si no hay sesión, `redirect('/login')`; si hay, envuelve todo en `AdminShell` |
-| `components/admin/AdminShell.tsx` | Sidebar (`#0B3554`) + header con el nombre/rol de la sesión y botón de salir |
-| `components/admin/SiteContentEditor.tsx` | El editor de banners/categorías de la v1, reutilizado dentro del panel nuevo |
+| `components/admin/AdminShell.tsx` | Sidebar (`#0B3554`) + header + **banner de pestaña** azul/oro (`AdminPageHero`) |
+| `components/admin/AdminCategoriesCards.tsx` | Cartas de categorías + modal de alta/edición (nombre, descripción, imagen) |
+| `components/admin/CmsImageField.tsx` | Campo de imagen reutilizable: URL o galería/carpetas |
 | `API_CONTRACT.md` (raíz del repo) | El documento de handover: cada endpoint, su body/respuesta de ejemplo, y el paso a paso para "enchufar" el backend real |
 
 #### A.12.3 Cómo funciona
@@ -306,13 +316,15 @@ Piezas clave (v2):
 | --- | --- | --- |
 | Dashboard | `/admin` | ✅ Real — KPIs desde `getDashboardKPIs()` (mock) |
 | Productos → Ver productos | `/admin/productos` | ✅ Real — `getProducts({ q })`, búsqueda por SKU/nombre/marca |
-| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes se suben desde archivos o galería (drag & drop o `<input type="file">`, convertidas a `data:` URL con `FileReader`, no son URLs pegadas a mano); `createProduct()` recién se llama al terminar la fase 4, valida SKU único; el `<select>` de categoría viene de `getCategories()` (no de `data/home.ts` directo) |
+| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes por **galería/carpetas** o **URL**; `createProduct()` se llama al terminar la fase 4; el `<select>` de categoría une `getCategories()` + líneas del CMS |
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
-| Banners | `/admin/banners` | ✅ Real — edita `chamo-cms-v1` (slider del home) |
-| Categorías | `/admin/categorias` | ✅ Real — edita `chamo-cms-v1` (textos de líneas del home) |
+| Banners | `/admin/banners` | ✅ Real — cartas para el slider del home y los banners de Nosotros, Contacto, Ofertas y Catálogo (`chamo-cms-v1`) |
+| Categorías | `/admin/categorias` | ✅ Real — cartas (nombre, descripción, recuento de productos) + modal para editar/agregar; imagen por URL o galería; persiste en CMS (`customCategories`) y en el mock `createCategory`/`updateCategory` |
+| Equipo | `/admin/equipo` | ✅ Real — cartas de colaboradores (se ven en `/nosotros`) |
+| Ajustes | `/admin/ajustes` | ✅ Real — desglose: Footer (`/admin/ajustes/footer`) y Canales de atención (`/admin/ajustes/canales`). `/admin/configuracion` redirige al índice |
 | Usuarios | `/admin/usuarios` | ✅ Real — `getUsers()` + alta (`createUser()` con contraseña) + cambiar estado. Esas cuentas entran por “Mi cuenta” |
 | Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`). El login copia `permissions` a `AuthSession`; `AdminShell` filtra el sidebar |
-| Marcas, Clientes, Inventario, Ofertas, Reportes, Configuración | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
+| Marcas, Clientes, Inventario, Ofertas, Reportes | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
 
 **Datos:** todo lo "real" arriba corre contra `productsDb`/`ordersDb` **en memoria del
 proceso de Next** (dentro de `services/adminApi.ts`) — se reinician con cada reinicio
@@ -466,11 +478,15 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/productos` | Listado mock (`getProducts`). Query `?q=` |
 | `/admin/productos/nuevo` | Alta mock (`createProduct`) |
 | `/admin/pedidos` | Pedidos mock + cambio de estado |
-| `/admin/banners` | Editar banners del slider (`chamo-cms-v1`) |
-| `/admin/categorias` | Editar textos de líneas (`chamo-cms-v1`) |
-| `/nosotros` | Banner con sticker **SOBRE NOSOTROS**, historia, misión, visión y valores (textos de ejemplo) |
-| `/contacto` | Banner **NUESTRO CONTACTO**, tarjetas de WhatsApp/teléfono/correo/horario, formulario que abre WhatsApp (sin `window.open`), y mapa |
-| `/ofertas` | Encabezado **OFERTAS DESCUENTOS** (azul + borde oro) y productos en oferta |
+| `/admin/banners` | Cartas para editar el slider del home y los banners de Nosotros/Contacto/Ofertas/Catálogo |
+| `/admin/categorias` | Cartas de líneas: nombre, descripción, cantidad de productos, editar/agregar |
+| `/admin/equipo` | Cartas de colaboradores (alta, foto, cargo, bio) |
+| `/admin/ajustes` | Índice de ajustes (Footer y Canales). Alias: `/admin/configuracion` |
+| `/admin/ajustes/footer` | Pie de tienda: frase, dirección, mapa, horario y pagos |
+| `/admin/ajustes/canales` | WhatsApp (botón flotante), teléfono para llamar, correo y redes |
+| `/nosotros` | Banner CMS, historia, misión, visión, **equipo de trabajo en cartas** y valores |
+| `/contacto` | Banner CMS **NUESTRO CONTACTO**, tarjetas y mapa leen el footer de Ajustes, formulario WhatsApp |
+| `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
 | Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña y cerrar sesión (este navegador) |
@@ -482,14 +498,15 @@ Hay un **panel de administración** en `/admin`. La sesión del panel es propia
 `THE WINTER` / `Criper@11` o `admin@local.test` / `admin123`). El enlace
 **Administrar** (ícono de casa) del Navbar solo aparece con sesión del panel.
 El dashboard muestra KPIs del contrato. Productos y pedidos se gestionan contra
-el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). Banners del
-slider y textos de categorías se editan en `/admin/banners` y
-`/admin/categorias` (`chamo-cms-v1`).
+el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). El CMS local
+(`chamo-cms-v1`) cubre:
 
-- Banners → `/admin/banners` o `public/images/slider/` + `data/media.ts`
-- Categorías del home → `/admin/categorias` o `data/home.ts` + collage de productos de la línea
+- Banners (home + páginas) → `/admin/banners`
+- Categorías (cartas, alta y foto) → `/admin/categorias`
+- Footer (dirección, mapa, pagos) → `/admin/ajustes/footer`
+- Canales de atención (WhatsApp, llamadas, correo, redes) → `/admin/ajustes/canales`
+- Equipo de `/nosotros` → `/admin/equipo`
 - Logos de marcas → `public/images/marcas/`
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
-- Teléfono / WhatsApp / correo → `data/contact.ts`
 - Testimonios del home → `data/testimonials.ts` (hoy ejemplo)
 - Historia, misión y visión de `/nosotros` → `data/company.ts` (hoy placeholder)

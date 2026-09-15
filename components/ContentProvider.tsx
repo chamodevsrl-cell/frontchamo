@@ -13,11 +13,17 @@ import { mainCategories, type MainCategory } from "@/data/home";
 import { slides as defaultSlides, type Slide } from "@/data/media";
 import {
   CMS_KEY,
+  cloneCms,
   emptyCmsState,
   mergeCategories,
+  mergePageBanners,
   mergeSlides,
   parseCms,
+  visibleTeam,
+  type CmsFooter,
   type CmsState,
+  type CmsTeamMember,
+  type ResolvedPageBanner,
 } from "@/lib/cms";
 
 type ContentContextValue = {
@@ -25,14 +31,17 @@ type ContentContextValue = {
   cms: CmsState;
   slides: Slide[];
   categories: MainCategory[];
-  saveCms: (next: CmsState) => void;
+  footer: CmsFooter;
+  pageBanners: ResolvedPageBanner[];
+  team: CmsTeamMember[];
+  saveCms: (patch: Partial<CmsState>) => void;
   resetCms: () => void;
 };
 
 const ContentContext = createContext<ContentContextValue | null>(null);
 
 export function ContentProvider({ children }: { children: ReactNode }) {
-  const [cms, setCms] = useState<CmsState>(emptyCmsState);
+  const [cms, setCms] = useState<CmsState>(() => cloneCms(emptyCmsState));
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -46,12 +55,12 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(CMS_KEY, JSON.stringify(cms));
   }, [cms, ready]);
 
-  const saveCms = useCallback((next: CmsState) => {
-    setCms(next);
+  const saveCms = useCallback((patch: Partial<CmsState>) => {
+    setCms((prev) => ({ ...prev, ...patch }));
   }, []);
 
   const resetCms = useCallback(() => {
-    setCms(emptyCmsState);
+    setCms(cloneCms(emptyCmsState));
   }, []);
 
   const slides = useMemo(
@@ -59,13 +68,28 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     [cms.slides],
   );
   const categories = useMemo(
-    () => mergeCategories(mainCategories, cms.categories),
-    [cms.categories],
+    () => mergeCategories(mainCategories, cms.categories, cms.customCategories),
+    [cms.categories, cms.customCategories],
   );
+  const pageBanners = useMemo(
+    () => mergePageBanners(cms.pageBanners),
+    [cms.pageBanners],
+  );
+  const team = useMemo(() => visibleTeam(cms.team), [cms.team]);
 
   const value = useMemo(
-    () => ({ ready, cms, slides, categories, saveCms, resetCms }),
-    [ready, cms, slides, categories, saveCms, resetCms],
+    () => ({
+      ready,
+      cms,
+      slides,
+      categories,
+      footer: cms.footer,
+      pageBanners,
+      team,
+      saveCms,
+      resetCms,
+    }),
+    [ready, cms, slides, categories, pageBanners, team, saveCms, resetCms],
   );
 
   return (

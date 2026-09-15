@@ -2,8 +2,8 @@
 
 import PageBanner from "@/components/PageBanner";
 import type { MainCategory } from "@/data/home";
-import { categoryWhatsappUrl } from "@/data/contact";
 import { useSiteContent } from "@/components/ContentProvider";
+import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 
 type CategoryBannerProps = {
   category: MainCategory;
@@ -15,6 +15,7 @@ export default function CategoryBanner({
   brands = [],
 }: CategoryBannerProps) {
   const { categories } = useSiteContent();
+  const whatsappHref = useCmsWhatsappHref();
   const resolved =
     categories.find((item) => item.slug === category.slug) ?? category;
 
@@ -34,7 +35,9 @@ export default function CategoryBanner({
       brands={brands}
       cta={{ href: "#productos-categoria", label: "Explorar ahora" }}
       ctaAlt={{
-        href: categoryWhatsappUrl(resolved.label),
+        href: whatsappHref(
+          `Hola, quiero cotizar productos de la línea ${resolved.label} al por mayor.`,
+        ),
         label: "Cotizar esta línea",
         external: true,
       }}

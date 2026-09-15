@@ -8,10 +8,11 @@ import Reveal from "@/components/Reveal";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/format";
-import { whatsappUrl } from "@/data/contact";
+import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 
 export default function CarritoPage() {
   const { lines, count, setQuantity, removeItem, clear } = useCart();
+  const whatsappHrefFor = useCmsWhatsappHref();
 
   // Se usa el precio guardado al agregar (no el vivo del catálogo) para que el
   // total no cambie solo si el precio de un producto cambia después.
@@ -25,7 +26,7 @@ export default function CarritoPage() {
   );
   const hasPriceChanges = lines.some((line) => line.priceChanged);
 
-  const whatsappHref = whatsappUrl(
+  const whatsappHref = whatsappHrefFor(
     [
       "Hola, quiero cotizar estos productos del carrito:",
       ...lines.map(

@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import CatalogFilters from "@/components/CatalogFilters";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
-import StampHeading, { StampBand } from "@/components/StampHeading";
+import SitePageBanner from "@/components/SitePageBanner";
 import { searchCatalog } from "@/data/products";
 
 export const metadata: Metadata = {
@@ -31,21 +31,16 @@ export default async function CatalogoPage({
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
-        <Reveal>
-          <StampBand
-            crumbs={[
-              { href: "/", label: "Inicio" },
-              { label: "Catálogo" },
-            ]}
-          >
-            <StampHeading lead="NUESTRO" accent="CATÁLOGO" />
-            <p className="mt-6 max-w-2xl text-sm text-brand-dark/70 sm:text-base dark:text-white/70">
-              Busca por nombre, SKU, marca o categoría. La misma lógica alimenta
-              {" "}
-              <code className="text-xs">GET /api/productos</code>.
-            </p>
-          </StampBand>
-        </Reveal>
+        <SitePageBanner
+          pageId="catalogo"
+          title="CATÁLOGO"
+          stamp={{ lead: "NUESTRO", accent: "CATÁLOGO" }}
+          subtitle="Busca por nombre, SKU, marca o categoría. La misma lógica alimenta GET /api/productos."
+          crumbs={[
+            { href: "/", label: "Inicio" },
+            { label: "Catálogo" },
+          ]}
+        />
         <Reveal delayMs={80}>
         <div className="space-y-6">
           <Suspense

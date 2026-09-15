@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
+  FolderOpen,
   Image as ImageIcon,
+  Link2,
   Plus,
   Trash2,
   X,
 } from "lucide-react";
 import { createProductAction } from "@/app/admin/actions";
+import { useSiteContent } from "@/components/ContentProvider";
+import { readCmsImageFile } from "@/lib/cms-image";
 import type { Category, CreateProductInput, ProductStatus } from "@/types/admin";
 
 const STATUSES: ProductStatus[] = ["active", "draft", "archived"];
@@ -34,15 +38,6 @@ function soles(value: number) {
   })}`;
 }
 
-function readAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error ?? new Error("No se pudo leer el archivo."));
-    reader.readAsDataURL(file);
-  });
-}
-
 export default function AdminNewProductForm({
   categories,
 }: {
@@ -50,6 +45,22 @@ export default function AdminNewProductForm({
   categories: Category[];
 }) {
   const router = useRouter();
+  const { categories: siteCategories } = useSiteContent();
+  const categoryOptions = useMemo(() => {
+    const byId = new Map(categories.map((item) => [item.id, item]));
+    for (const item of siteCategories) {
+      const current = byId.get(item.slug);
+      byId.set(item.slug, {
+        id: item.slug,
+        name: item.label,
+        subcategoriesCount: current?.subcategoriesCount ?? 0,
+        status: current?.status ?? "active",
+        image: item.image,
+        description: item.eyebrow,
+      });
+    }
+    return [...byId.values()];
+  }, [categories, siteCategories]);
   const [step, setStep] = useState<StepId>(1);
   const [stepError, setStepError] = useState("");
   const [error, setError] = useState("");
@@ -65,6 +76,7 @@ export default function AdminNewProductForm({
   // Fase 2 — Detalle
   const [descriptionFull, setDescriptionFull] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState("");
 
   // Fase 3 — Precios
@@ -85,11 +97,24 @@ export default function AdminNewProductForm({
       return;
     }
     try {
-      const dataUrls = await Promise.all(files.map(readAsDataUrl));
+      const dataUrls = await Promise.all(files.map(readCmsImageFile));
       setImages((prev) => [...prev, ...dataUrls]);
-    } catch {
-      setImageError("No se pudo leer una de las imágenes. Probá de nuevo.");
+    } catch (cause) {
+      setImageError(
+        cause instanceof Error ? cause.message : "No se pudo leer una de las imágenes.",
+      );
     }
+  }
+
+  function addImageUrl() {
+    const url = imageUrl.trim();
+    if (!url) {
+      setImageError("Pega una URL o ruta de imagen.");
+      return;
+    }
+    setImageError("");
+    setImages((prev) => [...prev, url]);
+    setImageUrl("");
   }
 
   function removeImage(index: number) {
@@ -182,10 +207,7 @@ export default function AdminNewProductForm({
         >
           ← Volver a productos
         </Link>
-        <h1 className="mt-1 font-display text-2xl font-bold text-brand-dark">
-          Crear producto
-        </h1>
-        <p className="mt-1 text-sm text-brand-dark/65">
+        <p className="mt-2 text-sm text-brand-dark/65">
           Wizard de 4 fases. Llama a <code>createProduct()</code> (mock) recién al
           terminar la fase 4 — nada se guarda antes.
         </p>
@@ -256,7 +278,7 @@ export default function AdminNewProductForm({
                   onChange={(event) => setCategoryId(event.target.value)}
                   className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
                 >
-                  {categories.map((category) => (
+                  {categoryOptions.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
@@ -306,8 +328,9 @@ export default function AdminNewProductForm({
                   <p className="text-sm text-brand-dark/60">
                     Arrastra imágenes aquí o
                   </p>
-                  <label className="cursor-pointer rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#0e6aad]">
-                    Elegir desde archivos o galería
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#0e6aad]">
+                    <FolderOpen className="h-4 w-4" />
+                    Galería o carpetas
                     <input
                       type="file"
                       accept="image/*"
@@ -322,10 +345,37 @@ export default function AdminNewProductForm({
                     />
                   </label>
                   <p className="text-xs text-brand-dark/40">
-                    En móvil abre la galería/cámara del equipo. La primera imagen es la
-                    principal.
+                    En móvil abre la galería/cámara del equipo. También puedes pegar una
+                    URL. La primera imagen es la principal.
                   </p>
                 </div>
+                <label className="mt-3 block text-sm font-semibold">
+                  <span className="inline-flex items-center gap-1">
+                    <Link2 className="h-3.5 w-3.5" />
+                    O pega una URL / ruta
+                  </span>
+                  <span className="mt-1 flex gap-2">
+                    <input
+                      value={imageUrl}
+                      onChange={(event) => setImageUrl(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          addImageUrl();
+                        }
+                      }}
+                      placeholder="https://… o /images/…"
+                      className="w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
+                    />
+                    <button
+                      type="button"
+                      onClick={addImageUrl}
+                      className="shrink-0 rounded-lg border border-brand-primary/30 px-3 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/10"
+                    >
+                      Añadir
+                    </button>
+                  </span>
+                </label>
                 {imageError ? (
                   <p className="mt-2 text-sm text-red-700">{imageError}</p>
                 ) : null}

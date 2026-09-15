@@ -2,7 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { MessageCircle } from "lucide-react";
-import { openWhatsApp } from "@/data/contact";
+import { openCmsWhatsapp } from "@/lib/cms";
+import { useSiteContent } from "@/components/ContentProvider";
 
 const topics = [
   { value: "cotizacion", label: "Cotización mayorista" },
@@ -15,6 +16,7 @@ const inputClass =
   "w-full rounded-lg border border-brand-dark/15 px-3 py-2 text-sm outline-none focus:border-brand-primary dark:bg-brand-dark dark:text-white";
 
 export default function ContactForm() {
+  const { footer } = useSiteContent();
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
@@ -37,7 +39,7 @@ export default function ContactForm() {
       .filter((line) => line !== null)
       .join("\n");
 
-    openWhatsApp(text);
+    openCmsWhatsapp(footer, text);
   }
 
   return (

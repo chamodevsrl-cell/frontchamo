@@ -148,6 +148,21 @@ export interface ProductFilters {
 /** Payload de alta. El backend asigna `id` y `createdAt`. */
 export type CreateProductInput = Omit<Product, "id" | "createdAt">;
 
+/** Alta de línea comercial. `id` opcional: si falta, el mock genera el slug. */
+export type CreateCategoryInput = {
+  name: string;
+  description: string;
+  image: string;
+  id?: string;
+};
+
+export type UpdateCategoryInput = {
+  name?: string;
+  description?: string;
+  image?: string;
+  status?: CategoryStatus;
+};
+
 /**
  * Categoría del panel (árbol comercial).
  * El CMS local de banners (`chamo-cms-v1`) es otra capa; no confundir.
@@ -163,6 +178,8 @@ export interface Category {
   status: CategoryStatus;
   /** URL de la imagen de portada. */
   image: string;
+  /** Texto corto de la línea (tarjeta del panel y antetítulo en la tienda). */
+  description: string;
 }
 
 /** Línea de un pedido. */

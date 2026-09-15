@@ -15,9 +15,9 @@ import {
   getRelatedProducts,
   type FeaturedProduct,
 } from "@/data/products";
-import { whatsappUrl } from "@/data/contact";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/components/CartProvider";
+import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 import FavoriteButton from "@/components/FavoriteButton";
 import CompareButton from "@/components/CompareButton";
 
@@ -47,6 +47,7 @@ export default function ProductModal({
 }: ProductModalProps) {
   const titleId = useId();
   const { addItem } = useCart();
+  const whatsappHrefFor = useCmsWhatsappHref();
   const [activeImage, setActiveImage] = useState(0);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -77,7 +78,7 @@ export default function ProductModal({
     };
   }, [onClose]);
 
-  const whatsappHref = whatsappUrl(
+  const whatsappHref = whatsappHrefFor(
     `Hola, quiero cotizar este producto: ${product.name} (${product.sku}) x${qty}`,
   );
 

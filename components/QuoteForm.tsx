@@ -4,14 +4,16 @@ import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
+import { useSiteContent } from "@/components/ContentProvider";
 import { featuredProducts, getProductById } from "@/data/products";
-import { openWhatsApp } from "@/data/contact";
+import { openCmsWhatsapp } from "@/lib/cms";
 import { formatPrice } from "@/lib/format";
 
 const DEFAULT_SKU_PARAM = "sku";
 
 export default function QuoteForm() {
   const searchParams = useSearchParams();
+  const { footer } = useSiteContent();
   const { lines } = useCart();
   const skuFromUrl = searchParams.get(DEFAULT_SKU_PARAM) ?? "";
   const productFromUrl = skuFromUrl
@@ -68,7 +70,7 @@ export default function QuoteForm() {
       .filter((line) => line !== null)
       .join("\n");
 
-    openWhatsApp(message);
+    openCmsWhatsapp(footer, message);
   }
 
   return (

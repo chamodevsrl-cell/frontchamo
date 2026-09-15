@@ -13,10 +13,12 @@
 
 import { featuredProducts } from "@/data/products";
 import { mainCategories } from "@/data/home";
+import { slugifyLabel, uniqueCategorySlug } from "@/lib/cms";
 import type {
   AdminPermission,
   AuthSession,
   Category,
+  CreateCategoryInput,
   CreatePanelRoleInput,
   CreatePanelUserInput,
   CreateProductInput,
@@ -29,6 +31,7 @@ import type {
   PanelUserStatus,
   Product,
   ProductFilters,
+  UpdateCategoryInput,
 } from "@/types/admin";
 
 /** Latencia artificial para emular red. No usar en `getAdminSession()`. */
@@ -101,6 +104,17 @@ function seedProducts(): Product[] {
       createdAt: `2026-08-${String(10 + (index % 18)).padStart(2, "0")}T12:00:00.000Z`,
     };
   });
+}
+
+function seedCategories(): Category[] {
+  return mainCategories.map((category) => ({
+    id: category.slug,
+    name: category.label,
+    subcategoriesCount: 0,
+    status: "active",
+    image: category.image,
+    description: category.eyebrow,
+  }));
 }
 
 function seedOrders(products: Product[]): Order[] {
@@ -291,6 +305,7 @@ function seedUsers(): PanelUser[] {
 
 const productsDb: Product[] = seedProducts();
 const ordersDb: Order[] = seedOrders(productsDb);
+const categoriesDb: Category[] = seedCategories();
 const rolesDb: PanelRole[] = seedRoles();
 const usersDb: PanelUser[] = seedUsers();
 
@@ -484,13 +499,68 @@ export async function updateOrderStatus(
 export async function getCategories(): Promise<Category[]> {
   // TODO Backend: Reemplazar mock con fetch('/api/v1/categories')
   await delay();
-  return mainCategories.map((category) => ({
-    id: category.slug,
-    name: category.label,
+  return categoriesDb.map((category) => ({ ...category }));
+}
+
+/**
+ * POST /api/v1/categories
+ * Body: {@link CreateCategoryInput}
+ */
+export async function createCategory(
+  input: CreateCategoryInput,
+): Promise<Category> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/categories')
+  await delay();
+  const name = input.name.trim();
+  if (!name) {
+    throw new AdminApiError("VALIDATION", "El nombre de la categoría es obligatorio.");
+  }
+  const taken = categoriesDb.map((item) => item.id);
+  const requested = input.id?.trim() || slugifyLabel(name);
+  const id = taken.includes(requested)
+    ? uniqueCategorySlug(requested, taken)
+    : requested;
+  const created: Category = {
+    id,
+    name,
+    description: input.description.trim(),
+    image: input.image.trim() || "/images/categorias/herramientas.jpg",
     subcategoriesCount: 0,
     status: "active",
-    image: category.image,
-  }));
+  };
+  categoriesDb.push(created);
+  return { ...created };
+}
+
+/**
+ * PUT /api/v1/categories/:id
+ * Body: {@link UpdateCategoryInput}
+ */
+export async function updateCategory(
+  categoryId: string,
+  input: UpdateCategoryInput,
+): Promise<Category> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/categories/:id')
+  await delay();
+  const category = categoriesDb.find((item) => item.id === categoryId);
+  if (!category) {
+    throw new AdminApiError("NOT_FOUND", `No existe la categoría ${categoryId}.`);
+  }
+  if (input.name !== undefined) {
+    const name = input.name.trim();
+    if (name) category.name = name;
+  }
+  if (input.description !== undefined) {
+    category.description = input.description.trim();
+  }
+  if (input.image !== undefined) {
+    const image = input.image.trim();
+    if (image) category.image = image;
+  }
+  if (input.status !== undefined) {
+    category.status = input.status;
+  }
+  return { ...category };
 }
 
 /**

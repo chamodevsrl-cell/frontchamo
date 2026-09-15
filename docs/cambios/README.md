@@ -13,6 +13,11 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-15 | Ajustes desglosado: Footer y Canales de atención | [2026-09-15-ajustes-footer-canales.md](./2026-09-15-ajustes-footer-canales.md) |
+| 2026-09-15 | Categorías en cartas + imagen por URL/galería en todo el panel | [2026-09-15-categorias-cartas-imagenes.md](./2026-09-15-categorias-cartas-imagenes.md) |
+| 2026-09-15 | Cursor personalizado: negro puro, blanco al pasar sobre imágenes | [2026-09-15-cursor-negro-blanco-imagenes.md](./2026-09-15-cursor-negro-blanco-imagenes.md) |
+| 2026-09-15 | Banner azul/oro en cada pestaña del panel admin | [2026-09-15-admin-page-hero.md](./2026-09-15-admin-page-hero.md) |
+| 2026-09-15 | CMS: footer editable, banners por página y equipo en cartas | [2026-09-15-cms-footer-banners-equipo.md](./2026-09-15-cms-footer-banners-equipo.md) |
 | 2026-09-15 | Alta de producto: wizard de 4 fases + subir imágenes desde archivos/galería | [2026-09-15-wizard-producto-imagenes.md](./2026-09-15-wizard-producto-imagenes.md) |
 | 2026-09-15 | Admin entra por “Mi cuenta”; Comparar sale de la barra; ícono Administrar | [2026-09-15-admin-login-tienda.md](./2026-09-15-admin-login-tienda.md) |
 | 2026-09-15 | Login del panel valida contra Usuarios/Roles + cuenta THE WINTER | [2026-09-15-admin-login-usuarios.md](./2026-09-15-admin-login-usuarios.md) |

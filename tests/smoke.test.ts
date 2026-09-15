@@ -111,6 +111,17 @@ describe("smoke de catálogo y home", () => {
     expect(
       categories.find((category) => category.slug === "ferreteria")?.label,
     ).toBe("Ferretería VIP");
+    const withExtra = mergeCategories(undefined, [], [
+      {
+        slug: "pintura",
+        label: "Pintura",
+        eyebrow: "Látex y esmalte",
+        image: "/images/categorias/herramientas.jpg",
+      },
+    ]);
+    expect(withExtra.some((item) => item.slug === "pintura" && item.label === "Pintura")).toBe(
+      true,
+    );
   });
 
   it("hash de cuenta local es determinista con el mismo salt", async () => {
@@ -220,6 +231,29 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
     expect(parseAdminSession(null)).toBeNull();
   });
 
+  it("heroForAdminPath pone título y CTA de cada pestaña", async () => {
+    const { heroForAdminPath } = await import("@/lib/admin-hero");
+    expect(heroForAdminPath("/admin")).toEqual({ title: "Dashboard" });
+    expect(heroForAdminPath("/admin/roles")).toEqual({
+      title: "Roles y permisos",
+      action: { href: "#nuevo-rol", label: "Nuevo rol" },
+    });
+    expect(heroForAdminPath("/admin/productos")).toMatchObject({
+      title: "Productos",
+      action: { href: "/admin/productos/nuevo", label: "Crear producto" },
+    });
+    expect(heroForAdminPath("/admin/productos/nuevo").title).toBe("Nuevo producto");
+    expect(heroForAdminPath("/admin/categorias")).toEqual({
+      title: "Categorías",
+      action: { href: "#nueva-categoria", label: "Nueva categoría" },
+    });
+    expect(heroForAdminPath("/admin/ajustes")).toEqual({ title: "Ajustes" });
+    expect(heroForAdminPath("/admin/ajustes/footer")).toEqual({ title: "Footer" });
+    expect(heroForAdminPath("/admin/ajustes/canales")).toEqual({
+      title: "Canales de atención",
+    });
+  });
+
   it("loginAdmin valida contra PanelUser (nombre o correo) y respeta roles", async () => {
     const {
       loginAdmin,
@@ -313,7 +347,23 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
       expect(typeof category.subcategoriesCount).toBe("number");
       expect(["active", "hidden"]).toContain(category.status);
       expect(typeof category.image).toBe("string");
+      expect(typeof category.description).toBe("string");
     }
+  });
+
+  it("createCategory agrega una línea al mock", async () => {
+    const { slugifyLabel } = await import("@/lib/cms");
+    const { createCategory, getCategories } = await import("@/services/adminApi");
+    expect(slugifyLabel("Eléctricos")).toBe("electricos");
+    const created = await createCategory({
+      name: "Iluminación LED Test",
+      description: "Focos y tiras",
+      image: "/images/categorias/electricos.jpg",
+    });
+    expect(created.id).toBe("iluminacion-led-test");
+    expect(created.description).toBe("Focos y tiras");
+    const all = await getCategories();
+    expect(all.some((item) => item.id === created.id)).toBe(true);
   });
 
   it("getProducts filtra por q y createProduct agrega un SKU", async () => {
@@ -357,6 +407,73 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
     const confirmed = await getOrders("confirmed");
     expect(confirmed.some((order) => order.id === first.id)).toBe(true);
     await updateOrderStatus(first.id, "pending");
+  });
+});
+
+describe("CMS local (footer, banners de página, equipo)", () => {
+  it("parseCms rellena footer, banners y equipo si el JSON viejo no los trae", async () => {
+    const { parseCms, phoneToWhatsapp, mergePageBanners, footerWhatsapp } = await import("@/lib/cms");
+    const { defaultTeam } = await import("@/data/team");
+    const cms = parseCms(JSON.stringify({ slides: [], categories: [] }));
+    expect(cms.footer.phone).toContain("959 723 602");
+    expect(cms.footer.paymentMethods.length).toBeGreaterThanOrEqual(4);
+    expect(cms.team.map((member) => member.role)).toEqual(
+      defaultTeam.map((member) => member.role),
+    );
+    expect(phoneToWhatsapp(cms.footer.phone)).toBe("51959723602");
+    expect(footerWhatsapp({ ...cms.footer, whatsapp: "", phone: "+51 999 000 111" })).toBe(
+      "+51 999 000 111",
+    );
+    expect(footerWhatsapp({ ...cms.footer, whatsapp: "+51 111 222 333" })).toBe(
+      "+51 111 222 333",
+    );
+    const pages = mergePageBanners(cms.pageBanners);
+    expect(pages.map((page) => page.id)).toEqual([
+      "nosotros",
+      "contacto",
+      "ofertas",
+      "catalogo",
+    ]);
+  });
+
+  it("parseCms conserva un footer y un colaborador guardados", async () => {
+    const { parseCms } = await import("@/lib/cms");
+    const cms = parseCms(
+      JSON.stringify({
+        slides: [],
+        categories: [],
+        footer: {
+          phone: "+51 999 111 222",
+          address: "Callao",
+          paymentMethods: [
+            { id: "yape", label: "Yape", hint: "QR", image: "/yape.png" },
+          ],
+        },
+        team: [
+          {
+            id: "tm_x",
+            name: "Ana",
+            role: "Asesor",
+            photo: "/ana.jpg",
+            bio: "Cotiza líneas.",
+          },
+        ],
+        pageBanners: [
+          { id: "nosotros", src: "/custom.jpg", alt: "Nosotros custom" },
+        ],
+      }),
+    );
+    expect(cms.footer.phone).toBe("+51 999 111 222");
+    expect(cms.footer.address).toBe("Callao");
+    expect(cms.footer.paymentMethods).toEqual([
+      { id: "yape", label: "Yape", hint: "QR", image: "/yape.png" },
+    ]);
+    expect(cms.team).toHaveLength(1);
+    expect(cms.team[0].name).toBe("Ana");
+    expect(cms.pageBanners[0]).toMatchObject({
+      id: "nosotros",
+      src: "/custom.jpg",
+    });
   });
 });
 

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getProducts } from "@/services/adminApi";
 import type { ProductStatus } from "@/types/admin";
 
@@ -30,21 +29,10 @@ export default async function AdminProductosPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-brand-dark">Productos</h1>
-          <p className="mt-1 text-sm text-brand-dark/65">
-            {products.length} SKU{products.length === 1 ? "" : "s"}
-            {q ? ` · filtro “${q}”` : ""} · mock <code>getProducts()</code>
-          </p>
-        </div>
-        <Link
-          href="/admin/productos/nuevo"
-          className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white hover:bg-[#0e6aad]"
-        >
-          Crear producto
-        </Link>
-      </div>
+      <p className="text-sm text-brand-dark/65">
+        {products.length} SKU{products.length === 1 ? "" : "s"}
+        {q ? ` · filtro “${q}”` : ""} · mock <code>getProducts()</code>
+      </p>
 
       <div className="overflow-x-auto rounded-2xl border border-brand-dark/10 bg-white shadow-sm">
         <table className="min-w-full text-left text-sm">

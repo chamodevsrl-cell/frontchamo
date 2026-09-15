@@ -4,16 +4,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
-import { categoryWhatsappUrl } from "@/data/contact";
+import { useSiteContent } from "@/components/ContentProvider";
+import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 import Reveal from "@/components/Reveal";
 import CategoryIcon from "@/components/CategoryIcon";
 import CategoryCollage from "@/components/CategoryCollage";
-import { useSiteContent } from "@/components/ContentProvider";
 
 const shinyCard =
   "border border-brand-primary/35 shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_18px_rgba(18,126,201,0.35)] hover:shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_28px_rgba(18,126,201,0.55)]";
 
 function CategoryCard({ category }: { category: MainCategory }) {
+  const whatsappHref = useCmsWhatsappHref();
   return (
     <article
       className={`group flex h-full flex-col overflow-hidden rounded-2xl text-brand-dark transition duration-300 hover:-translate-y-0.5 dark:bg-[#102a40] dark:text-white ${shinyCard}`}
@@ -52,7 +53,9 @@ function CategoryCard({ category }: { category: MainCategory }) {
             <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
           </Link>
           <a
-            href={categoryWhatsappUrl(category.label)}
+            href={whatsappHref(
+              `Hola, quiero cotizar productos de la línea ${category.label} al por mayor.`,
+            )}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex w-fit items-center gap-1.5 rounded-full border border-brand-whatsapp/40 bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-dark transition hover:bg-brand-whatsapp hover:text-white sm:px-4 sm:py-2 sm:text-sm"

@@ -10,12 +10,16 @@ import {
   createProduct,
   createRole,
   createUser,
+  createCategory,
   loginAdmin,
+  updateCategory,
   updateOrderStatus,
   updateUserStatus,
 } from "@/services/adminApi";
 import type {
   AuthSession,
+  Category,
+  CreateCategoryInput,
   CreatePanelRoleInput,
   CreatePanelUserInput,
   CreateProductInput,
@@ -26,6 +30,7 @@ import type {
   PanelUser,
   PanelUserStatus,
   Product,
+  UpdateCategoryInput,
 } from "@/types/admin";
 
 function cookieOptions() {
@@ -131,6 +136,33 @@ export async function updateUserStatusAction(
   } catch (cause) {
     const message =
       cause instanceof Error ? cause.message : "No se pudo actualizar el usuario.";
+    return { ok: false, message };
+  }
+}
+
+export async function createCategoryAction(
+  input: CreateCategoryInput,
+): Promise<{ ok: true; category: Category } | { ok: false; message: string }> {
+  try {
+    const category = await createCategory(input);
+    return { ok: true, category };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo crear la categoría.";
+    return { ok: false, message };
+  }
+}
+
+export async function updateCategoryAction(
+  categoryId: string,
+  input: UpdateCategoryInput,
+): Promise<{ ok: true; category: Category } | { ok: false; message: string }> {
+  try {
+    const category = await updateCategory(categoryId, input);
+    return { ok: true, category };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo actualizar la categoría.";
     return { ok: false, message };
   }
 }

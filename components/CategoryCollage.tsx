@@ -1,4 +1,4 @@
-import Image from "next/image";
+import CmsImage from "@/components/CmsImage";
 import { getCategoryCollage } from "@/data/products";
 
 type CategoryCollageProps = {
@@ -20,7 +20,7 @@ export default function CategoryCollage({
 
   if (collage.images.length < 2) {
     return (
-      <Image
+      <CmsImage
         src={fallback}
         alt={fallbackAlt}
         fill
@@ -36,13 +36,13 @@ export default function CategoryCollage({
     <div className={`absolute inset-0 grid grid-cols-2 grid-rows-2 ${className}`}>
       {cells.map((cell, index) => (
         <div key={`${cell.src}-${index}`} className="relative overflow-hidden">
-          <Image
-            src={cell.src}
-            alt={cell.alt}
-            fill
-            className="object-cover"
-            sizes={sizes}
-          />
+            <CmsImage
+              src={cell.src}
+              alt={cell.alt}
+              fill
+              className="object-cover"
+              sizes={sizes}
+            />
         </div>
       ))}
       {collage.brands.length > 0 ? (

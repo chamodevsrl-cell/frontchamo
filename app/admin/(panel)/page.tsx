@@ -62,16 +62,11 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-brand-dark sm:text-3xl">
-          Dashboard
-        </h1>
-        <p className="mt-1 text-sm text-brand-dark/65">
-          KPIs desde <code>getDashboardKPIs()</code> (mock 300 ms). La gráfica y
-          el ranking siguen en <code>data/admin.ts</code> hasta que el backend
-          los exponga.
-        </p>
-      </div>
+      <p className="text-sm text-brand-dark/65">
+        KPIs desde <code>getDashboardKPIs()</code> (mock 300 ms). La gráfica y
+        el ranking siguen en <code>data/admin.ts</code> hasta que el backend
+        los exponga.
+      </p>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((kpi) => {

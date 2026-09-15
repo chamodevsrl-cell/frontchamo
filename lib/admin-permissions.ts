@@ -14,9 +14,11 @@ export const ADMIN_PATH_PERMISSIONS: {
   { href: "/admin/inventario", permission: "inventario" },
   { href: "/admin/ofertas", permission: "ofertas" },
   { href: "/admin/banners", permission: "banners" },
+  { href: "/admin/equipo", permission: "configuracion" },
   { href: "/admin/reportes", permission: "reportes" },
   { href: "/admin/usuarios", permission: "usuarios" },
   { href: "/admin/roles", permission: "roles" },
+  { href: "/admin/ajustes", permission: "configuracion" },
   { href: "/admin/configuracion", permission: "configuracion" },
 ];
 

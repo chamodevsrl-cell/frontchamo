@@ -263,7 +263,8 @@ Front: `getCategories()`. Usada hoy por el `<select>` de categoría en
         "name": "Ferretería",
         "subcategoriesCount": 0,
         "status": "active",
-        "image": "/images/categorias/ferreteria.jpg"
+        "image": "/images/categorias/ferreteria.jpg",
+        "description": "Insumos al por mayor"
       }
     ]
   }
@@ -271,11 +272,32 @@ Front: `getCategories()`. Usada hoy por el `<select>` de categoría en
 ```
 
 El mock del front devuelve el array plano; el fetch real debe usar `data.items`
-(mismo patrón que `getProducts`/`getOrders`).
+(mismo patrón que `getProducts`/`getOrders`). `description` es el texto corto de
+la línea (tarjeta del panel y antetítulo en la tienda).
 
-### `POST /api/v1/categories` / `PUT /api/v1/categories/:id`
+### `POST /api/v1/categories`
 
-Pendientes de UI. Estados: `active` | `hidden`.
+Front: `createCategory()` / `createCategoryAction()`. Body:
+
+```json
+{
+  "name": "Iluminación",
+  "description": "Focos y tiras LED",
+  "image": "/images/categorias/electricos.jpg",
+  "id": "iluminacion"
+}
+```
+
+`id` es opcional (slug). Si falta, el mock lo genera con `slugifyLabel(name)`.
+
+**Respuesta `201`:** `{ ok: true, data: { item: Category } }`
+
+### `PUT /api/v1/categories/:id`
+
+Front: `updateCategory()` / `updateCategoryAction()`. Body parcial:
+`name`, `description`, `image`, `status` (`active` | `hidden`).
+
+**Respuesta `200`:** `{ ok: true, data: { item: Category } }`
 
 ---
 

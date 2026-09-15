@@ -2,6 +2,12 @@
 
 Última actualización: **2026-09-15**
 
+## 🖱️ Cursor negro/blanco sobre imágenes (2026-09-15)
+
+- [x] 2026-09-15 — `WrenchCursor.tsx`: negro puro por defecto, blanco al pasar sobre
+  cualquier `<img>` (antes usaba los colores de marca). Detalle:
+  [`cambios/2026-09-15-cursor-negro-blanco-imagenes.md`](./cambios/2026-09-15-cursor-negro-blanco-imagenes.md).
+
 ## 🧙 Wizard de alta de producto + imágenes reales (2026-09-15)
 
 El cliente mandó otra captura del panel de su compañero (rosversac.com/admin/productos/nuevo):
@@ -11,7 +17,8 @@ imagen real. Se llevó a nuestro panel — detalle:
 
 - [x] 2026-09-15 — Wizard de 4 fases en `/admin/productos/nuevo` + vista previa en vivo.
 - [x] 2026-09-15 — Subida de imágenes desde archivos/galería (drag & drop +
-  `<input type="file">`, sin bucket real todavía — quedan como `data:` URL en memoria).
+  `<input type="file">`) **o pegando una URL**; sin bucket real todavía — los
+  archivos locales quedan como `data:` URL.
 - [x] 2026-09-15 — Ficha técnica (Especs) como fase del alta, sumando `specs` al
   contrato `Product`/`CreateProductInput`.
 - [ ] Cuando haya backend: reemplazar el guardado de imágenes en `data:` URL por
@@ -59,6 +66,24 @@ panel sigue siendo mock (`services/adminApi.ts`, sin backend real), esto quedar�
   sesión, el sidebar filtra por permiso y las cuentas suspendidas no entran.
   Cuenta staff: **THE WINTER** / `Criper@11` (también `thewinter@local.test`).
   Detalle: [`cambios/2026-09-15-admin-login-usuarios.md`](./cambios/2026-09-15-admin-login-usuarios.md).
+- [x] 2026-09-15 — **Ajustes + Banners + Equipo (CMS local).** Footer 100% editable
+  (dirección, mapa, redes, imágenes de medios de pago) en `/admin/ajustes`. Banners
+  en cartas para el slider del home y Nosotros/Contacto/Ofertas/Catálogo. Equipo de
+  trabajo en cartas (gerente, asesor, vendedor, tienda, TI…) en `/admin/equipo`,
+  visible en `/nosotros`. Detalle:
+  [`cambios/2026-09-15-cms-footer-banners-equipo.md`](./cambios/2026-09-15-cms-footer-banners-equipo.md).
+- [x] 2026-09-15 — **Ajustes desglosado** como Productos: Footer (dirección, mapa, pagos)
+  y Canales de atención (WhatsApp del botón flotante, teléfono para llamar, correo y
+  redes). Detalle:
+  [`cambios/2026-09-15-ajustes-footer-canales.md`](./cambios/2026-09-15-ajustes-footer-canales.md).
+- [x] 2026-09-15 — **Banner de pestaña azul/oro** en todo el panel (`AdminPageHero`),
+  al estilo de la barra “Roles y permisos” de referencia pero con `brand-dark` +
+  `brand-gold`. Detalle:
+  [`cambios/2026-09-15-admin-page-hero.md`](./cambios/2026-09-15-admin-page-hero.md).
+- [x] 2026-09-15 — **Categorías en cartas** (nombre, descripción, recuento) + modal
+  editar/agregar; imágenes por URL o galería/carpetas (`CmsImageField`) en banners,
+  equipo, ajustes, categorías y alta de producto. Detalle:
+  [`cambios/2026-09-15-categorias-cartas-imagenes.md`](./cambios/2026-09-15-categorias-cartas-imagenes.md).
 - [ ] Contactos — guardar el mensaje del formulario antes de abrir WhatsApp + vista admin
 - [ ] Reclamaciones — decidir si existe un formulario público antes de construir la vista admin
 - [ ] Evaluar renombrar Reportes→Analítica e Inventario→Almacenamiento, o dejarlos así

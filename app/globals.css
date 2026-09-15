@@ -51,6 +51,28 @@ html.admin-shell footer {
   display: none !important;
 }
 
+.admin-page-hero {
+  background-color: var(--brand-dark);
+  background-image:
+    repeating-linear-gradient(
+      -32deg,
+      transparent 0,
+      transparent 14px,
+      rgba(228, 183, 20, 0.09) 14px,
+      rgba(228, 183, 20, 0.09) 15px
+    ),
+    radial-gradient(
+      ellipse 42% 120% at 100% 50%,
+      rgba(18, 126, 201, 0.55),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 28% 90% at 92% 50%,
+      rgba(228, 183, 20, 0.28),
+      transparent 70%
+    );
+}
+
 /* Cursor llave inglesa — solo mouse/trackpad (no touch) */
 @media (hover: hover) and (pointer: fine) {
   html,
