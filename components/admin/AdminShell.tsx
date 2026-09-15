@@ -17,9 +17,11 @@ import {
   Package,
   Search,
   Settings,
+  ShieldCheck,
   ShoppingCart,
   Store,
   Tags,
+  UserCog,
   Users,
   Warehouse,
   X,
@@ -55,6 +57,8 @@ const NAV: NavItem[] = [
   { href: "/admin/ofertas", label: "Ofertas", icon: Flame },
   { href: "/admin/banners", label: "Banners", icon: ImageIcon },
   { href: "/admin/reportes", label: "Reportes", icon: BarChart3 },
+  { href: "/admin/usuarios", label: "Usuarios", icon: UserCog },
+  { href: "/admin/roles", label: "Roles", icon: ShieldCheck },
   { href: "/admin/configuracion", label: "Configuración", icon: Settings },
 ];
 

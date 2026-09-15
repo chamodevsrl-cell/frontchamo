@@ -311,6 +311,8 @@ Piezas clave (v2):
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
 | Banners | `/admin/banners` | ✅ Real — edita `chamo-cms-v1` (slider del home) |
 | Categorías | `/admin/categorias` | ✅ Real — edita `chamo-cms-v1` (textos de líneas del home) |
+| Usuarios | `/admin/usuarios` | ✅ Real — `getUsers()` + alta (`createUser()`) + cambiar estado (`updateUserStatus()`). Staff del panel, no clientes de la tienda |
+| Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`) con checklist de 13 permisos (`AdminPermission`). Administrador/Editor son roles base (`isSystem: true`), no se pueden borrar |
 | Marcas, Clientes, Inventario, Ofertas, Reportes, Configuración | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
 
 **Datos:** todo lo "real" arriba corre contra `productsDb`/`ordersDb` **en memoria del

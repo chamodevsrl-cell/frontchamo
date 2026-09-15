@@ -1,6 +1,47 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-11**
+Última actualización: **2026-09-15**
+
+## 🗂️ Propuesta: ampliar el panel admin para que la web sea 100% editable (2026-09-15)
+
+El cliente mandó una captura de otro panel de referencia (sidebar "ROSVER SYSTEM")
+pidiendo que el sitio se pueda administrar por completo desde `/admin` (productos,
+categorías, imágenes de banners/slider, textos, etc.). Comparado contra el `NAV` actual
+de [`AdminShell.tsx`](../components/admin/AdminShell.tsx):
+
+**Ya cubierto (solo cambia de nombre o agrupamiento):**
+- Inicio → Dashboard, Analítica → Reportes, Almacenamiento → Inventario, Slider → Banners
+- Catálogo (con submenú) → hoy son 3 links sueltos: Productos, Categorías, Marcas
+
+**Nuevo de verdad (no existe ni el dato ni la pantalla):**
+- **Usuarios** — cuentas del *staff* que entra al panel (distinto de "Clientes", que son
+  cuentas de la tienda). Necesita modelo propio + relación con **Roles**.
+- **Roles** — permisos por usuario admin (qué secciones puede ver/editar). Sin esto,
+  "Usuarios" es solo una lista sin función real.
+- **Cotizaciones** — hoy `/cotizar` arma el mensaje y abre WhatsApp directo, no queda
+  ningún registro. Para que aparezca en el panel hay que guardar la cotización antes de
+  redirigir a WhatsApp (nuevo modelo de datos + mock API).
+- **Contactos** — mismo caso que Cotizaciones: `ContactForm.tsx` hoy solo abre WhatsApp,
+  no persiste el mensaje en ningún lado.
+- **Reclamaciones** — no existe ni el formulario del lado cliente. Habría que decidir
+  primero si el negocio quiere un canal formal de reclamos (¿un form público nuevo tipo
+  `/reclamaciones`?) antes de construir la vista admin.
+
+**Nota:** Cotizaciones/Contactos/Reclamaciones implican guardar algo que hoy es
+"efímero" (se arma un mensaje y se abre WhatsApp, sin persistir nada) — como todo el
+panel sigue siendo mock (`services/adminApi.ts`, sin backend real), esto quedaría en
+`localStorage` por ahora, igual que carrito/favoritos, con el mismo TODO de
+"reemplazar por `fetch()` cuando haya backend" que ya aplica al resto.
+
+- [x] 2026-09-15 — El cliente definió prioridad: **Usuarios + Roles primero**,
+  **Cotizaciones descartada por ahora**. Construido: `/admin/usuarios` y
+  `/admin/roles` (mock completo, 13 permisos por sección, 3 roles semilla). Detalle:
+  [`cambios/2026-09-15-admin-usuarios-roles.md`](./cambios/2026-09-15-admin-usuarios-roles.md).
+- [ ] Contactos — guardar el mensaje del formulario antes de abrir WhatsApp + vista admin
+- [ ] Reclamaciones — decidir si existe un formulario público antes de construir la vista admin
+- [ ] Evaluar renombrar Reportes→Analítica e Inventario→Almacenamiento, o dejarlos así
+- [ ] Usuarios/Roles todavía no están conectados al login real (`loginAdmin()` sigue
+  devolviendo siempre la misma sesión mock) — pendiente para cuando haya backend
 
 Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al surgir una idea en un cambio, anótala aquí.
 

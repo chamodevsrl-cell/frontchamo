@@ -8,15 +8,23 @@ import {
 } from "@/lib/auth";
 import {
   createProduct,
+  createRole,
+  createUser,
   loginAdmin,
   updateOrderStatus,
+  updateUserStatus,
 } from "@/services/adminApi";
 import type {
   AuthSession,
+  CreatePanelRoleInput,
+  CreatePanelUserInput,
   CreateProductInput,
   LoginCredentials,
   Order,
   OrderStatus,
+  PanelRole,
+  PanelUser,
+  PanelUserStatus,
   Product,
 } from "@/types/admin";
 
@@ -84,6 +92,45 @@ export async function updateOrderStatusAction(
   } catch (cause) {
     const message =
       cause instanceof Error ? cause.message : "No se pudo actualizar el pedido.";
+    return { ok: false, message };
+  }
+}
+
+export async function createRoleAction(
+  input: CreatePanelRoleInput,
+): Promise<{ ok: true; role: PanelRole } | { ok: false; message: string }> {
+  try {
+    const role = await createRole(input);
+    return { ok: true, role };
+  } catch (cause) {
+    const message = cause instanceof Error ? cause.message : "No se pudo crear el rol.";
+    return { ok: false, message };
+  }
+}
+
+export async function createUserAction(
+  input: CreatePanelUserInput,
+): Promise<{ ok: true; user: PanelUser } | { ok: false; message: string }> {
+  try {
+    const user = await createUser(input);
+    return { ok: true, user };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo crear el usuario.";
+    return { ok: false, message };
+  }
+}
+
+export async function updateUserStatusAction(
+  userId: string,
+  newStatus: PanelUserStatus,
+): Promise<{ ok: true; user: PanelUser } | { ok: false; message: string }> {
+  try {
+    const user = await updateUserStatus(userId, newStatus);
+    return { ok: true, user };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo actualizar el usuario.";
     return { ok: false, message };
   }
 }

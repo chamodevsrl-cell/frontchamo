@@ -13,13 +13,19 @@
 import { featuredProducts } from "@/data/products";
 import { mainCategories } from "@/data/home";
 import type {
+  AdminPermission,
   AuthSession,
   Category,
+  CreatePanelRoleInput,
+  CreatePanelUserInput,
   CreateProductInput,
   DashboardKPIs,
   LoginCredentials,
   Order,
   OrderStatus,
+  PanelRole,
+  PanelUser,
+  PanelUserStatus,
   Product,
   ProductFilters,
 } from "@/types/admin";
@@ -179,8 +185,95 @@ function seedOrders(products: Product[]): Order[] {
   ];
 }
 
+const ALL_PERMISSIONS: AdminPermission[] = [
+  "dashboard",
+  "productos",
+  "categorias",
+  "marcas",
+  "pedidos",
+  "clientes",
+  "inventario",
+  "ofertas",
+  "banners",
+  "reportes",
+  "usuarios",
+  "roles",
+  "configuracion",
+];
+
+function seedRoles(): PanelRole[] {
+  return [
+    {
+      id: "role_admin",
+      name: "Administrador",
+      description: "Acceso total al panel, incluyendo Usuarios y Roles.",
+      permissions: [...ALL_PERMISSIONS],
+      isSystem: true,
+      createdAt: "2026-09-11T12:00:00.000Z",
+    },
+    {
+      id: "role_editor",
+      name: "Editor",
+      description: "Gestiona catálogo y pedidos, sin acceso a Usuarios/Roles.",
+      permissions: [
+        "dashboard",
+        "productos",
+        "categorias",
+        "marcas",
+        "pedidos",
+        "ofertas",
+        "banners",
+      ],
+      isSystem: true,
+      createdAt: "2026-09-11T12:00:00.000Z",
+    },
+    {
+      id: "role_almacen",
+      name: "Almacén",
+      description: "Solo inventario y pedidos, para el equipo de despacho.",
+      permissions: ["dashboard", "inventario", "pedidos"],
+      isSystem: false,
+      createdAt: "2026-09-15T09:00:00.000Z",
+    },
+  ];
+}
+
+function seedUsers(): PanelUser[] {
+  return [
+    {
+      id: "usr_admin_local",
+      name: "Admin Demo",
+      email: MOCK_ADMIN_EMAIL,
+      roleId: "role_admin",
+      status: "active",
+      createdAt: "2026-09-11T12:00:00.000Z",
+      lastLoginAt: "2026-09-15T08:30:00.000Z",
+    },
+    {
+      id: "usr_editor_demo",
+      name: "Katia Ríos (demo)",
+      email: "katia.demo@local.test",
+      roleId: "role_editor",
+      status: "active",
+      createdAt: "2026-09-12T15:00:00.000Z",
+      lastLoginAt: "2026-09-14T19:10:00.000Z",
+    },
+    {
+      id: "usr_almacen_demo",
+      name: "Julio Paredes (demo)",
+      email: "julio.demo@local.test",
+      roleId: "role_almacen",
+      status: "suspended",
+      createdAt: "2026-09-13T10:00:00.000Z",
+      lastLoginAt: null,
+    },
+  ];
+}
+
 const productsDb: Product[] = seedProducts();
 const ordersDb: Order[] = seedOrders(productsDb);
+const rolesDb: PanelRole[] = seedRoles();
+const usersDb: PanelUser[] = seedUsers();
 
 const MOCK_SESSION: AuthSession = {
   id: "usr_admin_local",
@@ -337,4 +430,97 @@ export async function getCategories(): Promise<Category[]> {
     status: "active",
     image: category.image,
   }));
+}
+
+/**
+ * GET /api/v1/roles
+ */
+export async function getRoles(): Promise<PanelRole[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/roles')
+  await delay();
+  return [...rolesDb];
+}
+
+/**
+ * POST /api/v1/roles
+ * Body: {@link CreatePanelRoleInput}
+ */
+export async function createRole(input: CreatePanelRoleInput): Promise<PanelRole> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/roles')
+  await delay();
+  const name = input.name.trim();
+  if (!name) {
+    throw new AdminApiError("VALIDATION", "El nombre del rol es obligatorio.");
+  }
+  if (rolesDb.some((role) => role.name.toLowerCase() === name.toLowerCase())) {
+    throw new AdminApiError("CONFLICT", `Ya existe un rol llamado ${name}.`);
+  }
+  const created: PanelRole = {
+    id: newId("role"),
+    name,
+    description: input.description.trim(),
+    permissions: input.permissions,
+    isSystem: false,
+    createdAt: new Date().toISOString(),
+  };
+  rolesDb.push(created);
+  return created;
+}
+
+/**
+ * GET /api/v1/users
+ */
+export async function getUsers(): Promise<PanelUser[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/users')
+  await delay();
+  return [...usersDb];
+}
+
+/**
+ * POST /api/v1/users
+ * Body: {@link CreatePanelUserInput}
+ */
+export async function createUser(input: CreatePanelUserInput): Promise<PanelUser> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/users')
+  await delay();
+  const email = normalizeEmail(input.email);
+  const name = input.name.trim();
+  if (!name || !email) {
+    throw new AdminApiError("VALIDATION", "Nombre y correo son obligatorios.");
+  }
+  if (usersDb.some((user) => user.email.toLowerCase() === email)) {
+    throw new AdminApiError("CONFLICT", `Ya existe un usuario con correo ${email}.`);
+  }
+  if (!rolesDb.some((role) => role.id === input.roleId)) {
+    throw new AdminApiError("VALIDATION", "El rol seleccionado no existe.");
+  }
+  const created: PanelUser = {
+    id: newId("usr"),
+    name,
+    email,
+    roleId: input.roleId,
+    status: "active",
+    createdAt: new Date().toISOString(),
+    lastLoginAt: null,
+  };
+  usersDb.push(created);
+  return created;
+}
+
+/**
+ * PUT /api/v1/users/:userId/status
+ * Body: `{ status }`
+ */
+export async function updateUserStatus(
+  userId: string,
+  status: PanelUserStatus,
+): Promise<PanelUser> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/users/:id/status')
+  await delay();
+  const user = usersDb.find((item) => item.id === userId);
+  if (!user) {
+    throw new AdminApiError("NOT_FOUND", `No existe el usuario ${userId}.`);
+  }
+  user.status = status;
+  return { ...user };
 }

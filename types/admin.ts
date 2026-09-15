@@ -204,6 +204,77 @@ export interface DashboardKPIs {
   newClientsCount: number;
 }
 
+/**
+ * Sección del panel sobre la que se puede otorgar acceso. Coincide 1:1 con las
+ * entradas de `NAV` en `AdminShell.tsx` — si se agrega una sección al sidebar,
+ * sumarla acá también.
+ */
+export type AdminPermission =
+  | "dashboard"
+  | "productos"
+  | "categorias"
+  | "marcas"
+  | "pedidos"
+  | "clientes"
+  | "inventario"
+  | "ofertas"
+  | "banners"
+  | "reportes"
+  | "usuarios"
+  | "roles"
+  | "configuracion";
+
+/**
+ * Rol configurable del panel (qué secciones puede ver/editar cada usuario).
+ * No confundir con `AdminRole` (`"admin" | "editor"`), que es el permiso fijo
+ * que hoy emite el login mock — `PanelRole` es el modelo nuevo de Usuarios/Roles.
+ */
+export interface PanelRole {
+  /** Identificador estable. */
+  id: string;
+  /** Nombre visible (p. ej. Administrador, Almacén). */
+  name: string;
+  /** Para qué sirve este rol, en una frase. */
+  description: string;
+  /** Secciones del panel habilitadas para este rol. */
+  permissions: AdminPermission[];
+  /** Roles base (Administrador/Editor) no se pueden borrar desde el panel. */
+  isSystem: boolean;
+  /** ISO-8601 de alta. */
+  createdAt: string;
+}
+
+/** Payload de alta de rol. El backend asigna `id`, `createdAt` y `isSystem: false`. */
+export type CreatePanelRoleInput = Omit<PanelRole, "id" | "createdAt" | "isSystem">;
+
+/** Estado de acceso de un usuario del panel. */
+export type PanelUserStatus = "active" | "suspended";
+
+/**
+ * Miembro del staff con acceso al panel (login, contraseña propia, etc.).
+ * Independiente de `Client`/las cuentas de la tienda (`AuthUser` en
+ * `lib/auth-local.ts`): esto es "quién entra a `/admin`", no "quién compra".
+ */
+export interface PanelUser {
+  /** Identificador estable. */
+  id: string;
+  /** Nombre para mostrar. */
+  name: string;
+  /** Correo de acceso (único). */
+  email: string;
+  /** Id de {@link PanelRole} asignado. */
+  roleId: string;
+  /** `suspended` bloquea el acceso sin borrar la cuenta. */
+  status: PanelUserStatus;
+  /** ISO-8601 de alta. */
+  createdAt: string;
+  /** ISO-8601 del último login, o `null` si nunca entró. */
+  lastLoginAt: string | null;
+}
+
+/** Payload de alta de usuario. El backend asigna `id`, `createdAt` y `lastLoginAt: null`. */
+export type CreatePanelUserInput = Pick<PanelUser, "name" | "email" | "roleId">;
+
 /** Sobre JSON de éxito que debe devolver el backend. */
 export interface ApiSuccess<T> {
   ok: true;
