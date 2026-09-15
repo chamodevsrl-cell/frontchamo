@@ -59,7 +59,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 
 - **Navbar de 3 niveles** (`components/Navbar.tsx`), estilo ferretería:
   1. Barra superior `brand-dark`: envíos, atención mayorista, enlaces Nosotros/Contacto, redes sociales.
-  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta, Favoritos (badge), Carrito (badge con `CartProvider`).
+  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta, Favoritos (badge), Carrito (badge con `CartProvider`). Si hay sesión del panel, aparece **Administrar** (ícono de casa) en esa fila. Comparar ya no está en la barra (sigue en tarjetas / `/comparar`).
   3. Barra `brand-primary`: botón **Categorías** (fondo `brand-dark`, dropdown desde `mainCategories` + "Ver todas") y menú principal uppercase (Inicio, Catálogo, Ofertas, Nosotros, Contacto). El ítem activo y el hover solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo además lleva una **barra dorada animada** debajo (`navIndicator`, calculada por `offsetLeft`/`offsetWidth` del link con `data-nav-active`).
   - Menú móvil tipo drawer lateral con categorías + navegación + botón "Mi cuenta".
   - Los badges **Oferta/Nuevo** (no el botón de categorías) son los que usan `brand-gold` — ver `FeaturedOffers.tsx` / `CategoriesGrid.tsx`.
@@ -67,7 +67,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS banners/categorías en `/admin/banners` y `/admin/categorias`.
+- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `THE WINTER` / `Criper@11`, también `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS banners/categorías en `/admin/banners` y `/admin/categorias`.
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -194,14 +194,9 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-11): contrato del Panel Admin para el backend —
-`types/admin.ts`, mock `services/adminApi.ts` (300 ms), sesión en `lib/auth.ts`,
-login `/admin/login`, layout `(panel)` protegido y [`API_CONTRACT.md`](API_CONTRACT.md).
-Credenciales mock: `admin@local.test` / `admin123`. Detalle:
-[`docs/cambios/2026-09-11-admin-api-contract.md`](docs/cambios/2026-09-11-admin-api-contract.md).
-Revisión de las funciones nuevas del panel: el alta de producto usaba `mainCategories`
-directo en vez del mock — se agregó `getCategories()` a `services/adminApi.ts` y se
-enchufó ahí. Detalle: [`docs/cambios/2026-09-11-categorias-mock-api.md`](docs/cambios/2026-09-11-categorias-mock-api.md).
+Último avance (2026-09-15): el staff entra por “Mi cuenta”; Comparar salió de la
+barra; **Administrar** (casa) aparece al admin. Cuenta **THE WINTER** / `Criper@11`.
+Detalle: [`docs/cambios/2026-09-15-admin-login-tienda.md`](docs/cambios/2026-09-15-admin-login-tienda.md).
 
 ## 10. Pendientes conocidos
 

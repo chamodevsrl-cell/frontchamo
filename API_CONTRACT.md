@@ -51,14 +51,21 @@ Códigos estables: `UNAUTHORIZED`, `FORBIDDEN`, `VALIDATION`, `NOT_FOUND`,
 
 ## Mock actual (solo front)
 
-| Campo | Valor |
-| --- | --- |
-| Correo | `admin@local.test` |
-| Contraseña | `admin123` |
-| Token de ejemplo | `mock.jwt.admin-local-test` |
+El login valida contra la lista de `PanelUser` (no una sola cuenta fija).
+`email` en el body acepta **correo o nombre**.
 
-**No es una cuenta oficial de Chamo Import.** No usar correos de la empresa
+| Usuario | Correo | Contraseña | Rol |
+| --- | --- | --- | --- |
+| THE WINTER | `thewinter@local.test` | `Criper@11` | Administrador |
+| Admin Demo | `admin@local.test` | `admin123` | Administrador |
+| Katia Ríos (demo) | `katia.demo@local.test` | `editor123` | Editor |
+| Julio Paredes (demo) | `julio.demo@local.test` | `almacen123` | Almacén (**suspendido**) |
+
+**No son cuentas oficiales de Chamo Import.** No usar correos de la empresa
 en el mock. Cuando el login real exista, borrar estas credenciales del front.
+
+La sesión incluye `roleId` + `permissions` copiados del `PanelRole`. El sidebar
+del front filtra con eso.
 
 Sesión del panel ≠ cuentas de la tienda (`lib/auth-local.ts` /
 `chamo-accounts-v1`).
@@ -75,8 +82,8 @@ Front: `loginAdmin(credentials)`.
 
 ```json
 {
-  "email": "admin@local.test",
-  "password": "admin123"
+  "email": "THE WINTER",
+  "password": "Criper@11"
 }
 ```
 
@@ -86,19 +93,21 @@ Front: `loginAdmin(credentials)`.
 {
   "ok": true,
   "data": {
-    "id": "usr_…",
-    "name": "Admin Demo",
-    "email": "admin@local.test",
+    "id": "usr_winter",
+    "name": "THE WINTER",
+    "email": "thewinter@local.test",
     "role": "admin",
+    "roleId": "role_admin",
+    "permissions": ["dashboard", "productos", "usuarios", "roles"],
     "token": "eyJhbGciOi…"
   }
 }
 ```
 
-También enviar `Set-Cookie: chamo_admin_session=…` (httpOnly). Roles:
-`admin` | `editor`.
+También enviar `Set-Cookie: chamo_admin_session=…` (httpOnly). `role` grosero:
+`admin` | `editor` (si el `PanelRole` incluye Usuarios y Roles → `admin`).
 
-**Errores:** `401 INVALID_CREDENTIALS`.
+**Errores:** `401 INVALID_CREDENTIALS`, `403 FORBIDDEN` (cuenta suspendida).
 
 ### `POST /api/v1/auth/logout`
 
@@ -336,6 +345,36 @@ Front: `updateOrderStatus(orderId, newStatus)`.
 
 ---
 
+## Usuarios y roles del panel
+
+Staff que entra a `/admin`, distinto de los clientes de la tienda.
+
+### `GET /api/v1/roles`
+
+Front: `getRoles()`.
+
+**Respuesta `200`:** `{ "ok": true, "data": [ /* PanelRole[] */ ] }`
+
+### `POST /api/v1/roles`
+
+Front: `createRole(input)`. Body: `{ name, description, permissions }`.
+
+### `GET /api/v1/users`
+
+Front: `getUsers()`. **Nunca** devolver contraseñas.
+
+### `POST /api/v1/users`
+
+Front: `createUser(input)`. Body: `{ name, email, roleId, password }`.
+La cuenta queda `active` y puede usarse en `POST /auth/login`.
+
+### `PUT /api/v1/users/:userId/status`
+
+Front: `updateUserStatus(userId, status)`. Body: `{ "status": "active" | "suspended" }`.
+`suspended` bloquea el login.
+
+---
+
 ## Cómo enchufar el front
 
 1. Implementar los endpoints de arriba.
@@ -351,11 +390,13 @@ Front: `updateOrderStatus(orderId, newStatus)`.
 
 | Ruta | Protección | Datos |
 | --- | --- | --- |
-| `/admin/login` | Pública; si hay sesión → `/admin` | `loginAdmin` |
+| `/admin/login` | Redirige a `/login` (modal de Mi cuenta) | `loginAdmin` vía `AuthProvider` |
 | `/admin` | Cookie de sesión | `getDashboardKPIs` |
-| `/admin/productos` | Cookie | `getProducts({ q })` |
-| `/admin/productos/nuevo` | Cookie | `createProduct` |
-| `/admin/pedidos` | Cookie | `getOrders` / `updateOrderStatus` |
+| `/admin/productos` | Cookie + permiso `productos` | `getProducts({ q })` |
+| `/admin/productos/nuevo` | Cookie + permiso `productos` | `createProduct` |
+| `/admin/pedidos` | Cookie + permiso `pedidos` | `getOrders` / `updateOrderStatus` |
+| `/admin/usuarios` | Cookie + permiso `usuarios` | `getUsers` / `createUser` |
+| `/admin/roles` | Cookie + permiso `roles` | `getRoles` / `createRole` |
 
 El layout `app/admin/(panel)/layout.tsx` redirige a `/admin/login` si
 `getAdminSession()` es `null`.

@@ -2,6 +2,23 @@
 
 Última actualización: **2026-09-15**
 
+## 🧙 Wizard de alta de producto + imágenes reales (2026-09-15)
+
+El cliente mandó otra captura del panel de su compañero (rosversac.com/admin/productos/nuevo):
+formulario en fases (Datos/Detalle/Precios/Especs) con vista previa en vivo y subida de
+imagen real. Se llevó a nuestro panel — detalle:
+[`cambios/2026-09-15-wizard-producto-imagenes.md`](./cambios/2026-09-15-wizard-producto-imagenes.md).
+
+- [x] 2026-09-15 — Wizard de 4 fases en `/admin/productos/nuevo` + vista previa en vivo.
+- [x] 2026-09-15 — Subida de imágenes desde archivos/galería (drag & drop +
+  `<input type="file">`, sin bucket real todavía — quedan como `data:` URL en memoria).
+- [x] 2026-09-15 — Ficha técnica (Especs) como fase del alta, sumando `specs` al
+  contrato `Product`/`CreateProductInput`.
+- [ ] Cuando haya backend: reemplazar el guardado de imágenes en `data:` URL por
+  subida real a un bucket (tipo R2/S3) y guardar solo la URL resultante.
+- [ ] Evaluar el mismo wizard para **editar** un producto existente (hoy solo existe
+  para alta; `/admin/productos` no tiene pantalla de edición todavía).
+
 ## 🗂️ Propuesta: ampliar el panel admin para que la web sea 100% editable (2026-09-15)
 
 El cliente mandó una captura de otro panel de referencia (sidebar "ROSVER SYSTEM")
@@ -37,11 +54,14 @@ panel sigue siendo mock (`services/adminApi.ts`, sin backend real), esto quedar�
   **Cotizaciones descartada por ahora**. Construido: `/admin/usuarios` y
   `/admin/roles` (mock completo, 13 permisos por sección, 3 roles semilla). Detalle:
   [`cambios/2026-09-15-admin-usuarios-roles.md`](./cambios/2026-09-15-admin-usuarios-roles.md).
+- [x] 2026-09-15 — **Usuarios/Roles conectados al login.** `loginAdmin()` valida
+  contra `PanelUser` + contraseña en memoria, copia `PanelRole.permissions` a la
+  sesión, el sidebar filtra por permiso y las cuentas suspendidas no entran.
+  Cuenta staff: **THE WINTER** / `Criper@11` (también `thewinter@local.test`).
+  Detalle: [`cambios/2026-09-15-admin-login-usuarios.md`](./cambios/2026-09-15-admin-login-usuarios.md).
 - [ ] Contactos — guardar el mensaje del formulario antes de abrir WhatsApp + vista admin
 - [ ] Reclamaciones — decidir si existe un formulario público antes de construir la vista admin
 - [ ] Evaluar renombrar Reportes→Analítica e Inventario→Almacenamiento, o dejarlos así
-- [ ] Usuarios/Roles todavía no están conectados al login real (`loginAdmin()` sigue
-  devolviendo siempre la misma sesión mock) — pendiente para cuando haya backend
 
 Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al surgir una idea en un cambio, anótala aquí.
 
@@ -227,6 +247,12 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-15 — El admin inicia sesión en el mismo modal de “Mi cuenta”.
+  **Comparar** salió de la barra de la tienda. Con sesión del panel aparece
+  **Administrar** (ícono de casa). Nota:
+  [`cambios/2026-09-15-admin-login-tienda.md`](./cambios/2026-09-15-admin-login-tienda.md).
+- [x] 2026-09-15 — Login del panel conectado a Usuarios/Roles + cuenta **THE WINTER** / `Criper@11`. Nota: [`cambios/2026-09-15-admin-login-usuarios.md`](./cambios/2026-09-15-admin-login-usuarios.md).
+- [x] 2026-09-15 — Panel admin: secciones Usuarios y Roles (permisos por sección, mock API). Nota: [`cambios/2026-09-15-admin-usuarios-roles.md`](./cambios/2026-09-15-admin-usuarios-roles.md).
 - [x] 2026-09-11 — `FRONTEND_DOCUMENTATION.md`: referencia única (variables por componente + cómo conectar el backend + manual de uso). Nota: [`cambios/2026-09-11-frontend-documentation.md`](./cambios/2026-09-11-frontend-documentation.md).
 - [x] 2026-09-11 — Contrato API del panel admin (`types/admin.ts`, mock `services/adminApi.ts`, login `/admin/login`, `API_CONTRACT.md`). Nota: [`cambios/2026-09-11-admin-api-contract.md`](./cambios/2026-09-11-admin-api-contract.md).
 - [x] 2026-09-11 — Diseño base del **panel de administración** (sidebar corporativa, header, dashboard KPI). Nota: [`cambios/2026-09-11-admin-panel-layout.md`](./cambios/2026-09-11-admin-panel-layout.md).

@@ -5,9 +5,10 @@
  * ruta real que el backend debe exponer. Cuando exista API, reemplazar el
  * cuerpo por `fetch('/api/v1/...')` manteniendo la misma firma.
  *
- * Credenciales de demo (NO son datos oficiales de Chamo Import):
- *   email:    admin@local.test
- *   password: admin123
+ * Credenciales de demo (NO son datos oficiales de Chamo Import).
+ * `loginAdmin()` valida contra `usersDb` + contraseñas en memoria.
+ *   THE WINTER / Criper@11  (también thewinter@local.test)
+ *   admin@local.test / admin123
  */
 
 import { featuredProducts } from "@/data/products";
@@ -36,6 +37,14 @@ export const MOCK_NETWORK_DELAY_MS = 300;
 /** Usuario de prueba del mock. No usar correos de la empresa. */
 export const MOCK_ADMIN_EMAIL = "admin@local.test";
 export const MOCK_ADMIN_PASSWORD = "admin123";
+
+/** Cuenta staff pedida para entrar al dashboard (rol Administrador). */
+export const MOCK_WINTER_NAME = "THE WINTER";
+export const MOCK_WINTER_EMAIL = "thewinter@local.test";
+export const MOCK_WINTER_PASSWORD = "Criper@11";
+
+const MOCK_EDITOR_PASSWORD = "editor123";
+const MOCK_ALMACEN_PASSWORD = "almacen123";
 
 export class AdminApiError extends Error {
   code: string;
@@ -88,6 +97,7 @@ function seedProducts(): Product[] {
       descriptionShort: shortDescription(item.description),
       descriptionFull: item.description,
       isFeatured: item.badge === "destacado" || index < 3,
+      specs: item.specs,
       createdAt: `2026-08-${String(10 + (index % 18)).padStart(2, "0")}T12:00:00.000Z`,
     };
   });
@@ -241,6 +251,15 @@ function seedRoles(): PanelRole[] {
 function seedUsers(): PanelUser[] {
   return [
     {
+      id: "usr_winter",
+      name: MOCK_WINTER_NAME,
+      email: MOCK_WINTER_EMAIL,
+      roleId: "role_admin",
+      status: "active",
+      createdAt: "2026-09-15T10:00:00.000Z",
+      lastLoginAt: null,
+    },
+    {
       id: "usr_admin_local",
       name: "Admin Demo",
       email: MOCK_ADMIN_EMAIL,
@@ -275,36 +294,78 @@ const ordersDb: Order[] = seedOrders(productsDb);
 const rolesDb: PanelRole[] = seedRoles();
 const usersDb: PanelUser[] = seedUsers();
 
-const MOCK_SESSION: AuthSession = {
-  id: "usr_admin_local",
-  name: "Admin Demo",
-  email: MOCK_ADMIN_EMAIL,
-  role: "admin",
-  token: "mock.jwt.admin-local-test",
-};
+/** Contraseñas del mock. Nunca viajan en {@link PanelUser} ni en la sesión. */
+const passwordsByUserId = new Map<string, string>([
+  ["usr_winter", MOCK_WINTER_PASSWORD],
+  ["usr_admin_local", MOCK_ADMIN_PASSWORD],
+  ["usr_editor_demo", MOCK_EDITOR_PASSWORD],
+  ["usr_almacen_demo", MOCK_ALMACEN_PASSWORD],
+]);
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+function sessionRoleFromPermissions(permissions: AdminPermission[]): AuthSession["role"] {
+  if (permissions.includes("usuarios") && permissions.includes("roles")) {
+    return "admin";
+  }
+  return "editor";
+}
+
+function buildSession(user: PanelUser, role: PanelRole): AuthSession {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: sessionRoleFromPermissions(role.permissions),
+    roleId: role.id,
+    permissions: [...role.permissions],
+    token: `mock.jwt.${user.id}`,
+  };
+}
+
+function findUserByLogin(identifier: string): PanelUser | undefined {
+  const trimmed = identifier.trim();
+  if (!trimmed) return undefined;
+  const email = normalizeEmail(trimmed);
+  return usersDb.find(
+    (user) =>
+      user.email.toLowerCase() === email ||
+      user.name.toLowerCase() === trimmed.toLowerCase(),
+  );
+}
+
 /**
  * POST /api/v1/auth/login
- * Body: `{ email, password }`
+ * Body: `{ email, password }` — `email` acepta correo o nombre del PanelUser.
  */
 export async function loginAdmin(
   credentials: LoginCredentials,
 ): Promise<AuthSession> {
   // TODO Backend: Reemplazar mock con fetch('/api/v1/auth/login')
   await delay();
-  const email = normalizeEmail(credentials.email);
   const password = credentials.password ?? "";
-  if (email !== MOCK_ADMIN_EMAIL || password !== MOCK_ADMIN_PASSWORD) {
+  const user = findUserByLogin(credentials.email);
+  const expectedPassword = user ? passwordsByUserId.get(user.id) : undefined;
+  if (!user || expectedPassword === undefined || expectedPassword !== password) {
     throw new AdminApiError(
       "INVALID_CREDENTIALS",
-      "Correo o contraseña incorrectos. En el mock usa admin@local.test / admin123.",
+      "Usuario o contraseña incorrectos.",
     );
   }
-  return { ...MOCK_SESSION };
+  if (user.status === "suspended") {
+    throw new AdminApiError(
+      "FORBIDDEN",
+      "Esta cuenta está suspendida. Un administrador debe reactivarla.",
+    );
+  }
+  const role = rolesDb.find((item) => item.id === user.roleId);
+  if (!role) {
+    throw new AdminApiError("FORBIDDEN", "El rol de esta cuenta ya no existe.");
+  }
+  user.lastLoginAt = new Date().toISOString();
+  return buildSession(user, role);
 }
 
 /**
@@ -485,11 +546,21 @@ export async function createUser(input: CreatePanelUserInput): Promise<PanelUser
   await delay();
   const email = normalizeEmail(input.email);
   const name = input.name.trim();
+  const password = input.password ?? "";
   if (!name || !email) {
     throw new AdminApiError("VALIDATION", "Nombre y correo son obligatorios.");
   }
+  if (password.length < 6) {
+    throw new AdminApiError(
+      "VALIDATION",
+      "La contraseña debe tener al menos 6 caracteres.",
+    );
+  }
   if (usersDb.some((user) => user.email.toLowerCase() === email)) {
     throw new AdminApiError("CONFLICT", `Ya existe un usuario con correo ${email}.`);
+  }
+  if (usersDb.some((user) => user.name.toLowerCase() === name.toLowerCase())) {
+    throw new AdminApiError("CONFLICT", `Ya existe un usuario llamado ${name}.`);
   }
   if (!rolesDb.some((role) => role.id === input.roleId)) {
     throw new AdminApiError("VALIDATION", "El rol seleccionado no existe.");
@@ -504,6 +575,7 @@ export async function createUser(input: CreatePanelUserInput): Promise<PanelUser
     lastLoginAt: null,
   };
   usersDb.push(created);
+  passwordsByUserId.set(created.id, password);
   return created;
 }
 

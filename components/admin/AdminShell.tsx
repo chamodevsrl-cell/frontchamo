@@ -27,39 +27,46 @@ import {
   X,
 } from "lucide-react";
 import { firstName } from "@/lib/auth-local";
-import { logoutAdmin } from "@/lib/auth";
-import type { AuthSession } from "@/types/admin";
+import {
+  firstAllowedAdminHref,
+  hasAdminPermission,
+  permissionForAdminPath,
+} from "@/lib/admin-permissions";
+import { useAuth } from "@/components/AuthProvider";
+import type { AdminPermission, AuthSession } from "@/types/admin";
 
 type NavChild = { href: string; label: string };
 type NavItem = {
   href: string;
   label: string;
   icon: typeof LayoutDashboard;
+  permission: AdminPermission;
   children?: NavChild[];
 };
 
 const NAV: NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, permission: "dashboard" },
   {
     href: "/admin/productos",
     label: "Productos",
     icon: Package,
+    permission: "productos",
     children: [
       { href: "/admin/productos", label: "Ver productos" },
       { href: "/admin/productos/nuevo", label: "Crear producto" },
     ],
   },
-  { href: "/admin/categorias", label: "Categorías", icon: FolderTree },
-  { href: "/admin/marcas", label: "Marcas", icon: Tags },
-  { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingCart },
-  { href: "/admin/clientes", label: "Clientes", icon: Users },
-  { href: "/admin/inventario", label: "Inventario", icon: Warehouse },
-  { href: "/admin/ofertas", label: "Ofertas", icon: Flame },
-  { href: "/admin/banners", label: "Banners", icon: ImageIcon },
-  { href: "/admin/reportes", label: "Reportes", icon: BarChart3 },
-  { href: "/admin/usuarios", label: "Usuarios", icon: UserCog },
-  { href: "/admin/roles", label: "Roles", icon: ShieldCheck },
-  { href: "/admin/configuracion", label: "Configuración", icon: Settings },
+  { href: "/admin/categorias", label: "Categorías", icon: FolderTree, permission: "categorias" },
+  { href: "/admin/marcas", label: "Marcas", icon: Tags, permission: "marcas" },
+  { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingCart, permission: "pedidos" },
+  { href: "/admin/clientes", label: "Clientes", icon: Users, permission: "clientes" },
+  { href: "/admin/inventario", label: "Inventario", icon: Warehouse, permission: "inventario" },
+  { href: "/admin/ofertas", label: "Ofertas", icon: Flame, permission: "ofertas" },
+  { href: "/admin/banners", label: "Banners", icon: ImageIcon, permission: "banners" },
+  { href: "/admin/reportes", label: "Reportes", icon: BarChart3, permission: "reportes" },
+  { href: "/admin/usuarios", label: "Usuarios", icon: UserCog, permission: "usuarios" },
+  { href: "/admin/roles", label: "Roles", icon: ShieldCheck, permission: "roles" },
+  { href: "/admin/configuracion", label: "Configuración", icon: Settings, permission: "configuracion" },
 ];
 
 function isActivePath(pathname: string, href: string) {
@@ -74,6 +81,7 @@ export default function AdminShell({
   children: ReactNode;
   session: AuthSession;
 }) {
+  const { logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -83,11 +91,19 @@ export default function AdminShell({
   const [loggingOut, setLoggingOut] = useState(false);
   const onProductos = pathname.startsWith("/admin/productos");
   const showProductosSub = onProductos || productsOpen;
+  const visibleNav = NAV.filter((item) => hasAdminPermission(session, item.permission));
 
   useEffect(() => {
     document.documentElement.classList.add("admin-shell");
     return () => document.documentElement.classList.remove("admin-shell");
   }, []);
+
+  useEffect(() => {
+    const required = permissionForAdminPath(pathname);
+    if (required && !hasAdminPermission(session, required)) {
+      router.replace(firstAllowedAdminHref(session));
+    }
+  }, [pathname, router, session]);
 
   const initials = useMemo(() => {
     const name = session.name?.trim() || "Admin";
@@ -141,7 +157,7 @@ export default function AdminShell({
         </div>
 
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4" aria-label="Admin">
-          {NAV.map((item) => {
+          {visibleNav.map((item) => {
             const Icon = item.icon;
             const active = isActivePath(pathname, item.href);
             if (item.children) {
@@ -250,8 +266,8 @@ export default function AdminShell({
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0B3554] font-display text-xs font-bold text-white">
                 {initials}
               </span>
-              <span className="hidden max-w-[8rem] truncate text-left text-sm font-semibold sm:block">
-                {firstName(session.name)}
+              <span className="hidden max-w-[10rem] truncate text-left text-sm font-semibold sm:block">
+                {session.name?.trim() || firstName(session.name)}
               </span>
             </button>
             {accountOpen ? (
@@ -272,10 +288,9 @@ export default function AdminShell({
                   onClick={() => {
                     setLoggingOut(true);
                     setAccountOpen(false);
-                    void logoutAdmin().then(() => {
-                      router.replace("/admin/login");
-                      router.refresh();
-                    });
+                    logout();
+                    router.replace("/");
+                    router.refresh();
                   }}
                   className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-brand-dark hover:bg-brand-gray disabled:opacity-60"
                 >

@@ -38,8 +38,6 @@ permisos, ambas contra el dev server real.
 
 ## Pendiente
 
-- Esto **no** está conectado a la sesión real del panel: `loginAdmin()` sigue devolviendo
-  siempre el mismo `MOCK_SESSION` fijo. Cuando haya backend, además de reemplazar los
-  `fetch()` en `adminApi.ts`, hay que decidir cómo el login valida contra `PanelUser` +
-  `PanelRole` en vez de la sesión hardcodeada.
+- Cerrado el 2026-09-15: el login ya valida contra `PanelUser` + `PanelRole`
+  (ver [`2026-09-15-admin-login-usuarios.md`](./2026-09-15-admin-login-usuarios.md)).
 - Sin borrado de usuarios/roles todavía (solo alta + cambio de estado).

@@ -9,6 +9,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { loginAdminAction } from "@/app/admin/actions";
+import {
+  clearAdminSessionClient,
+  persistAdminSession,
+  parseAdminSession,
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_STORAGE_KEY,
+} from "@/lib/auth";
 import {
   ACCOUNTS_KEY,
   SESSION_KEY,
@@ -24,6 +32,7 @@ import {
   type AuthUser,
   type StoredAccount,
 } from "@/lib/auth-local";
+import type { AuthSession } from "@/types/admin";
 
 export type AuthMode = "login" | "register" | "reset";
 
@@ -31,6 +40,8 @@ type AuthContextValue = {
   isOpen: boolean;
   mode: AuthMode;
   user: AuthUser | null;
+  /** True si hay sesión del panel (`chamo_admin_session`) — muestra Administrar. */
+  hasPanelSession: boolean;
   ready: boolean;
   openAuth: (mode?: AuthMode) => void;
   closeAuth: () => void;
@@ -45,12 +56,39 @@ type AuthContextValue = {
   logout: () => void;
 };
 
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const prefix = `${name}=`;
+  const match = document.cookie.split("; ").find((part) => part.startsWith(prefix));
+  return match ? match.slice(prefix.length) : null;
+}
+
+function readPanelSession(): AuthSession | null {
+  const fromCookie = parseAdminSession(readCookie(ADMIN_SESSION_COOKIE));
+  if (fromCookie) return fromCookie;
+  try {
+    return parseAdminSession(localStorage.getItem(ADMIN_SESSION_STORAGE_KEY));
+  } catch {
+    return null;
+  }
+}
+
+function panelUserFromSession(session: AuthSession): AuthUser {
+  return {
+    id: session.id,
+    name: session.name,
+    email: session.email,
+    role: "admin",
+  };
+}
+
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [hasPanelSession, setHasPanelSession] = useState(false);
   const [accounts, setAccounts] = useState<StoredAccount[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -66,9 +104,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadedAccounts = parseAccounts(window.localStorage.getItem(ACCOUNTS_KEY));
     const loadedSession = parseSession(window.localStorage.getItem(SESSION_KEY));
+    const panelSession = readPanelSession();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setAccounts(loadedAccounts);
-    setUser(hydrateSessionUser(loadedSession, loadedAccounts));
+    setHasPanelSession(Boolean(panelSession));
+    setUser(
+      hydrateSessionUser(loadedSession, loadedAccounts) ??
+        (panelSession ? panelUserFromSession(panelSession) : null),
+    );
     setReady(true);
   }, []);
 
@@ -109,14 +152,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsOpen(false);
   }, []);
 
+  const applyPanelSession = useCallback((session: AuthSession) => {
+    persistAdminSession(session);
+    setHasPanelSession(true);
+    setUser(panelUserFromSession(session));
+    setIsOpen(false);
+  }, []);
+
   const login = useCallback(
     async (email: string, password: string) => {
       const account = await verifyAccount(accounts, email, password);
-      if (!account) return "Correo o contraseña incorrectos.";
-      persistUser(account);
+      if (account) {
+        persistUser(account);
+        return null;
+      }
+
+      const panel = await loginAdminAction({ email, password });
+      if (!panel.ok) {
+        return panel.message.toLowerCase().includes("suspendida")
+          ? panel.message
+          : "Correo o contraseña incorrectos.";
+      }
+      applyPanelSession(panel.session);
       return null;
     },
-    [accounts, persistUser],
+    [accounts, persistUser, applyPanelSession],
   );
 
   const register = useCallback(
@@ -154,6 +214,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     setUser(null);
+    setHasPanelSession(false);
+    clearAdminSessionClient();
+    void import("@/lib/auth").then(({ logoutAdmin }) => {
+      void logoutAdmin();
+    });
   }, []);
 
   const value = useMemo(
@@ -161,6 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isOpen,
       mode,
       user,
+      hasPanelSession,
       ready,
       openAuth,
       closeAuth,
@@ -174,6 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isOpen,
       mode,
       user,
+      hasPanelSession,
       ready,
       openAuth,
       closeAuth,

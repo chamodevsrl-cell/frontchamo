@@ -146,13 +146,13 @@ placeholder hasta ficha oficial del cliente.
 El árbol `/admin` se parte en dos layouts para no bloquear el login:
 
 - `app/admin/layout.tsx` — solo metadata.
-- `app/admin/login` — formulario contra `loginAdmin()` (mock). Credenciales de
-  demo: `admin@local.test` / `admin123` (no son datos oficiales).
+- `app/admin/login` — redirige a `/login` (mismo modal de “Mi cuenta”). Credenciales de
+  demo: `THE WINTER` / `Criper@11` (no son datos oficiales).
 - `app/admin/(panel)/layout.tsx` — lee `getAdminSession()` (cookie
   `chamo_admin_session`, sin delay de red). Si no hay sesión →
-  `redirect('/admin/login')`. Envuelve `AdminShell` con esa sesión.
-- `logoutAdmin()` borra cookie + `localStorage` (`chamo-admin-session-v1`) y
-  vuelve al login. **No** cierra la cuenta de la tienda.
+  `redirect('/login')`. Envuelve `AdminShell` con esa sesión.
+- Cerrar sesión (tienda o panel) borra cookie + `localStorage`
+  (`chamo-admin-session-v1`) y la cuenta de “Mi cuenta”.
 
 Tipos: `types/admin.ts`. Cliente: `services/adminApi.ts` (300 ms + comentarios
 `TODO Backend`). Contrato HTTP: [`API_CONTRACT.md`](../API_CONTRACT.md) en la
@@ -277,8 +277,8 @@ Piezas clave (v2):
 | `services/adminApi.ts` | Cliente **mock**: cada función simula un endpoint real con 300 ms de latencia y trae en un comentario la ruta HTTP que debe reemplazarla (`// TODO Backend: Reemplazar mock con fetch('/api/v1/...')`) |
 | `lib/auth.ts` | Sesión del panel: lee/escribe la cookie `chamo_admin_session` (+ copia en `localStorage` para el cliente) |
 | `app/admin/actions.ts` | Server Actions: `loginAdminAction`, `createProductAction`, `updateOrderStatusAction` — hacen de puente entre los componentes cliente y `lib/auth.ts`/`services/adminApi.ts` |
-| `app/admin/login/page.tsx` + `components/admin/AdminLoginForm.tsx` | Login del panel (público) |
-| `app/admin/(panel)/layout.tsx` | Layout protegido: si no hay sesión, `redirect('/admin/login')`; si hay, envuelve todo en `AdminShell` |
+| `app/admin/login/page.tsx` | Redirige a `/login` (modal de Mi cuenta) o a `/admin` si ya hay cookie |
+| `app/admin/(panel)/layout.tsx` | Layout protegido: si no hay sesión, `redirect('/login')`; si hay, envuelve todo en `AdminShell` |
 | `components/admin/AdminShell.tsx` | Sidebar (`#0B3554`) + header con el nombre/rol de la sesión y botón de salir |
 | `components/admin/SiteContentEditor.tsx` | El editor de banners/categorías de la v1, reutilizado dentro del panel nuevo |
 | `API_CONTRACT.md` (raíz del repo) | El documento de handover: cada endpoint, su body/respuesta de ejemplo, y el paso a paso para "enchufar" el backend real |
@@ -287,19 +287,18 @@ Piezas clave (v2):
 
 **Flujo de acceso:**
 
-1. `GET /admin/login` — pública. Si ya hay sesión, redirige a `/admin`.
-2. El formulario llama a `loginAdminAction` (Server Action) → `loginAdmin()` en
-   `services/adminApi.ts` (valida contra las credenciales mock, ver A.12.4) →
-   si es correcto, escribe la cookie `chamo_admin_session` (`lib/auth.ts`) y una
-   copia en `localStorage` (`chamo-admin-session-v1`).
-3. Cualquier ruta bajo `/admin/(panel)` (o sea, todo menos `/admin/login`) pasa por
+1. “Mi cuenta” en la tienda (o `GET /login`) — mismo modal para clientes y staff.
+   Si las credenciales son de un `PanelUser` (p. ej. THE WINTER), además se escribe
+   la cookie `chamo_admin_session`.
+2. El formulario llama a `login()` de `AuthProvider` → primero cuentas de tienda,
+   si no hay match prueba `loginAdminAction()` → `loginAdmin()` en
+   `services/adminApi.ts`.
+3. Cualquier ruta bajo `/admin/(panel)` pasa por
    `app/admin/(panel)/layout.tsx`, que lee la cookie **en el servidor** con
-   `getAdminSession()` — sin sesión válida, redirige de vuelta a `/admin/login`.
+   `getAdminSession()` — sin sesión válida, redirige a `/login`.
 4. Con sesión válida, se renderiza `AdminShell` (sidebar + header) alrededor de la
-   página pedida.
-5. "Salir" llama a `logoutAdmin()`: borra cookie + `localStorage` y vuelve al login.
-   **No** cierra la sesión de "Mi cuenta" de la tienda — son dos sistemas
-   completamente aparte (ver A.12.5).
+   página pedida. En la barra de la tienda aparece **Administrar** (ícono de casa).
+5. "Salir" (tienda o panel) borra cookie + `localStorage` de ambas sesiones.
 
 **Secciones del sidebar — qué es real y qué es placeholder hoy:**
 
@@ -307,12 +306,12 @@ Piezas clave (v2):
 | --- | --- | --- |
 | Dashboard | `/admin` | ✅ Real — KPIs desde `getDashboardKPIs()` (mock) |
 | Productos → Ver productos | `/admin/productos` | ✅ Real — `getProducts({ q })`, búsqueda por SKU/nombre/marca |
-| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — `createProduct()`, valida SKU único; el `<select>` de categoría viene de `getCategories()` (no de `data/home.ts` directo) |
+| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes se suben desde archivos o galería (drag & drop o `<input type="file">`, convertidas a `data:` URL con `FileReader`, no son URLs pegadas a mano); `createProduct()` recién se llama al terminar la fase 4, valida SKU único; el `<select>` de categoría viene de `getCategories()` (no de `data/home.ts` directo) |
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
 | Banners | `/admin/banners` | ✅ Real — edita `chamo-cms-v1` (slider del home) |
 | Categorías | `/admin/categorias` | ✅ Real — edita `chamo-cms-v1` (textos de líneas del home) |
-| Usuarios | `/admin/usuarios` | ✅ Real — `getUsers()` + alta (`createUser()`) + cambiar estado (`updateUserStatus()`). Staff del panel, no clientes de la tienda |
-| Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`) con checklist de 13 permisos (`AdminPermission`). Administrador/Editor son roles base (`isSystem: true`), no se pueden borrar |
+| Usuarios | `/admin/usuarios` | ✅ Real — `getUsers()` + alta (`createUser()` con contraseña) + cambiar estado. Esas cuentas entran por “Mi cuenta” |
+| Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`). El login copia `permissions` a `AuthSession`; `AdminShell` filtra el sidebar |
 | Marcas, Clientes, Inventario, Ofertas, Reportes, Configuración | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
 
 **Datos:** todo lo "real" arriba corre contra `productsDb`/`ordersDb` **en memoria del
@@ -323,22 +322,26 @@ días y el ranking de SKUs del dashboard son datos de ejemplo fijos en `data/adm
 
 #### A.12.4 Credenciales para ingresar
 
-> ⚠️ **Son credenciales de prueba, no una cuenta oficial de Chamo Import.** Están
-> hardcodeadas en `services/adminApi.ts` (`MOCK_ADMIN_EMAIL` / `MOCK_ADMIN_PASSWORD`)
-> solo para poder probar el panel mientras no existe backend. **Se deben borrar del
-> código en cuanto el login real esté conectado** (ver A.12.5).
+> ⚠️ **Son credenciales de prueba, no una cuenta oficial de Chamo Import.** Viven
+> en `services/adminApi.ts` (`usersDb` + mapa de contraseñas) para probar el panel
+> mientras no existe backend. **Se deben borrar del código en cuanto el login real
+> esté conectado** (ver A.12.5).
 
-| Campo | Valor |
-| --- | --- |
-| URL | `/admin/login` (ej. `http://localhost:3000/admin/login` en desarrollo) |
-| Correo | `admin@local.test` |
-| Contraseña | `admin123` |
-| Rol de la sesión | `admin` (el otro rol posible, `editor`, existe en el tipo pero ningún flujo lo asigna todavía) |
-| Duración de la sesión | 8 horas (`ADMIN_SESSION_MAX_AGE_SECONDS` en `lib/auth.ts`) |
+El campo del login acepta **nombre o correo**. Cuentas suspendidas no entran.
 
-Cualquier otro correo/contraseña devuelve `INVALID_CREDENTIALS`. No hay
-"olvidé mi contraseña" ni registro de nuevos usuarios del panel — mientras sea mock,
-solo existe esta cuenta.
+| Campo | THE WINTER (staff) | Admin Demo |
+| --- | --- | --- |
+| URL | “Mi cuenta” en la tienda (`/login`) | igual |
+| Usuario | `THE WINTER` | `admin@local.test` |
+| Correo | `thewinter@local.test` | `admin@local.test` |
+| Contraseña | `Criper@11` | `admin123` |
+| Rol | Administrador (`role_admin`, sesión `admin`) | Administrador |
+| Duración | 8 horas (`ADMIN_SESSION_MAX_AGE_SECONDS`) | igual |
+
+Otras semillas: Katia Ríos (`katia.demo@local.test` / `editor123`, rol Editor — no ve Usuarios/Roles) y Julio Paredes (`julio.demo@local.test`, suspendido). El alta en `/admin/usuarios` pide contraseña y esa cuenta puede entrar de inmediato.
+
+Cualquier usuario/contraseña que no coincida devuelve `INVALID_CREDENTIALS`. No hay
+"olvidé mi contraseña" del panel.
 
 #### A.12.5 Dos sesiones distintas — no confundir
 
@@ -347,8 +350,8 @@ solo existe esta cuenta.
 | Para qué | "Mi cuenta" del sitio público (favoritos, carrito, comparar) | Gestionar el negocio en `/admin` |
 | Dónde vive | `lib/auth-local.ts` | `lib/auth.ts` |
 | Storage | `chamo-accounts-v1` / `chamo-session-v1` (solo `localStorage`) | Cookie `chamo_admin_session` + copia en `localStorage` (`chamo-admin-session-v1`) |
-| Cómo se entra | Se registra cualquiera desde `/login` | Con las credenciales mock en `/admin/login` |
-| Quién es "admin" | La primera cuenta creada en ese navegador (`role: "admin"`) | La única cuenta del mock (`admin@local.test`) |
+| Cómo se entra | Se registra cualquiera desde “Mi cuenta” | Staff del panel, mismo modal (THE WINTER / `Criper@11`) |
+| Quién es "admin" | La primera cuenta creada en ese navegador (`role: "admin"`) | Staff con rol Administrador (p. ej. THE WINTER o `admin@local.test`) |
 | Se cierran juntas? | No — cerrar una no afecta a la otra | |
 
 Antes había un solo admin (v1, ligado a la cuenta de la tienda); ahora conviven las
@@ -459,7 +462,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
 | `/admin` | Panel (sidebar + dashboard). Requiere cookie `chamo_admin_session`. KPIs del mock `getDashboardKPIs()` |
-| `/admin/login` | Login del panel (`admin@local.test` / `admin123` en el mock) |
+| `/admin/login` | Redirige a `/login` (modal de Mi cuenta) |
 | `/admin/productos` | Listado mock (`getProducts`). Query `?q=` |
 | `/admin/productos/nuevo` | Alta mock (`createProduct`) |
 | `/admin/pedidos` | Pedidos mock + cambio de estado |
@@ -475,15 +478,13 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 ### B.4 Contenido que el negocio puede cambiar sin programar
 
 Hay un **panel de administración** en `/admin`. La sesión del panel es propia
-(cookie `chamo_admin_session`, login en `/admin/login`; mock
-`admin@local.test` / `admin123`). No es la misma cuenta que “Mi cuenta” de la
-tienda. El dashboard muestra KPIs del contrato (`totalSales`, pedidos
-pendientes, stock bajo, clientes nuevos). Productos y pedidos se gestionan
-contra el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). Banners
-del slider y textos de categorías se editan en `/admin/banners` y
-`/admin/categorias` (`chamo-cms-v1`). El enlace “Editar contenido” del Navbar
-sigue pidiendo `role: "admin"` de la tienda; al entrar a `/admin` hay que
-iniciar la sesión del panel.
+(cookie `chamo_admin_session`, login en “Mi cuenta”; mock
+`THE WINTER` / `Criper@11` o `admin@local.test` / `admin123`). El enlace
+**Administrar** (ícono de casa) del Navbar solo aparece con sesión del panel.
+El dashboard muestra KPIs del contrato. Productos y pedidos se gestionan contra
+el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). Banners del
+slider y textos de categorías se editan en `/admin/banners` y
+`/admin/categorias` (`chamo-cms-v1`).
 
 - Banners → `/admin/banners` o `public/images/slider/` + `data/media.ts`
 - Categorías del home → `/admin/categorias` o `data/home.ts` + collage de productos de la línea

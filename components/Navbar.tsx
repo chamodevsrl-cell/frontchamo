@@ -5,9 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronDown,
-  GitCompareArrows,
   Heart,
-  LayoutDashboard,
+  House,
   LayoutGrid,
   LogOut,
   Menu,
@@ -25,11 +24,10 @@ import { LOGO_SRC } from "@/data/media";
 import { mainCategories } from "@/data/home";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
-import { useCompare } from "@/components/CompareProvider";
 import { useFavorites } from "@/components/FavoritesProvider";
 import { useSiteContent } from "@/components/ContentProvider";
 import CategoryIcon from "@/components/CategoryIcon";
-import { firstName, isAdminUser } from "@/lib/auth-local";
+import { firstName } from "@/lib/auth-local";
 
 const mainLinks = [
   { href: "/", label: "Inicio" },
@@ -47,10 +45,9 @@ const topLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { openAuth, user, logout } = useAuth();
+  const { openAuth, user, logout, hasPanelSession } = useAuth();
   const { count } = useCart();
   const { count: favoritesCount } = useFavorites();
-  const { count: compareCount } = useCompare();
   const { categories } = useSiteContent();
   const navCategories = categories.length > 0 ? categories : mainCategories;
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -285,14 +282,14 @@ export default function Navbar() {
                     <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
                       {user.email}
                     </p>
-                    {isAdminUser(user) ? (
+                    {hasPanelSession ? (
                       <Link
                         href="/admin"
                         onClick={() => setAccountOpen(false)}
                         className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
                       >
-                        <LayoutDashboard className="h-4 w-4 text-brand-primary" />
-                        Editar contenido
+                        <House className="h-4 w-4 text-brand-primary" />
+                        Administrar
                       </Link>
                     ) : null}
                     <button
@@ -320,20 +317,16 @@ export default function Navbar() {
               </button>
             )}
 
-            <Link
-              href="/comparar"
-              className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
-              aria-label={`Comparar, ${compareCount} productos`}
-            >
-              <GitCompareArrows className="h-5 w-5" strokeWidth={2} />
-              <span className="text-[11px] font-semibold">Comparar</span>
-              <span
-                suppressHydrationWarning
-                className="absolute -top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+            {hasPanelSession ? (
+              <Link
+                href="/admin"
+                className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
+                aria-label="Administrar"
               >
-                {compareCount}
-              </span>
-            </Link>
+                <House className="h-5 w-5" strokeWidth={2} />
+                <span className="text-[11px] font-semibold">Administrar</span>
+              </Link>
+            ) : null}
 
             <Link
               href="/favoritos"
@@ -367,19 +360,15 @@ export default function Navbar() {
             </Link>
 
             {/* Compact icons on very small screens */}
-            <Link
-              href="/comparar"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
-              aria-label={`Comparar, ${compareCount} productos`}
-            >
-              <GitCompareArrows className="h-5 w-5" strokeWidth={2} />
-              <span
-                suppressHydrationWarning
-                className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white"
+            {hasPanelSession ? (
+              <Link
+                href="/admin"
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
+                aria-label="Administrar"
               >
-                {compareCount}
-              </span>
-            </Link>
+                <House className="h-5 w-5" strokeWidth={2} />
+              </Link>
+            ) : null}
             <Link
               href="/favoritos"
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
@@ -603,11 +592,11 @@ export default function Navbar() {
                 );
               })}
               <Link
-                href="/comparar"
+                href="/favoritos"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg px-3 py-2.5 font-display text-base font-semibold text-brand-dark hover:bg-brand-gray"
               >
-                Comparar
+                Favoritos
               </Link>
             </nav>
 
@@ -617,14 +606,14 @@ export default function Navbar() {
                   <p className="text-center text-xs text-brand-dark/60">
                     {user.email}
                   </p>
-                  {isAdminUser(user) ? (
+                  {hasPanelSession ? (
                     <Link
                       href="/admin"
                       onClick={() => setMobileOpen(false)}
                       className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
                     >
-                      <LayoutDashboard className="h-5 w-5" strokeWidth={2} />
-                      Editar contenido
+                      <House className="h-5 w-5" strokeWidth={2} />
+                      Administrar
                     </Link>
                   ) : null}
                   <button

@@ -8,7 +8,11 @@
  * Fuente de verdad HTTP: `API_CONTRACT.md` en la raíz del repo.
  */
 
-/** Rol del usuario del panel. El mock actual solo emite `admin`. */
+/**
+ * Permiso grosero de la sesión (`admin` ve todo; `editor` no gestiona
+ * Usuarios/Roles). El detalle fino vive en {@link AuthSession.permissions},
+ * copiado del {@link PanelRole} al hacer login.
+ */
 export type AdminRole = "admin" | "editor";
 
 /** Estado de publicación de un SKU en el catálogo admin. */
@@ -55,23 +59,38 @@ export interface AuthSession {
   id: string;
   /** Nombre para mostrar en el header del panel. */
   name: string;
-  /** Correo de acceso. En el mock es `admin@local.test`. */
+  /** Correo de acceso. */
   email: string;
-  /** Permiso dentro del panel (`admin` | `editor`). */
+  /** Permiso grosero (`admin` | `editor`), derivado del {@link PanelRole}. */
   role: AdminRole;
   /**
    * Token opaco de sesión. El front lo guarda en la cookie `chamo_admin_session`.
    * En producción el backend debería emitirlo como JWT/sesión httpOnly.
    */
   token: string;
+  /** Id del {@link PanelRole} asignado al usuario. */
+  roleId: string;
+  /** Secciones del sidebar habilitadas (copia de `PanelRole.permissions` al login). */
+  permissions: AdminPermission[];
 }
 
 /** Credenciales que envía el formulario de `/admin/login`. */
 export interface LoginCredentials {
-  /** Correo normalizado (trim + minúsculas en el cliente). */
+  /**
+   * Identificador de acceso: correo o nombre del {@link PanelUser}
+   * (el campo se llama `email` por el contrato HTTP).
+   */
   email: string;
   /** Contraseña en texto plano. Nunca loguear este campo. */
   password: string;
+}
+
+/** Fila de la ficha técnica (fase "Especs" del alta de producto). */
+export interface ProductSpec {
+  /** Nombre del atributo (p. ej. "Material"). */
+  label: string;
+  /** Valor del atributo. */
+  value: string;
 }
 
 /**
@@ -108,6 +127,8 @@ export interface Product {
   descriptionFull: string;
   /** Si aparece en destacados / home. */
   isFeatured: boolean;
+  /** Ficha técnica (tabla de la fase "Especs"). Puede quedar vacía. */
+  specs: ProductSpec[];
   /** ISO-8601 de alta (`2026-09-11T18:00:00.000Z`). */
   createdAt: string;
 }
@@ -226,8 +247,9 @@ export type AdminPermission =
 
 /**
  * Rol configurable del panel (qué secciones puede ver/editar cada usuario).
- * No confundir con `AdminRole` (`"admin" | "editor"`), que es el permiso fijo
- * que hoy emite el login mock — `PanelRole` es el modelo nuevo de Usuarios/Roles.
+ * No confundir con `AdminRole` (`"admin" | "editor"`), el permiso grosero de
+ * `AuthSession`. `PanelRole` es el modelo de Usuarios/Roles: el login copia
+ * `permissions` a la sesión.
  */
 export interface PanelRole {
   /** Identificador estable. */
@@ -272,8 +294,13 @@ export interface PanelUser {
   lastLoginAt: string | null;
 }
 
-/** Payload de alta de usuario. El backend asigna `id`, `createdAt` y `lastLoginAt: null`. */
-export type CreatePanelUserInput = Pick<PanelUser, "name" | "email" | "roleId">;
+/**
+ * Payload de alta de usuario. El backend asigna `id`, `createdAt` y
+ * `lastLoginAt: null`. `password` no se devuelve nunca en {@link PanelUser}.
+ */
+export type CreatePanelUserInput = Pick<PanelUser, "name" | "email" | "roleId"> & {
+  password: string;
+};
 
 /** Sobre JSON de éxito que debe devolver el backend. */
 export interface ApiSuccess<T> {

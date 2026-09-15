@@ -98,8 +98,8 @@ export default function AuthForm() {
         <p className="mt-1 text-sm text-brand-dark/65 dark:text-white/65">
           {isReset
             ? "La cuenta vive en este navegador. Si el correo ya está registrado aquí, puedes cambiar la contraseña."
-            : isLogin
-              ? "Ingresa para cotizar, guardar favoritos y editar el contenido local."
+              : isLogin
+                ? "Ingresa para cotizar, guardar favoritos o administrar el sitio."
               : "Regístrate en este navegador. Cuando haya backend, estas cuentas se migrarán."}
         </p>
       </div>
@@ -132,18 +132,18 @@ export default function AuthForm() {
             htmlFor="auth-email"
             className="mb-1.5 block text-sm font-medium text-brand-dark dark:text-white"
           >
-            Correo electrónico
+            {isLogin ? "Usuario o correo" : "Correo electrónico"}
           </label>
           <input
             id="auth-email"
             name="email"
-            type="email"
+            type={isLogin ? "text" : "email"}
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
+            autoComplete="username"
             className={fieldClass}
-            placeholder="correo@empresa.com"
+            placeholder={isLogin ? "correo o usuario" : "correo@empresa.com"}
           />
         </div>
 

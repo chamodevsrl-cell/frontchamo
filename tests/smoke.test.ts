@@ -15,6 +15,7 @@ import {
 } from "@/data/contact";
 import { testimonials } from "@/data/testimonials";
 import { isBrokenImage } from "@/lib/image";
+import type { AdminPermission } from "@/types/admin";
 
 describe("smoke de catálogo y home", () => {
   it("el slider tiene 3 banners y rutas sin espacios", () => {
@@ -210,6 +211,8 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
       email: "admin@local.test",
       role: "admin" as const,
       token: "tok_test",
+      roleId: "role_admin",
+      permissions: ["dashboard", "productos", "usuarios", "roles"] as AdminPermission[],
     };
     expect(parseAdminSession(serializeAdminSession(session))).toEqual(session);
     expect(parseAdminSession(encodeAdminSessionCookie(session))).toEqual(session);
@@ -217,19 +220,75 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
     expect(parseAdminSession(null)).toBeNull();
   });
 
-  it("loginAdmin solo acepta las credenciales mock", async () => {
-    const { loginAdmin, AdminApiError, MOCK_ADMIN_EMAIL, MOCK_ADMIN_PASSWORD } =
-      await import("@/services/adminApi");
-    const session = await loginAdmin({
+  it("loginAdmin valida contra PanelUser (nombre o correo) y respeta roles", async () => {
+    const {
+      loginAdmin,
+      AdminApiError,
+      MOCK_ADMIN_EMAIL,
+      MOCK_ADMIN_PASSWORD,
+      MOCK_WINTER_NAME,
+      MOCK_WINTER_EMAIL,
+      MOCK_WINTER_PASSWORD,
+    } = await import("@/services/adminApi");
+
+    const winterByName = await loginAdmin({
+      email: MOCK_WINTER_NAME,
+      password: MOCK_WINTER_PASSWORD,
+    });
+    expect(winterByName.name).toBe(MOCK_WINTER_NAME);
+    expect(winterByName.email).toBe(MOCK_WINTER_EMAIL);
+    expect(winterByName.role).toBe("admin");
+    expect(winterByName.roleId).toBe("role_admin");
+    expect(winterByName.permissions).toContain("dashboard");
+    expect(winterByName.permissions).toContain("usuarios");
+
+    const winterByEmail = await loginAdmin({
+      email: MOCK_WINTER_EMAIL,
+      password: MOCK_WINTER_PASSWORD,
+    });
+    expect(winterByEmail.id).toBe(winterByName.id);
+
+    const adminSession = await loginAdmin({
       email: MOCK_ADMIN_EMAIL,
       password: MOCK_ADMIN_PASSWORD,
     });
-    expect(session.email).toBe(MOCK_ADMIN_EMAIL);
-    expect(session.role).toBe("admin");
-    expect(session.token.length).toBeGreaterThan(0);
+    expect(adminSession.email).toBe(MOCK_ADMIN_EMAIL);
+    expect(adminSession.role).toBe("admin");
+
+    const editorSession = await loginAdmin({
+      email: "katia.demo@local.test",
+      password: "editor123",
+    });
+    expect(editorSession.role).toBe("editor");
+    expect(editorSession.permissions).not.toContain("usuarios");
+
     await expect(
-      loginAdmin({ email: MOCK_ADMIN_EMAIL, password: "wrong-password" }),
+      loginAdmin({ email: MOCK_WINTER_NAME, password: "wrong-password" }),
     ).rejects.toBeInstanceOf(AdminApiError);
+
+    await expect(
+      loginAdmin({ email: "julio.demo@local.test", password: "almacen123" }),
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("getUsers incluye THE WINTER y createUser deja una cuenta que puede entrar", async () => {
+    const { getUsers, createUser, loginAdmin } = await import("@/services/adminApi");
+    const users = await getUsers();
+    expect(users.some((user) => user.name === "THE WINTER")).toBe(true);
+
+    const created = await createUser({
+      name: "QA Login",
+      email: "qa.login@local.test",
+      roleId: "role_editor",
+      password: "qa-pass-11",
+    });
+    expect(created.status).toBe("active");
+    const session = await loginAdmin({
+      email: "QA Login",
+      password: "qa-pass-11",
+    });
+    expect(session.id).toBe(created.id);
+    expect(session.role).toBe("editor");
   });
 
   it("getDashboardKPIs expone las 4 cifras del contrato", async () => {
@@ -279,6 +338,7 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
       descriptionShort: "Corto",
       descriptionFull: "Largo",
       isFeatured: false,
+      specs: [],
     });
     expect(created.id).toMatch(/^prd_/);
     expect(created.createdAt).toMatch(/T/);
@@ -335,14 +395,14 @@ describe("home HTTP (si el dev server está arriba)", () => {
         redirect: "manual",
       });
       expect([307, 302, 303, 308]).toContain(admin.status);
-      expect(admin.headers.get("location") ?? "").toContain("/admin/login");
+      expect(admin.headers.get("location") ?? "").toContain("/login");
 
       const login = await fetch("http://127.0.0.1:3000/admin/login", {
         signal: AbortSignal.timeout(4000),
+        redirect: "manual",
       });
-      expect(login.ok).toBe(true);
-      const loginHtml = await login.text();
-      expect(loginHtml).toMatch(/Panel de administración|admin@local.test/);
+      expect([307, 302, 303, 308]).toContain(login.status);
+      expect(login.headers.get("location") ?? "").toContain("/login");
     } catch (error) {
       if (error instanceof Error && error.message.includes("expected")) {
         throw error;

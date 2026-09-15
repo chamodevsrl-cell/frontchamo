@@ -6,11 +6,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginAdminAction } from "@/app/admin/actions";
 import { persistAdminSession } from "@/lib/auth";
-import { MOCK_ADMIN_EMAIL } from "@/services/adminApi";
+import { MOCK_WINTER_NAME, MOCK_WINTER_PASSWORD } from "@/services/adminApi";
 
 export default function AdminLoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState(MOCK_ADMIN_EMAIL);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -67,9 +67,9 @@ export default function AdminLoginForm() {
         className="mt-8 w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 text-brand-dark shadow-xl"
       >
         <label className="block text-sm font-semibold">
-          Correo
+          Usuario o correo
           <input
-            type="email"
+            type="text"
             name="email"
             autoComplete="username"
             required
@@ -97,7 +97,7 @@ export default function AdminLoginForm() {
           </p>
         ) : (
           <p className="text-xs text-brand-dark/55">
-            Demo: <code>{MOCK_ADMIN_EMAIL}</code> / <code>admin123</code>
+            Demo: <code>{MOCK_WINTER_NAME}</code> / <code>{MOCK_WINTER_PASSWORD}</code>
           </p>
         )}
         <button

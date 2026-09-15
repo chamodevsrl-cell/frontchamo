@@ -190,7 +190,7 @@ solo WhatsApp), hay que diseñar ese endpoint desde cero; no hay contrato previo
 
 | Tipo | Campos clave | Quién lo produce hoy |
 | --- | --- | --- |
-| `AuthSession` | `id, name, email, role: "admin"\|"editor", token` | `loginAdmin()` en `services/adminApi.ts` (mock: solo `admin@local.test`/`admin123`) |
+| `AuthSession` | `id, name, email, role: "admin"\|"editor", roleId, permissions[], token` | `loginAdmin()` en `services/adminApi.ts` (mock: THE WINTER / `Criper@11`, o `admin@local.test`/`admin123`) |
 | `Product` | `id, sku, name, brand, categoryId, subcategoryId, price, stock, minStock, status, images, descriptionShort, descriptionFull, isFeatured, createdAt` | `getProducts()`, `createProduct()` |
 | `Order` / `OrderItem` | `id, orderNumber, clientName/Phone/Email, address, status, items[], total, createdAt, paymentMethod, shippingMethod` | `getOrders()`, `updateOrderStatus()` |
 | `Category` | `id, name, subcategoriesCount, status, image` | `getCategories()` (nuevo — ver `docs/cambios/2026-09-11-categorias-mock-api.md`) |
@@ -203,7 +203,7 @@ solo WhatsApp), hay que diseñar ese endpoint desde cero; no hay contrato previo
 | Componente | Props | Fuente de los datos |
 | --- | --- | --- |
 | `AdminShell.tsx` | `children: ReactNode`, `session: AuthSession` | `app/admin/(panel)/layout.tsx` (server, lee la cookie) |
-| `AdminLoginForm.tsx` | sin props — llama `loginAdminAction()` (Server Action) | `app/admin/login/page.tsx` |
+| `AdminLoginForm.tsx` | (sin uso en rutas; el login vive en `AuthForm` / “Mi cuenta”) | `/admin/login` redirige a `/login` |
 | `AdminNewProductForm.tsx` | `categories: Category[]` | `app/admin/(panel)/productos/nuevo/page.tsx` awaits `getCategories()` |
 | `AdminOrdersTable.tsx` | `orders: Order[]`, `statusFilter: string` | `app/admin/(panel)/pedidos/page.tsx` awaits `getOrders(statusFilter)` |
 | `app/admin/(panel)/productos/page.tsx` | (server) lee `?q=` y awaits `getProducts({ q })` | — |
@@ -314,11 +314,15 @@ Hoy conviven, a propósito, dos pares de conceptos duplicados:
 
 ### 6.2 Panel de administración (equipo Chamo Import)
 
-1. Ir a **`/admin/login`** (no es la misma cuenta que "Mi cuenta" de la tienda).
+1. Ir a **“Mi cuenta”** en la tienda (mismo modal que un cliente). `/admin/login`
+   redirige ahí.
 2. Credenciales de prueba — **no oficiales, borrar cuando haya backend real**:
-   correo `admin@local.test`, contraseña `admin123`.
-3. Tras entrar: sidebar con Dashboard, Productos, Categorías, Marcas, Pedidos,
-   Clientes, Inventario, Ofertas, Banners, Reportes, Configuración.
+   usuario `THE WINTER` / contraseña `Criper@11` (también correo
+   `thewinter@local.test`). Sigue existiendo `admin@local.test` / `admin123`.
+3. Tras entrar: en la barra aparece **Administrar** (casa). El sidebar del panel
+   tiene Dashboard, Productos, Categorías, Marcas, Pedidos,
+   Clientes, Inventario, Ofertas, Banners, Reportes, Usuarios, Roles, Configuración
+   (las entradas visibles dependen del rol).
 4. **Lo que ya funciona de verdad** (contra el mock, no una base de datos):
    - **Dashboard**: 4 KPIs (ventas, pedidos pendientes, stock bajo, clientes nuevos).
    - **Productos**: ver/buscar (`/admin/productos`) y crear (`/admin/productos/nuevo`,

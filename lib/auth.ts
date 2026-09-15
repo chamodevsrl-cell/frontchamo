@@ -42,7 +42,11 @@ export function isAuthSession(value: unknown): value is AuthSession {
     typeof session.email === "string" &&
     typeof session.token === "string" &&
     session.token.length > 0 &&
-    ADMIN_ROLES.includes(session.role as AdminRole)
+    ADMIN_ROLES.includes(session.role as AdminRole) &&
+    typeof session.roleId === "string" &&
+    session.roleId.length > 0 &&
+    Array.isArray(session.permissions) &&
+    session.permissions.every((item) => typeof item === "string")
   );
 }
 

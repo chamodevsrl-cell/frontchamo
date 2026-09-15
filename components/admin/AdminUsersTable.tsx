@@ -62,6 +62,7 @@ export default function AdminUsersTable({
         name: String(form.get("name") ?? ""),
         email: String(form.get("email") ?? ""),
         roleId: String(form.get("roleId") ?? ""),
+        password: String(form.get("password") ?? ""),
       });
       if (!result.ok) {
         setError(result.message);
@@ -81,9 +82,9 @@ export default function AdminUsersTable({
       <div>
         <h1 className="font-display text-2xl font-bold text-brand-dark">Usuarios</h1>
         <p className="mt-1 text-sm text-brand-dark/65">
-          Staff con acceso a este panel. Mock <code>getUsers()</code> /{" "}
-          <code>createUser()</code> — distinto de &quot;Clientes&quot;, que son cuentas
-          de la tienda.
+          Staff con acceso a este panel. El login de &quot;Mi cuenta&quot; en la
+          tienda valida contra esta lista. Distinto de &quot;Clientes&quot;, que son
+          cuentas de la tienda.
         </p>
       </div>
 
@@ -149,8 +150,8 @@ export default function AdminUsersTable({
         <div>
           <h2 className="font-display text-lg font-bold text-brand-dark">Nuevo usuario</h2>
           <p className="mt-1 text-sm text-brand-dark/65">
-            Llama a <code>createUser()</code> (mock). Queda <code>active</code> por
-            defecto.
+            Llama a <code>createUser()</code> (mock). Queda <code>active</code> y
+            puede entrar desde &quot;Mi cuenta&quot; con nombre o correo.
           </p>
         </div>
 
@@ -169,6 +170,18 @@ export default function AdminUsersTable({
             name="email"
             type="email"
             required
+            className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
+          />
+        </label>
+
+        <label className="block text-sm font-semibold">
+          Contraseña
+          <input
+            name="password"
+            type="password"
+            required
+            minLength={6}
+            autoComplete="new-password"
             className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
           />
         </label>

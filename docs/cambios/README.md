@@ -13,6 +13,9 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-15 | Alta de producto: wizard de 4 fases + subir imágenes desde archivos/galería | [2026-09-15-wizard-producto-imagenes.md](./2026-09-15-wizard-producto-imagenes.md) |
+| 2026-09-15 | Admin entra por “Mi cuenta”; Comparar sale de la barra; ícono Administrar | [2026-09-15-admin-login-tienda.md](./2026-09-15-admin-login-tienda.md) |
+| 2026-09-15 | Login del panel valida contra Usuarios/Roles + cuenta THE WINTER | [2026-09-15-admin-login-usuarios.md](./2026-09-15-admin-login-usuarios.md) |
 | 2026-09-15 | Panel admin: secciones Usuarios y Roles (permisos por sección, mock API) | [2026-09-15-admin-usuarios-roles.md](./2026-09-15-admin-usuarios-roles.md) |
 | 2026-09-11 | `FRONTEND_DOCUMENTATION.md`: variables por componente + cómo conectar backend + manual de uso | [2026-09-11-frontend-documentation.md](./2026-09-11-frontend-documentation.md) |
 | 2026-09-11 | Fix: categorías del alta de producto ahora pasan por `getCategories()` del mock | [2026-09-11-categorias-mock-api.md](./2026-09-11-categorias-mock-api.md) |
