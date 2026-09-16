@@ -14,6 +14,7 @@ import {
   loginAdmin,
   updateCategory,
   updateOrderStatus,
+  updateProduct,
   updateUserStatus,
 } from "@/services/adminApi";
 import type {
@@ -31,6 +32,7 @@ import type {
   PanelUserStatus,
   Product,
   UpdateCategoryInput,
+  UpdateProductInput,
 } from "@/types/admin";
 
 function cookieOptions() {
@@ -83,6 +85,20 @@ export async function createProductAction(
   } catch (cause) {
     const message =
       cause instanceof Error ? cause.message : "No se pudo crear el producto.";
+    return { ok: false, message };
+  }
+}
+
+export async function updateProductAction(
+  productId: string,
+  productData: UpdateProductInput,
+): Promise<{ ok: true; product: Product } | { ok: false; message: string }> {
+  try {
+    const product = await updateProduct(productId, productData);
+    return { ok: true, product };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo actualizar el producto.";
     return { ok: false, message };
   }
 }

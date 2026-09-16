@@ -260,7 +260,9 @@ export type AdminPermission =
   | "reportes"
   | "usuarios"
   | "roles"
-  | "configuracion";
+  | "configuracion"
+  | "contactos"
+  | "reclamaciones";
 
 /**
  * Rol configurable del panel (qué secciones puede ver/editar cada usuario).
@@ -318,6 +320,50 @@ export interface PanelUser {
 export type CreatePanelUserInput = Pick<PanelUser, "name" | "email" | "roleId"> & {
   password: string;
 };
+
+/**
+ * Marca comercial del catálogo admin (distinta del wordmark de la tienda).
+ */
+export interface Brand {
+  /** Identificador estable (slug del nombre). */
+  id: string;
+  /** Nombre visible. */
+  name: string;
+  /** SKUs activos de esta marca. */
+  productCount: number;
+  /** Logo si existe en `public/images/marcas`. */
+  image: string;
+}
+
+/**
+ * Cliente/mayorista visto desde pedidos (no es un {@link PanelUser}).
+ */
+export interface Client {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  ordersCount: number;
+  totalSpent: number;
+}
+
+/** Mensaje enviado desde `/contacto` o `/reclamaciones`. */
+export interface InboxMessage {
+  id: string;
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
+  topic: string;
+  message: string;
+  source: "contacto" | "reclamacion";
+  status: "new" | "attended";
+  createdAt: string;
+}
+
+export type CreateInboxInput = Omit<InboxMessage, "id" | "status" | "createdAt">;
+
+export type UpdateProductInput = Partial<CreateProductInput>;
 
 /** Sobre JSON de éxito que debe devolver el backend. */
 export interface ApiSuccess<T> {

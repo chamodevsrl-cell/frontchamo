@@ -13,10 +13,10 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { createProductAction } from "@/app/admin/actions";
+import { createProductAction, updateProductAction } from "@/app/admin/actions";
 import { useSiteContent } from "@/components/ContentProvider";
 import { readCmsImageFile } from "@/lib/cms-image";
-import type { Category, CreateProductInput, ProductStatus } from "@/types/admin";
+import type { Category, CreateProductInput, Product, ProductStatus } from "@/types/admin";
 
 const STATUSES: ProductStatus[] = ["active", "draft", "archived"];
 
@@ -40,10 +40,14 @@ function soles(value: number) {
 
 export default function AdminNewProductForm({
   categories,
+  product,
 }: {
   /** Viene de `getCategories()` (mock) — no importar `mainCategories` directo aquí. */
   categories: Category[];
+  /** Si viene, el wizard actualiza el SKU en vez de crearlo. */
+  product?: Product;
 }) {
+  const isEdit = Boolean(product);
   const router = useRouter();
   const { categories: siteCategories } = useSiteContent();
   const categoryOptions = useMemo(() => {
@@ -67,27 +71,27 @@ export default function AdminNewProductForm({
   const [pending, setPending] = useState(false);
 
   // Fase 1 — Datos
-  const [name, setName] = useState("");
-  const [sku, setSku] = useState("");
-  const [brand, setBrand] = useState("");
-  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
-  const [descriptionShort, setDescriptionShort] = useState("");
+  const [name, setName] = useState(product?.name ?? "");
+  const [sku, setSku] = useState(product?.sku ?? "");
+  const [brand, setBrand] = useState(product?.brand ?? "");
+  const [categoryId, setCategoryId] = useState(product?.categoryId ?? categories[0]?.id ?? "");
+  const [descriptionShort, setDescriptionShort] = useState(product?.descriptionShort ?? "");
 
   // Fase 2 — Detalle
-  const [descriptionFull, setDescriptionFull] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [descriptionFull, setDescriptionFull] = useState(product?.descriptionFull ?? "");
+  const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState("");
 
   // Fase 3 — Precios
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
-  const [minStock, setMinStock] = useState("10");
-  const [status, setStatus] = useState<ProductStatus>("active");
-  const [isFeatured, setIsFeatured] = useState(false);
+  const [price, setPrice] = useState(product ? String(product.price) : "");
+  const [stock, setStock] = useState(product ? String(product.stock) : "");
+  const [minStock, setMinStock] = useState(product ? String(product.minStock) : "10");
+  const [status, setStatus] = useState<ProductStatus>(product?.status ?? "active");
+  const [isFeatured, setIsFeatured] = useState(product?.isFeatured ?? false);
 
   // Fase 4 — Especs
-  const [specs, setSpecs] = useState<SpecRow[]>([]);
+  const [specs, setSpecs] = useState<SpecRow[]>(product?.specs ?? []);
 
   async function handleFiles(fileList: FileList) {
     setImageError("");
@@ -184,7 +188,9 @@ export default function AdminNewProductForm({
       specs: specs.filter((row) => row.label.trim() && row.value.trim()),
     };
     try {
-      const result = await createProductAction(payload);
+      const result = product
+        ? await updateProductAction(product.id, payload)
+        : await createProductAction(payload);
       if (!result.ok) {
         setError(result.message);
         return;
@@ -192,7 +198,13 @@ export default function AdminNewProductForm({
       router.replace("/admin/productos");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "No se pudo crear el producto.");
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : product
+            ? "No se pudo actualizar el producto."
+            : "No se pudo crear el producto.",
+      );
     } finally {
       setPending(false);
     }
@@ -208,7 +220,8 @@ export default function AdminNewProductForm({
           ← Volver a productos
         </Link>
         <p className="mt-2 text-sm text-brand-dark/65">
-          Wizard de 4 fases. Llama a <code>createProduct()</code> (mock) recién al
+          Wizard de 4 fases. Llama a{" "}
+          <code>{isEdit ? "updateProduct()" : "createProduct()"}</code> (mock) recién al
           terminar la fase 4 — nada se guarda antes.
         </p>
       </div>
@@ -583,7 +596,7 @@ export default function AdminNewProductForm({
                 onClick={() => void handleSubmit()}
                 className="rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0e6aad] disabled:opacity-60"
               >
-                {pending ? "Guardando…" : "Crear producto"}
+                {pending ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear producto"}
               </button>
             )}
           </div>

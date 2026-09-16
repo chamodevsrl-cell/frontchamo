@@ -59,6 +59,22 @@ describe("smoke de catálogo y home", () => {
     }
   });
 
+  it("parseFavoriteItems migra el formato viejo y resolveCategoryLabel lee la línea", async () => {
+    const { parseFavoriteItems } = await import("@/lib/favorites");
+    const { resolveCategoryLabel } = await import("@/data/products");
+    const migrated = parseFavoriteItems(JSON.stringify(["1", "2", "1"]));
+    expect(migrated).toEqual([
+      { productId: "1", addedAt: "2026-01-01T00:00:00.000Z" },
+      { productId: "2", addedAt: "2026-01-01T00:00:00.000Z" },
+    ]);
+    const modern = parseFavoriteItems(
+      JSON.stringify([{ productId: "3", addedAt: "2026-09-16T00:00:00.000Z" }]),
+    );
+    expect(modern[0]?.productId).toBe("3");
+    expect(resolveCategoryLabel("electricos")).toBe("Electricidad");
+    expect(resolveCategoryLabel("no-existe", "Fallback")).toBe("Fallback");
+  });
+
   it("searchCatalog filtra por texto y categoría", () => {
     const bySku = searchCatalog({ q: "TRU-7821" });
     expect(bySku).toHaveLength(1);
@@ -408,6 +424,38 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
     expect(confirmed.some((order) => order.id === first.id)).toBe(true);
     await updateOrderStatus(first.id, "pending");
   });
+
+  it("getBrands, getClients y updateProduct cubren el contrato nuevo", async () => {
+    const { getBrands, getClients, getProduct, updateProduct } = await import(
+      "@/services/adminApi"
+    );
+    const brands = await getBrands();
+    expect(brands.length).toBeGreaterThan(0);
+    expect(brands.every((item) => item.name && item.productCount >= 1)).toBe(true);
+    const clients = await getClients();
+    expect(clients.length).toBeGreaterThan(0);
+    const first = await getProduct("1");
+    const updated = await updateProduct("1", { name: `${first.name} (edit)` });
+    expect(updated.name.endsWith("(edit)")).toBe(true);
+    await updateProduct("1", { name: first.name });
+  });
+
+  it("createContact persiste en la bandeja mock", async () => {
+    const { createContact, getContacts } = await import("@/services/adminApi");
+    const created = await createContact({
+      name: "Demo Mayorista",
+      company: "Ferretería Test",
+      phone: "+51 900 000 111",
+      email: "demo.inbox@local.test",
+      topic: "Cotización mayorista",
+      message: "Necesito stock de taladros.",
+      source: "contacto",
+    });
+    expect(created.id).toMatch(/^msg_/);
+    expect(created.status).toBe("new");
+    const list = await getContacts();
+    expect(list.some((item) => item.id === created.id)).toBe(true);
+  });
 });
 
 describe("CMS local (footer, banners de página, equipo)", () => {
@@ -506,6 +554,13 @@ describe("home HTTP (si el dev server está arriba)", () => {
       const contactHtml = await contacto.text();
       expect(contactHtml).toContain("CONTACTO");
       expect(contactHtml).toContain("959 723 602");
+
+      const reclamaciones = await fetch("http://127.0.0.1:3000/reclamaciones", {
+        signal: AbortSignal.timeout(4000),
+      });
+      expect(reclamaciones.ok).toBe(true);
+      const claimsHtml = await reclamaciones.text();
+      expect(claimsHtml).toMatch(/RECLAMACIONES|Reclamaci/);
 
       const admin = await fetch("http://127.0.0.1:3000/admin", {
         signal: AbortSignal.timeout(4000),

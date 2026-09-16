@@ -397,6 +397,36 @@ Front: `updateUserStatus(userId, status)`. Body: `{ "status": "active" | "suspen
 
 ---
 
+## Marcas, clientes e inbox
+
+### `GET /api/v1/brands`
+
+Front: `getBrands()`.
+
+**Respuesta `200`:** `{ "ok": true, "data": [ { "id", "name", "productCount", "image" } ] }`
+
+### `GET /api/v1/clients`
+
+Front: `getClients()`. Derivado de pedidos en el mock.
+
+### `GET /api/v1/contacts` / `POST /api/v1/contacts`
+
+Front: `getContacts()` / `createContact()`. El formulario de `/contacto` llama al POST **antes** de abrir WhatsApp. Hoy el mock persiste en `localStorage` (`chamo-inbox-v1`) para que el panel vea el mensaje.
+
+### `GET /api/v1/claims` / `POST /api/v1/claims`
+
+Front: `getClaims()` / `createClaim()`. Igual, desde `/reclamaciones`.
+
+### `PUT /api/v1/inbox/:id/status`
+
+Front: `updateInboxStatus(id, status)`. Body: `{ "status": "new" | "attended" }`.
+
+### `GET /api/v1/products/:id` / `PUT /api/v1/products/:id`
+
+Front: `getProduct(id)` / `updateProduct(id, data)`. El wizard de `/admin/productos/[id]` usa el PUT.
+
+---
+
 ## Cómo enchufar el front
 
 1. Implementar los endpoints de arriba.
@@ -416,6 +446,14 @@ Front: `updateUserStatus(userId, status)`. Body: `{ "status": "active" | "suspen
 | `/admin` | Cookie de sesión | `getDashboardKPIs` |
 | `/admin/productos` | Cookie + permiso `productos` | `getProducts({ q })` |
 | `/admin/productos/nuevo` | Cookie + permiso `productos` | `createProduct` |
+| `/admin/productos/:id` | Cookie + permiso `productos` | `getProduct` / `updateProduct` |
+| `/admin/marcas` | Cookie + permiso `marcas` | `getBrands` |
+| `/admin/clientes` | Cookie + permiso `clientes` | `getClients` |
+| `/admin/inventario` | Cookie + permiso `inventario` | `getProducts` (stock) |
+| `/admin/ofertas` | Cookie + permiso `ofertas` | destacados |
+| `/admin/reportes` | Cookie + permiso `reportes` | `getDashboardKPIs` |
+| `/admin/contactos` | Cookie + permiso `contactos` | `getContacts` |
+| `/admin/reclamaciones` | Cookie + permiso `reclamaciones` | `getClaims` |
 | `/admin/pedidos` | Cookie + permiso `pedidos` | `getOrders` / `updateOrderStatus` |
 | `/admin/usuarios` | Cookie + permiso `usuarios` | `getUsers` / `createUser` |
 | `/admin/roles` | Cookie + permiso `roles` | `getRoles` / `createRole` |

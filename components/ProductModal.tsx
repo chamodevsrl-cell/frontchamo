@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import {
   getRelatedProducts,
+  resolveCategoryLabel,
   type FeaturedProduct,
 } from "@/data/products";
 import { formatPrice } from "@/lib/format";
@@ -331,7 +332,7 @@ export default function ProductModal({
                   Productos relacionados de la misma categoría
                 </h3>
                 <p className="mt-1 text-sm text-brand-dark/55">
-                  Más opciones en {product.categoryLabel}
+                  Más opciones en {resolveCategoryLabel(product.category, product.categoryLabel)}
                 </p>
                 <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
                   {related.map((item) => (

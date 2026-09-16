@@ -194,15 +194,14 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-15): Ajustes desglosado en Footer y Canales de atención
-(WhatsApp flotante, teléfono, correo y redes). Detalle:
-[`docs/cambios/2026-09-15-ajustes-footer-canales.md`](docs/cambios/2026-09-15-ajustes-footer-canales.md).
+Último avance (2026-09-16): se ejecutó el backlog pendiente del panel y la tienda —
+contactos/reclamaciones persistidos, edición de producto, módulos que eran
+placeholder, favoritos con `addedAt` y `resolveCategoryLabel`. Detalle:
+[`docs/cambios/2026-09-16-ejecutar-pendientes.md`](docs/cambios/2026-09-16-ejecutar-pendientes.md).
 
 ## 10. Pendientes conocidos
 
 - Backend real: sustituir el mock de `services/adminApi.ts` por `fetch('/api/v1/...')` según `API_CONTRACT.md`. Cuentas/carrito/comparar de la tienda siguen en este navegador.
-- `FavoritesProvider` sigue en `ids: string[]` (sin `addedAt`) — cambiar a `{productId, addedAt}[]` si se necesita ordenar u sincronizar con cuenta real.
-- `categoryLabel` sigue denormalizado en cada producto (documentado, no corregido).
 - Confirmar correo de contacto oficial (footer y `/contacto`).
 - Reemplazar textos placeholder de `/nosotros` (`data/company.ts`) por ficha oficial.
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).

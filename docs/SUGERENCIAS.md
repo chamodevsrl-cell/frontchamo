@@ -1,6 +1,6 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-15**
+Última actualización: **2026-09-16**
 
 ## 🖱️ Cursor negro/blanco sobre imágenes (2026-09-15)
 
@@ -23,8 +23,7 @@ imagen real. Se llevó a nuestro panel — detalle:
   contrato `Product`/`CreateProductInput`.
 - [ ] Cuando haya backend: reemplazar el guardado de imágenes en `data:` URL por
   subida real a un bucket (tipo R2/S3) y guardar solo la URL resultante.
-- [ ] Evaluar el mismo wizard para **editar** un producto existente (hoy solo existe
-  para alta; `/admin/productos` no tiene pantalla de edición todavía).
+- [x] 2026-09-16 — Evaluar el mismo wizard para **editar** un producto existente: `/admin/productos/[id]` reutiliza el wizard con `updateProduct()`.
 
 ## 🗂️ Propuesta: ampliar el panel admin para que la web sea 100% editable (2026-09-15)
 
@@ -84,9 +83,11 @@ panel sigue siendo mock (`services/adminApi.ts`, sin backend real), esto quedar�
   editar/agregar; imágenes por URL o galería/carpetas (`CmsImageField`) en banners,
   equipo, ajustes, categorías y alta de producto. Detalle:
   [`cambios/2026-09-15-categorias-cartas-imagenes.md`](./cambios/2026-09-15-categorias-cartas-imagenes.md).
-- [ ] Contactos — guardar el mensaje del formulario antes de abrir WhatsApp + vista admin
-- [ ] Reclamaciones — decidir si existe un formulario público antes de construir la vista admin
-- [ ] Evaluar renombrar Reportes→Analítica e Inventario→Almacenamiento, o dejarlos así
+- [x] 2026-09-16 — Contactos: el formulario de `/contacto` guarda el mensaje (`createContact`) y después abre WhatsApp. Vista admin `/admin/contactos`.
+- [x] 2026-09-16 — Reclamaciones: formulario público `/reclamaciones` + `/admin/reclamaciones`.
+- [x] 2026-09-16 — Sidebar: Inventario se muestra como **Almacenamiento** y Reportes como **Analítica** (mismas rutas).
+- [x] 2026-09-16 — Wizard de **editar** producto en `/admin/productos/[id]`.
+- [x] 2026-09-16 — Marcas, Clientes, Almacenamiento, Ofertas y Analítica dejan de ser placeholder (leen el mock API).
 
 Lista viva de mejoras. Al completar una, márcala como hecha y añade fecha. Al surgir una idea en un cambio, anótala aquí.
 
@@ -173,8 +174,8 @@ verificado con `npm run build` + `npm run test` en verde después de cada cambio
 - [x] **Cuentas (`lib/auth-local.ts`):** `id: string` en `StoredAccount`/`AuthUser` (antes la clave real era `email`); cuentas viejas sin `id` lo reciben solo al leerlas. `role` ya estaba (bug 2).
 - [x] **Carrito (`CartProvider.tsx`):** `qty` → `quantity`; `setQty` → `setQuantity`; se agregó `unitPrice`/`wholesaleUnitPrice` (bug 3).
 - [x] **Productos (`data/products.ts`):** `discount` → `discountPercent` (con comentario de que es 0-100, no un monto); se quitó el campo `image` (singular) redundante — todo el código ahora usa `images[0]`.
-- [ ] **Favoritos (`FavoritesProvider.tsx`):** sigue siendo `ids: string[]` — **sin aplicar todavía**. Cambiar a `{ productId, addedAt }[]` cuando se necesite ordenar "agregado recientemente" o sincronizar con cuenta real; no había ningún bug detrás, así que se dejó fuera de este cierre para no tocar más de la cuenta antes del backend.
-- [ ] **`categoryLabel` denormalizado** en cada producto — sin tocar, solo documentado: en un backend real normalmente viene de un `JOIN` con una tabla `categories`.
+- [x] 2026-09-16 — **Favoritos (`FavoritesProvider.tsx`):** `{ productId, addedAt }[]` con migración del `string[]` viejo. `/favoritos` ordena por más reciente.
+- [x] 2026-09-16 — **`categoryLabel`:** la UI usa `resolveCategoryLabel(category)` (JOIN de mentira contra `mainCategories`); el campo en cada SKU queda como fallback.
 - [ ] **`CartProvider`/`FavoritesProvider`/`CompareProvider` casi duplicados** (mismo patrón `localStorage` + `ready` + `idsRef`) — sin tocar; unificarlos en un hook genérico reduciría el riesgo de que se desincronicen, pero no es urgente para conectar el backend.
 
 ## ✅ Revisión de merge-readiness a `main` (2026-09-11)
@@ -271,6 +272,8 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 - [x] 2026-09-10 — Comparar productos (hasta 3 SKUs, `/comparar`, badge en Navbar)
 
 ## Hecho recientemente (referencia)
+
+- [x] 2026-09-16 — Backlog pendiente: contactos/reclamaciones, editar producto, marcas/clientes/almacén/ofertas/analítica, favoritos con fecha. Nota: [`cambios/2026-09-16-ejecutar-pendientes.md`](./cambios/2026-09-16-ejecutar-pendientes.md).
 
 - [x] 2026-09-15 — El admin inicia sesión en el mismo modal de “Mi cuenta”.
   **Comparar** salió de la barra de la tienda. Con sesión del panel aparece

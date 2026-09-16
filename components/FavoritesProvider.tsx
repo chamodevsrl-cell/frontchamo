@@ -12,11 +12,16 @@ import {
 } from "react";
 import { Heart } from "lucide-react";
 import { getProductById, type FeaturedProduct } from "@/data/products";
-
-const STORAGE_KEY = "chamo-favorites-v1";
+import {
+  FAVORITES_STORAGE_KEY,
+  parseFavoriteItems,
+  type FavoriteItem,
+} from "@/lib/favorites";
 
 type FavoritesContextValue = {
+  /** Ids en orden de más reciente a más antiguo (derivado de `items`). */
   ids: string[];
+  items: FavoriteItem[];
   products: FeaturedProduct[];
   count: number;
   has: (productId: string) => boolean;
@@ -27,25 +32,12 @@ type FavoritesContextValue = {
 
 const FavoritesContext = createContext<FavoritesContextValue | null>(null);
 
-function parseIds(raw: string | null): string[] {
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (id): id is string => typeof id === "string" && id.length > 0,
-    );
-  } catch {
-    return [];
-  }
-}
-
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [ids, setIds] = useState<string[]>([]);
+  const [items, setItems] = useState<FavoriteItem[]>([]);
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const noticeTimer = useRef<number>(0);
-  const idsRef = useRef<string[]>([]);
+  const itemsRef = useRef<FavoriteItem[]>([]);
 
   const flash = useCallback((text: string) => {
     window.clearTimeout(noticeTimer.current);
@@ -56,48 +48,62 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Hidratar después del mount para coincidir con el HTML del servidor (badge 0).
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
-    setIds(parseIds(window.localStorage.getItem(STORAGE_KEY)));
+    setItems(parseFavoriteItems(window.localStorage.getItem(FAVORITES_STORAGE_KEY)));
     setReady(true);
   }, []);
 
   useEffect(() => {
-    idsRef.current = ids;
-  }, [ids]);
+    itemsRef.current = items;
+  }, [items]);
 
   useEffect(() => {
     if (!ready) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-  }, [ids, ready]);
+    window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(items));
+  }, [items, ready]);
 
   useEffect(() => {
     return () => window.clearTimeout(noticeTimer.current);
   }, []);
 
-  const has = useCallback((productId: string) => ids.includes(productId), [ids]);
+  const ids = useMemo(
+    () =>
+      [...items]
+        .sort((a, b) => b.addedAt.localeCompare(a.addedAt))
+        .map((item) => item.productId),
+    [items],
+  );
+
+  const has = useCallback(
+    (productId: string) => items.some((item) => item.productId === productId),
+    [items],
+  );
 
   const toggle = useCallback((productId: string) => {
-    const currentlyActive = idsRef.current.includes(productId);
+    const currentlyActive = itemsRef.current.some((item) => item.productId === productId);
     const nextActive = !currentlyActive;
     const next = currentlyActive
-      ? idsRef.current.filter((id) => id !== productId)
-      : [...idsRef.current, productId];
-    idsRef.current = next;
-    setIds(next);
+      ? itemsRef.current.filter((item) => item.productId !== productId)
+      : [
+          ...itemsRef.current,
+          { productId, addedAt: new Date().toISOString() },
+        ];
+    itemsRef.current = next;
+    setItems(next);
     flash(nextActive ? "Guardado en favoritos" : "Quitado de favoritos");
     return nextActive;
   }, [flash]);
 
   const remove = useCallback((productId: string) => {
-    setIds((current) => {
-      const next = current.filter((id) => id !== productId);
-      idsRef.current = next;
+    setItems((current) => {
+      const next = current.filter((item) => item.productId !== productId);
+      itemsRef.current = next;
       return next;
     });
   }, []);
 
   const clear = useCallback(() => {
-    idsRef.current = [];
-    setIds([]);
+    itemsRef.current = [];
+    setItems([]);
   }, []);
 
   const products = useMemo(
@@ -112,6 +118,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       ids,
+      items,
       products,
       count: products.length,
       has,
@@ -119,7 +126,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       remove,
       clear,
     }),
-    [ids, products, has, toggle, remove, clear],
+    [ids, items, products, has, toggle, remove, clear],
   );
 
   return (

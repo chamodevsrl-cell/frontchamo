@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getProducts } from "@/services/adminApi";
 import type { ProductStatus } from "@/types/admin";
 
@@ -44,12 +45,13 @@ export default async function AdminProductosPage({
               <th className="px-4 py-3">Precio</th>
               <th className="px-4 py-3">Stock</th>
               <th className="px-4 py-3">Estado</th>
+              <th className="px-4 py-3"> </th>
             </tr>
           </thead>
           <tbody>
             {products.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-brand-dark/55">
+                <td colSpan={7} className="px-4 py-8 text-center text-brand-dark/55">
                   No hay productos con ese filtro.
                 </td>
               </tr>
@@ -77,6 +79,14 @@ export default async function AdminProductosPage({
                       {low ? " · bajo" : ""}
                     </td>
                     <td className="px-4 py-3">{STATUS_LABEL[product.status]}</td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/admin/productos/${product.id}`}
+                        className="text-sm font-semibold text-brand-primary hover:underline"
+                      >
+                        Editar
+                      </Link>
+                    </td>
                   </tr>
                 );
               })

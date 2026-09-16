@@ -41,6 +41,7 @@ const quickLinks = [
 const legalLinks = [
   { href: "/terminos", label: "Términos y condiciones" },
   { href: "/privacidad", label: "Política de privacidad" },
+  { href: "/reclamaciones", label: "Reclamaciones" },
 ] as const;
 
 const socialIcon = {
