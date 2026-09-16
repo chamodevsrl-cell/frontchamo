@@ -12,17 +12,22 @@
  */
 
 import { featuredProducts } from "@/data/products";
-import { mainCategories } from "@/data/home";
+import { distributorBrands, mainCategories } from "@/data/home";
 import { slugifyLabel, uniqueCategorySlug } from "@/lib/cms";
+import { appendInbox, listInbox, setInboxStatus } from "@/lib/inbox";
 import type {
   AdminPermission,
   AuthSession,
+  Brand,
   Category,
+  Client,
   CreateCategoryInput,
+  CreateInboxInput,
   CreatePanelRoleInput,
   CreatePanelUserInput,
   CreateProductInput,
   DashboardKPIs,
+  InboxMessage,
   LoginCredentials,
   Order,
   OrderStatus,
@@ -32,6 +37,7 @@ import type {
   Product,
   ProductFilters,
   UpdateCategoryInput,
+  UpdateProductInput,
 } from "@/types/admin";
 
 /** Latencia artificial para emular red. No usar en `getAdminSession()`. */
@@ -223,6 +229,8 @@ const ALL_PERMISSIONS: AdminPermission[] = [
   "usuarios",
   "roles",
   "configuracion",
+  "contactos",
+  "reclamaciones",
 ];
 
 function seedRoles(): PanelRole[] {
@@ -247,6 +255,8 @@ function seedRoles(): PanelRole[] {
         "pedidos",
         "ofertas",
         "banners",
+        "contactos",
+        "reclamaciones",
       ],
       isSystem: true,
       createdAt: "2026-09-11T12:00:00.000Z",
@@ -454,6 +464,174 @@ export async function createProduct(
   };
   productsDb.unshift(created);
   return created;
+}
+
+/**
+ * GET /api/v1/products/:id
+ */
+export async function getProduct(productId: string): Promise<Product> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/products/:id')
+  await delay();
+  const product = productsDb.find((item) => item.id === productId);
+  if (!product) {
+    throw new AdminApiError("NOT_FOUND", `No existe el producto ${productId}.`);
+  }
+  return { ...product, images: [...product.images], specs: [...(product.specs ?? [])] };
+}
+
+/**
+ * PUT /api/v1/products/:id
+ */
+export async function updateProduct(
+  productId: string,
+  productData: UpdateProductInput,
+): Promise<Product> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/products/:id')
+  await delay();
+  const index = productsDb.findIndex((item) => item.id === productId);
+  if (index < 0) {
+    throw new AdminApiError("NOT_FOUND", `No existe el producto ${productId}.`);
+  }
+  const current = productsDb[index];
+  if (!current) {
+    throw new AdminApiError("NOT_FOUND", `No existe el producto ${productId}.`);
+  }
+  const nextSku = productData.sku?.trim() ?? current.sku;
+  if (
+    nextSku.toLowerCase() !== current.sku.toLowerCase() &&
+    productsDb.some((item) => item.sku.toLowerCase() === nextSku.toLowerCase())
+  ) {
+    throw new AdminApiError("CONFLICT", `Ya existe un producto con SKU ${nextSku}.`);
+  }
+  const updated: Product = {
+    ...current,
+    ...productData,
+    id: current.id,
+    createdAt: current.createdAt,
+    sku: nextSku,
+    name: productData.name?.trim() ?? current.name,
+    brand: productData.brand?.trim() ?? current.brand,
+    images:
+      productData.images && productData.images.length > 0
+        ? productData.images
+        : current.images,
+  };
+  productsDb[index] = updated;
+  return { ...updated, images: [...updated.images] };
+}
+
+/**
+ * GET /api/v1/brands
+ */
+export async function getBrands(): Promise<Brand[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/brands')
+  await delay();
+  const counts = new Map<string, number>();
+  for (const product of productsDb) {
+    const key = product.brand.trim();
+    if (!key) continue;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  const logos = new Map(
+    distributorBrands.map((brand) => [brand.name.toUpperCase(), brand.src]),
+  );
+  return [...counts.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0], "es"))
+    .map(([name, productCount]) => ({
+      id: name.toLowerCase().replace(/\s+/g, "-"),
+      name,
+      productCount,
+      image: logos.get(name.toUpperCase()) ?? "",
+    }));
+}
+
+/**
+ * GET /api/v1/clients
+ */
+export async function getClients(): Promise<Client[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/clients')
+  await delay();
+  const map = new Map<string, Client>();
+  for (const order of ordersDb) {
+    const key = order.clientEmail.toLowerCase() || order.clientPhone;
+    const current = map.get(key);
+    if (current) {
+      current.ordersCount += 1;
+      current.totalSpent += order.total;
+      continue;
+    }
+    map.set(key, {
+      id: `cli_${key.replace(/[^a-z0-9]+/gi, "-")}`,
+      name: order.clientName,
+      phone: order.clientPhone,
+      email: order.clientEmail,
+      ordersCount: 1,
+      totalSpent: order.total,
+    });
+  }
+  return [...map.values()];
+}
+
+/**
+ * GET /api/v1/contacts
+ */
+export async function getContacts(): Promise<InboxMessage[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/contacts')
+  await delay();
+  return listInbox("contacto");
+}
+
+/**
+ * POST /api/v1/contacts
+ */
+export async function createContact(
+  input: CreateInboxInput,
+): Promise<InboxMessage> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/contacts')
+  await delay();
+  if (!input.name.trim() || !input.phone.trim() || !input.message.trim()) {
+    throw new AdminApiError("VALIDATION", "Nombre, teléfono y mensaje son obligatorios.");
+  }
+  return appendInbox({ ...input, source: "contacto" });
+}
+
+/**
+ * GET /api/v1/claims
+ */
+export async function getClaims(): Promise<InboxMessage[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/claims')
+  await delay();
+  return listInbox("reclamacion");
+}
+
+/**
+ * POST /api/v1/claims
+ */
+export async function createClaim(
+  input: CreateInboxInput,
+): Promise<InboxMessage> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/claims')
+  await delay();
+  if (!input.name.trim() || !input.phone.trim() || !input.message.trim()) {
+    throw new AdminApiError("VALIDATION", "Nombre, teléfono y mensaje son obligatorios.");
+  }
+  return appendInbox({ ...input, source: "reclamacion" });
+}
+
+/**
+ * PUT /api/v1/inbox/:id/status
+ */
+export async function updateInboxStatus(
+  id: string,
+  status: InboxMessage["status"],
+): Promise<InboxMessage> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/inbox/:id/status')
+  await delay();
+  const updated = setInboxStatus(id, status);
+  if (!updated) {
+    throw new AdminApiError("NOT_FOUND", `No existe el mensaje ${id}.`);
+  }
+  return updated;
 }
 
 /**

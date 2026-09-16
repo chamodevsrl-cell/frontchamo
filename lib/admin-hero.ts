@@ -15,6 +15,8 @@ const HEROES: { href: string; exact?: boolean; title: string; action?: AdminHero
       exact: true,
       title: "Nuevo producto",
     },
+    { href: "/admin/contactos", title: "Contactos" },
+    { href: "/admin/reclamaciones", title: "Reclamaciones" },
     {
       href: "/admin/productos",
       title: "Productos",
@@ -24,11 +26,11 @@ const HEROES: { href: string; exact?: boolean; title: string; action?: AdminHero
     { href: "/admin/marcas", title: "Marcas" },
     { href: "/admin/pedidos", title: "Pedidos" },
     { href: "/admin/clientes", title: "Clientes" },
-    { href: "/admin/inventario", title: "Inventario" },
+    { href: "/admin/inventario", title: "Almacenamiento" },
     { href: "/admin/ofertas", title: "Ofertas" },
     { href: "/admin/banners", title: "Banners" },
     { href: "/admin/equipo", title: "Equipo de trabajo" },
-    { href: "/admin/reportes", title: "Reportes" },
+    { href: "/admin/reportes", title: "Analítica" },
     {
       href: "/admin/usuarios",
       title: "Usuarios del panel",
@@ -53,6 +55,9 @@ const HEROES: { href: string; exact?: boolean; title: string; action?: AdminHero
   ];
 
 export function heroForAdminPath(pathname: string): AdminHero {
+  if (/^\/admin\/productos\/(?!nuevo$)[^/]+$/.test(pathname)) {
+    return { title: "Editar producto" };
+  }
   const ranked = [...HEROES].sort((a, b) => b.href.length - a.href.length);
   const match = ranked.find((item) =>
     item.exact

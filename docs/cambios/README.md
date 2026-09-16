@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-16 | Ejecutar backlog: inbox, edición de producto, módulos admin, favoritos | [2026-09-16-ejecutar-pendientes.md](./2026-09-16-ejecutar-pendientes.md) |
 | 2026-09-15 | Ajustes desglosado: Footer y Canales de atención | [2026-09-15-ajustes-footer-canales.md](./2026-09-15-ajustes-footer-canales.md) |
 | 2026-09-15 | Categorías en cartas + imagen por URL/galería en todo el panel | [2026-09-15-categorias-cartas-imagenes.md](./2026-09-15-categorias-cartas-imagenes.md) |
 | 2026-09-15 | Cursor personalizado: negro puro, blanco al pasar sobre imágenes | [2026-09-15-cursor-negro-blanco-imagenes.md](./2026-09-15-cursor-negro-blanco-imagenes.md) |

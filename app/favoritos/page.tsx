@@ -31,8 +31,8 @@ export default function FavoritosPage() {
             Favoritos
           </h1>
           <p className="mt-2 max-w-xl text-brand-dark/70 dark:text-white/70">
-            Guarda productos para cotizarlos después. La lista queda en este
-            navegador.
+            Guarda productos para cotizarlos después. Los más recientes salen
+            primero. La lista queda en este navegador.
           </p>
         </Reveal>
 

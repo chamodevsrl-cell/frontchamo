@@ -9,7 +9,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { useCompare } from "@/components/CompareProvider";
 import { formatPrice } from "@/lib/format";
 import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
-import type { FeaturedProduct, ProductSpec } from "@/data/products";
+import { resolveCategoryLabel, type FeaturedProduct, type ProductSpec } from "@/data/products";
 
 function specMap(product: FeaturedProduct) {
   return new Map(product.specs.map((spec) => [spec.label, spec.value]));
@@ -155,7 +155,7 @@ export default function CompararPage() {
                     {[
                       ["Marca", products.map((product) => product.brand)],
                       ["SKU", products.map((product) => product.sku)],
-                      ["Línea", products.map((product) => product.categoryLabel)],
+                      ["Línea", products.map((product) => resolveCategoryLabel(product.category, product.categoryLabel))],
                       [
                         "Precio",
                         products.map((product) => formatPrice(product.price)),

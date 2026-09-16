@@ -316,15 +316,22 @@ Piezas clave (v2):
 | --- | --- | --- |
 | Dashboard | `/admin` | ✅ Real — KPIs desde `getDashboardKPIs()` (mock) |
 | Productos → Ver productos | `/admin/productos` | ✅ Real — `getProducts({ q })`, búsqueda por SKU/nombre/marca |
-| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes por **galería/carpetas** o **URL**; `createProduct()` se llama al terminar la fase 4; el `<select>` de categoría une `getCategories()` + líneas del CMS |
+| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases; `createProduct()` al terminar |
+| Productos → Editar | `/admin/productos/[id]` | ✅ Real — el mismo wizard con `updateProduct()` |
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
+| Contactos | `/admin/contactos` | ✅ Real — mensajes de `/contacto` (`getContacts`) |
+| Reclamaciones | `/admin/reclamaciones` | ✅ Real — mensajes de `/reclamaciones` (`getClaims`) |
+| Marcas | `/admin/marcas` | ✅ Real — `getBrands()` |
+| Clientes | `/admin/clientes` | ✅ Real — `getClients()` (desde pedidos) |
+| Almacenamiento | `/admin/inventario` | ✅ Real — stock / mínimo (`getProducts`) |
+| Ofertas | `/admin/ofertas` | ✅ Real — SKUs destacados |
+| Analítica | `/admin/reportes` | ✅ Real — KPIs + gráfica demo de 7 días |
 | Banners | `/admin/banners` | ✅ Real — cartas para el slider del home y los banners de Nosotros, Contacto, Ofertas y Catálogo (`chamo-cms-v1`) |
 | Categorías | `/admin/categorias` | ✅ Real — cartas (nombre, descripción, recuento de productos) + modal para editar/agregar; imagen por URL o galería; persiste en CMS (`customCategories`) y en el mock `createCategory`/`updateCategory` |
 | Equipo | `/admin/equipo` | ✅ Real — cartas de colaboradores (se ven en `/nosotros`) |
 | Ajustes | `/admin/ajustes` | ✅ Real — desglose: Footer (`/admin/ajustes/footer`) y Canales de atención (`/admin/ajustes/canales`). `/admin/configuracion` redirige al índice |
 | Usuarios | `/admin/usuarios` | ✅ Real — `getUsers()` + alta (`createUser()` con contraseña) + cambiar estado. Esas cuentas entran por “Mi cuenta” |
 | Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`). El login copia `permissions` a `AuthSession`; `AdminShell` filtra el sidebar |
-| Marcas, Clientes, Inventario, Ofertas, Reportes | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
 
 **Datos:** todo lo "real" arriba corre contra `productsDb`/`ordersDb` **en memoria del
 proceso de Next** (dentro de `services/adminApi.ts`) — se reinician con cada reinicio
@@ -485,7 +492,8 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/ajustes/footer` | Pie de tienda: frase, dirección, mapa, horario y pagos |
 | `/admin/ajustes/canales` | WhatsApp (botón flotante), teléfono para llamar, correo y redes |
 | `/nosotros` | Banner CMS, historia, misión, visión, **equipo de trabajo en cartas** y valores |
-| `/contacto` | Banner CMS **NUESTRO CONTACTO**, tarjetas y mapa leen el footer de Ajustes, formulario WhatsApp |
+| `/contacto` | Banner CMS **NUESTRO CONTACTO**, tarjetas y mapa leen el footer de Ajustes, formulario WhatsApp (queda en el panel) |
+| `/reclamaciones` | Formulario de reclamo: se guarda en el panel y abre WhatsApp |
 | `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |

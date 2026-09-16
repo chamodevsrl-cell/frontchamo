@@ -1,3 +1,5 @@
+import { getCategoryBySlug } from "@/data/home";
+
 export type ProductSpec = {
   label: string;
   value: string;
@@ -10,6 +12,10 @@ export type FeaturedProduct = {
   sku: string;
   /** Slug de categoría (misma familia → relacionados) */
   category: string;
+  /**
+   * Etiqueta denormalizada (el mock la copia de `mainCategories.label`).
+   * En UI usar {@link resolveCategoryLabel} para leer la línea viva.
+   */
   categoryLabel: string;
   price: number;
   oldPrice: number;
@@ -901,6 +907,17 @@ export const homeFeaturedProducts = featuredProducts.slice(0, 8);
 
 export function getProductById(id: string) {
   return featuredProducts.find((product) => product.id === id);
+}
+
+/**
+ * Nombre de línea a partir del slug. El `categoryLabel` guardado en cada SKU
+ * queda como fallback (JOIN de mentira hasta que el backend envíe la categoría).
+ */
+export function resolveCategoryLabel(
+  category: string,
+  fallback?: string,
+): string {
+  return getCategoryBySlug(category)?.label ?? fallback ?? category;
 }
 
 export function getProductsByCategory(category: string) {

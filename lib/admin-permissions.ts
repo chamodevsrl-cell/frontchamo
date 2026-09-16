@@ -10,6 +10,8 @@ export const ADMIN_PATH_PERMISSIONS: {
   { href: "/admin/categorias", permission: "categorias" },
   { href: "/admin/marcas", permission: "marcas" },
   { href: "/admin/pedidos", permission: "pedidos" },
+  { href: "/admin/contactos", permission: "contactos" },
+  { href: "/admin/reclamaciones", permission: "reclamaciones" },
   { href: "/admin/clientes", permission: "clientes" },
   { href: "/admin/inventario", permission: "inventario" },
   { href: "/admin/ofertas", permission: "ofertas" },
