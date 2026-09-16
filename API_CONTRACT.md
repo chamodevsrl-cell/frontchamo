@@ -64,8 +64,10 @@ El login valida contra la lista de `PanelUser` (no una sola cuenta fija).
 **No son cuentas oficiales de Chamo Import.** No usar correos de la empresa
 en el mock. Cuando el login real exista, borrar estas credenciales del front.
 
-La sesión incluye `roleId` + `permissions` copiados del `PanelRole`. El sidebar
-del front filtra con eso.
+La sesión incluye `roleIds` (un usuario puede tener más de un rol) + `roleId`
+(`roleIds[0]`, por compatibilidad) + `permissions` — la **unión** de los
+`permissions` de todos los `PanelRole` en `roleIds`. El sidebar del front
+filtra con eso.
 
 Sesión del panel ≠ cuentas de la tienda (`lib/auth-local.ts` /
 `chamo-accounts-v1`).
@@ -98,6 +100,7 @@ Front: `loginAdmin(credentials)`.
     "email": "thewinter@local.test",
     "role": "admin",
     "roleId": "role_admin",
+    "roleIds": ["role_admin"],
     "permissions": ["dashboard", "productos", "usuarios", "roles"],
     "token": "eyJhbGciOi…"
   }
@@ -387,13 +390,65 @@ Front: `getUsers()`. **Nunca** devolver contraseñas.
 
 ### `POST /api/v1/users`
 
-Front: `createUser(input)`. Body: `{ name, email, roleId, password }`.
-La cuenta queda `active` y puede usarse en `POST /auth/login`.
+Front: `createUser(input)`. Body: `{ name, email, roleIds: string[], password }`.
+**`roleIds` es un arreglo** — un usuario puede tener más de un rol asignado; la
+sesión hereda la **unión** de los `permissions` de todos sus roles. La cuenta
+queda `active` y puede usarse en `POST /auth/login`.
+
+**Errores:** `400 VALIDATION` (`roleIds` vacío o con un id que no existe),
+`409 CONFLICT` (correo o nombre duplicado).
+
+### `PUT /api/v1/users/:userId`
+
+Front: `updateUser(userId, input)`, desde el formulario del modal "Editar
+usuario" en `/admin/usuarios` (`AdminUsersCards.tsx`). Body parcial —
+solo se aplican los campos presentes:
+
+```json
+{
+  "name": "Nuevo Nombre",
+  "email": "nuevo@correo.test",
+  "roleIds": ["role_admin", "role_editor"],
+  "password": "opcional, se omite o va vacío para no cambiarla"
+}
+```
+
+Distinto de `PUT /api/v1/users/me` (esa es la propia cuenta editando su
+nombre/teléfono desde "Mi perfil"); este endpoint es el **staff con permiso
+`usuarios` editando a cualquier otro usuario del panel** — nombre, correo,
+contraseña y roles.
+
+**Respuesta `200`:** `{ "ok": true, "data": { /* PanelUser actualizado, sin password */ } }`
+
+**Errores:** `404 NOT_FOUND`, `400 VALIDATION` (correo inválido, `roleIds`
+vacío o con un id que no existe, contraseña nueva menor a 6 caracteres),
+`409 CONFLICT` (correo o nombre ya usado por otra cuenta).
 
 ### `PUT /api/v1/users/:userId/status`
 
 Front: `updateUserStatus(userId, status)`. Body: `{ "status": "active" | "suspended" }`.
 `suspended` bloquea el login.
+
+### `DELETE /api/v1/users/:userId`
+
+Front: `deleteUser(userId)`, desde el modal "Editar usuario" en `/admin/usuarios`
+(`AdminUsersCards.tsx`). Borra la cuenta staff. El front bloquea borrarte a ti
+mismo mientras tienes la sesión abierta (comparando contra `getAdminSession().id`),
+pero el backend real **debería validar lo mismo** por si acaso.
+
+**Respuesta `200`:** `{ "ok": true, "data": { "deleted": true } }`
+
+**Errores:** `404 NOT_FOUND`.
+
+### `PUT /api/v1/users/me`
+
+Front: `updateOwnProfile(userId, input)`. Body: `{ "name", "phone?", "company?", "ruc?" }`.
+Cualquier rol del panel edita **su** ficha. La foto de perfil no viaja en este
+endpoint (queda en el cliente, `chamo-profiles-v1`) para no inflar la cookie.
+
+**Respuesta `200`:** `{ "ok": true, "data": { /* AuthSession actualizado */ } }`
+
+**Errores:** `404 NOT_FOUND`, `400 VALIDATION`, `409 CONFLICT` (nombre duplicado).
 
 ---
 

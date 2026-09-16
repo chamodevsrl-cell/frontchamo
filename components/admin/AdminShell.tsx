@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -23,10 +23,12 @@ import {
   Store,
   Tags,
   UserCog,
+  UserRound,
   Users,
   Warehouse,
   X,
 } from "lucide-react";
+import AccountAvatar from "@/components/AccountAvatar";
 import { firstName } from "@/lib/auth-local";
 import { heroForAdminPath } from "@/lib/admin-hero";
 import {
@@ -94,7 +96,7 @@ export default function AdminShell({
   children: ReactNode;
   session: AuthSession;
 }) {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -115,12 +117,7 @@ export default function AdminShell({
     }
   }, [pathname, router, session]);
 
-  const initials = useMemo(() => {
-    const name = session.name?.trim() || "Admin";
-    const parts = name.split(/\s+/).filter(Boolean);
-    const letters = (parts[0]?.[0] || "A") + (parts[1]?.[0] || "");
-    return letters.toUpperCase();
-  }, [session.name]);
+  const displayName = user?.name?.trim() || session.name?.trim() || "Admin";
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -274,11 +271,13 @@ export default function AdminShell({
               aria-expanded={accountOpen}
               aria-label="Cuenta de administrador"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0B3554] font-display text-xs font-bold text-white">
-                {initials}
-              </span>
+              <AccountAvatar
+                photo={user?.photo ?? ""}
+                name={displayName}
+                size={36}
+              />
               <span className="hidden max-w-[10rem] truncate text-left text-sm font-semibold sm:block">
-                {session.name?.trim() || firstName(session.name)}
+                {displayName || firstName(session.name)}
               </span>
             </button>
             {accountOpen ? (
@@ -286,6 +285,14 @@ export default function AdminShell({
                 <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
                   {session.email}
                 </p>
+                <Link
+                  href="/cuenta/perfil"
+                  onClick={() => setAccountOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                >
+                  <UserRound className="h-4 w-4 text-brand-primary" />
+                  Mi perfil
+                </Link>
                 <Link
                   href="/"
                   className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { usePathname } from "next/navigation";
 import { Cog, ShoppingCart } from "lucide-react";
 import BrandLoader, { BRAND_LOADER_MS } from "@/components/BrandLoader";
+import { AUTH_TRANSITION_EVENT } from "@/components/AuthProvider";
 
 type IntroVariant = "brand" | "cart" | "load";
 
@@ -24,20 +25,37 @@ function isSameOriginPath(href: string, path: string) {
   }
 }
 
-function isInternalPageLink(link: HTMLAnchorElement) {
-  if (link.target === "_blank" || link.hasAttribute("download")) return false;
+function isAdminPath(path: string) {
+  return path.startsWith("/admin");
+}
+
+function isProfilePath(path: string) {
+  return path === "/cuenta/perfil";
+}
+
+/**
+ * El loader "load" solo debe verse al cruzar hacia/desde el panel admin o la
+ * página de editar perfil — no en cada navegación interna (catálogo,
+ * categorías, ofertas, etc.).
+ */
+function isLoadBoundary(from: string, to: string) {
+  if (isAdminPath(from) !== isAdminPath(to)) return true;
+  if (isProfilePath(from) !== isProfilePath(to)) return true;
+  return false;
+}
+
+/** Pathname de destino de un link interno navegable, o `null` si no aplica. */
+function internalTargetPath(link: HTMLAnchorElement): string | null {
+  if (link.target === "_blank" || link.hasAttribute("download")) return null;
   try {
     const url = new URL(link.href, window.location.origin);
-    if (url.origin !== window.location.origin) return false;
+    if (url.origin !== window.location.origin) return null;
     if (url.pathname === window.location.pathname && url.search === window.location.search) {
-      return false;
+      return null;
     }
-    if (url.pathname.startsWith("/admin") || window.location.pathname.startsWith("/admin")) {
-      return false;
-    }
-    return true;
+    return url.pathname;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -110,7 +128,8 @@ export default function IntroSplash() {
         return;
       }
 
-      if (isInternalPageLink(link)) {
+      const targetPath = internalTargetPath(link);
+      if (targetPath && isLoadBoundary(window.location.pathname, targetPath)) {
         if (play("load")) loadClaimedByClick.current = true;
       }
     }
@@ -120,13 +139,18 @@ export default function IntroSplash() {
   }, [play]);
 
   useEffect(() => {
-    if (pathname === lastPath.current) return;
-    lastPath.current = pathname;
-    if (pathname.startsWith("/admin")) {
-      cartClaimedByClick.current = false;
-      loadClaimedByClick.current = false;
-      return;
+    function onAuthTransition() {
+      play("load");
     }
+    window.addEventListener(AUTH_TRANSITION_EVENT, onAuthTransition);
+    return () => window.removeEventListener(AUTH_TRANSITION_EVENT, onAuthTransition);
+  }, [play]);
+
+  useEffect(() => {
+    if (pathname === lastPath.current) return;
+    const previousPath = lastPath.current;
+    lastPath.current = pathname;
+
     if (pathname === "/carrito") {
       loadClaimedByClick.current = false;
       if (cartClaimedByClick.current) {
@@ -142,7 +166,9 @@ export default function IntroSplash() {
       loadClaimedByClick.current = false;
       return;
     }
-    play("load");
+    if (isLoadBoundary(previousPath, pathname)) {
+      play("load");
+    }
   }, [pathname, play]);
 
   useLayoutEffect(() => {

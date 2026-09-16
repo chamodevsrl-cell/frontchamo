@@ -1,7 +1,23 @@
 export const ACCOUNTS_KEY = "chamo-accounts-v1";
 export const SESSION_KEY = "chamo-session-v1";
+export const PROFILES_KEY = "chamo-profiles-v1";
 
 export type AuthRole = "customer" | "admin";
+
+export type ProfileExtras = {
+  phone: string;
+  photo: string;
+  company: string;
+  ruc: string;
+  bio: string;
+  banner: string;
+};
+
+export type ProfilePatch = {
+  name: string;
+} & ProfileExtras;
+
+export const BIO_MAX_LENGTH = 160;
 
 export type StoredAccount = {
   /** Identificador estable de la cuenta (no depende del email, que se puede cambiar). */
@@ -11,14 +27,49 @@ export type StoredAccount = {
   salt: string;
   passwordHash: string;
   role: AuthRole;
-};
+} & ProfileExtras;
 
 export type AuthUser = {
   id: string;
   name: string;
   email: string;
   role: AuthRole;
-};
+} & ProfileExtras;
+
+export function emptyProfile(): ProfileExtras {
+  return { phone: "", photo: "", company: "", ruc: "", bio: "", banner: "" };
+}
+
+export function readProfileFields(value: Record<string, unknown>): ProfileExtras {
+  return {
+    phone: typeof value.phone === "string" ? value.phone : "",
+    photo: typeof value.photo === "string" ? value.photo : "",
+    company: typeof value.company === "string" ? value.company : "",
+    ruc: typeof value.ruc === "string" ? value.ruc : "",
+    bio: typeof value.bio === "string" ? value.bio : "",
+    banner: typeof value.banner === "string" ? value.banner : "",
+  };
+}
+
+export function profileOf(user: Pick<AuthUser, keyof ProfileExtras> | ProfileExtras): ProfileExtras {
+  return {
+    phone: user.phone ?? "",
+    photo: user.photo ?? "",
+    company: user.company ?? "",
+    ruc: user.ruc ?? "",
+    bio: user.bio ?? "",
+    banner: user.banner ?? "",
+  };
+}
+
+export function applyProfileExtras(
+  user: AuthUser,
+  extras: ProfileExtras | undefined,
+): AuthUser {
+  const base = { ...emptyProfile(), ...user, ...profileOf(user) };
+  if (!extras) return base;
+  return { ...base, ...extras };
+}
 
 export function isAuthRole(value: unknown): value is AuthRole {
   return value === "customer" || value === "admin";
@@ -34,6 +85,7 @@ export function toAuthUser(account: StoredAccount): AuthUser {
     name: account.name,
     email: account.email,
     role: account.role,
+    ...profileOf(account),
   };
 }
 
@@ -51,6 +103,21 @@ export function normalizeEmail(email: string) {
 
 export function firstName(name: string) {
   return name.trim().split(/\s+/).filter(Boolean)[0] || "Cuenta";
+}
+
+export function accountRoleLabel(
+  user: AuthUser,
+  hasPanelSession: boolean,
+  panelRole?: string,
+): string {
+  if (hasPanelSession) {
+    const staff =
+      panelRole === "admin" ? "Cuenta administrador" : "Personal del panel";
+    return `${staff} · Teléfono obligatorio para contacto comercial`;
+  }
+  return user.role === "admin"
+    ? "Cuenta administrador · Teléfono obligatorio para contacto comercial"
+    : "Cliente mayorista";
 }
 
 function bytesToHex(bytes: Uint8Array) {
@@ -104,6 +171,7 @@ export function parseAccounts(raw: string | null): StoredAccount[] {
         : index === 0
           ? "admin"
           : "customer",
+      ...readProfileFields(account as unknown as Record<string, unknown>),
     }));
   } catch {
     return [];
@@ -124,11 +192,30 @@ export function parseSession(raw: string | null): AuthUser | null {
         name: parsed.name,
         email: normalizeEmail(parsed.email),
         role: isAuthRole(parsed.role) ? parsed.role : "customer",
+        ...readProfileFields(parsed as Record<string, unknown>),
       };
     }
     return null;
   } catch {
     return null;
+  }
+}
+
+export function parseProfiles(raw: string | null): Record<string, ProfileExtras> {
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {};
+    }
+    const out: Record<string, ProfileExtras> = {};
+    for (const [id, value] of Object.entries(parsed as Record<string, unknown>)) {
+      if (!id || !value || typeof value !== "object") continue;
+      out[id] = readProfileFields(value as Record<string, unknown>);
+    }
+    return out;
+  } catch {
+    return {};
   }
 }
 
@@ -138,7 +225,51 @@ export function hydrateSessionUser(
 ): AuthUser | null {
   if (!session) return null;
   const match = accounts.find((account) => account.email === session.email);
-  return match ? toAuthUser(match) : session;
+  return match
+    ? toAuthUser(match)
+    : applyProfileExtras(session, undefined);
+}
+
+export function validateProfilePatch(
+  patch: ProfilePatch,
+  options: { requirePhone: boolean },
+): string | null {
+  const name = patch.name.trim();
+  if (name.length < 2) return "Escribe tu nombre (mínimo 2 caracteres).";
+  const phone = patch.phone.trim();
+  const digits = phone.replace(/\D/g, "");
+  if (options.requirePhone && !phone) {
+    return "El teléfono es obligatorio para contacto comercial.";
+  }
+  if (phone && digits.length < 6) return "Escribe un teléfono válido.";
+  const ruc = patch.ruc.trim();
+  if (ruc && !/^\d{8,11}$/.test(ruc.replace(/\s+/g, ""))) {
+    return "El RUC debe tener entre 8 y 11 dígitos.";
+  }
+  if (patch.bio.trim().length > BIO_MAX_LENGTH) {
+    return `La descripción no puede superar los ${BIO_MAX_LENGTH} caracteres.`;
+  }
+  return null;
+}
+
+export function updateAccountProfile(
+  accounts: StoredAccount[],
+  userId: string,
+  patch: ProfilePatch,
+):
+  | { ok: true; accounts: StoredAccount[]; account: StoredAccount }
+  | { ok: false; message: string } {
+  const index = accounts.findIndex((account) => account.id === userId);
+  if (index < 0) return { ok: false, message: "No encontramos esa cuenta." };
+  const extras = profileOf(patch);
+  const account: StoredAccount = {
+    ...accounts[index],
+    name: patch.name.trim(),
+    ...extras,
+  };
+  const next = [...accounts];
+  next[index] = account;
+  return { ok: true, accounts: next, account };
 }
 
 export async function createAccount(
@@ -166,6 +297,7 @@ export async function createAccount(
       salt,
       passwordHash,
       role: accounts.length === 0 ? "admin" : "customer",
+      ...emptyProfile(),
     },
   };
 }

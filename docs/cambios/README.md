@@ -13,6 +13,10 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-16 | Editar usuario completo (nombre/correo/contraseña/roles) + varios roles por usuario | [2026-09-16-editar-usuario-multirol.md](./2026-09-16-editar-usuario-multirol.md) |
+| 2026-09-16 | Usuarios del panel: tarjetas con foto + modal editar/habilitar/borrar | [2026-09-16-usuarios-tarjetas-modal.md](./2026-09-16-usuarios-tarjetas-modal.md) |
+| 2026-09-16 | Animación de entrada solo en transiciones clave (admin, perfil, login/logout) | [2026-09-16-intro-solo-en-transiciones-clave.md](./2026-09-16-intro-solo-en-transiciones-clave.md) |
+| 2026-09-16 | Área cliente: cualquier rol edita su perfil | [2026-09-16-editar-perfil.md](./2026-09-16-editar-perfil.md) |
 | 2026-09-15 | Ajustes desglosado: Footer y Canales de atención | [2026-09-15-ajustes-footer-canales.md](./2026-09-15-ajustes-footer-canales.md) |
 | 2026-09-15 | Categorías en cartas + imagen por URL/galería en todo el panel | [2026-09-15-categorias-cartas-imagenes.md](./2026-09-15-categorias-cartas-imagenes.md) |
 | 2026-09-15 | Cursor personalizado: negro puro, blanco al pasar sobre imágenes | [2026-09-15-cursor-negro-blanco-imagenes.md](./2026-09-15-cursor-negro-blanco-imagenes.md) |

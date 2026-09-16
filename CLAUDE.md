@@ -59,7 +59,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 
 - **Navbar de 3 niveles** (`components/Navbar.tsx`), estilo ferretería:
   1. Barra superior `brand-dark`: envíos, atención mayorista, enlaces Nosotros/Contacto, redes sociales.
-  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta, Favoritos (badge), Carrito (badge con `CartProvider`). Si hay sesión del panel, aparece **Administrar** (ícono de casa) en esa fila. Comparar ya no está en la barra (sigue en tarjetas / `/comparar`).
+  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta (si hay sesión: menú con **Mi perfil**), Favoritos (badge), Carrito (badge con `CartProvider`). Si hay sesión del panel, aparece **Administrar** (ícono de casa) en esa fila. Comparar ya no está en la barra (sigue en tarjetas / `/comparar`).
   3. Barra `brand-primary`: botón **Categorías** (fondo `brand-dark`, dropdown desde `mainCategories` + "Ver todas") y menú principal uppercase (Inicio, Catálogo, Ofertas, Nosotros, Contacto). El ítem activo y el hover solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo además lleva una **barra dorada animada** debajo (`navIndicator`, calculada por `offsetLeft`/`offsetWidth` del link con `data-nav-active`).
   - Menú móvil tipo drawer lateral con categorías + navegación + botón "Mi cuenta".
   - Los badges **Oferta/Nuevo** (no el botón de categorías) son los que usan `brand-gold` — ver `FeaturedOffers.tsx` / `CategoriesGrid.tsx`.
@@ -67,7 +67,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `THE WINTER` / `Criper@11`, también `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS local (`chamo-cms-v1`): banners en `/admin/banners`, categorías en `/admin/categorias`, footer en `/admin/ajustes/footer`, canales (WhatsApp/teléfono/correo/redes) en `/admin/ajustes/canales`, equipo en `/admin/equipo`.
+- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Área cliente `/cuenta` (Mi perfil / Mi empresa) para **cualquier rol**. Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `THE WINTER` / `Criper@11`, también `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS local (`chamo-cms-v1`): banners en `/admin/banners`, categorías en `/admin/categorias`, footer en `/admin/ajustes/footer`, canales (WhatsApp/teléfono/correo/redes) en `/admin/ajustes/canales`, equipo en `/admin/equipo`.
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -106,9 +106,12 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión; `role: "customer" \| "admin"` |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
 | `AuthForm.tsx` | Login / registro / recuperar contraseña (este navegador) |
+| `AccountShell.tsx` | Área cliente `/cuenta`: banner, tabs, gate de sesión |
+| `AccountProfileForm.tsx` | Editar foto, nombre, teléfono (y empresa/RUC) |
+| `AccountAvatar.tsx` | Avatar de perfil (foto, preset o iniciales) |
 | `CompareProvider.tsx` | Comparar hasta 3 SKUs (`chamo-compare-v1`) |
 | `CompareButton.tsx` | Botón de comparar en tarjeta y modal |
-| `AdminShell.tsx` | Sidebar `#0B3554` + header; sesión `AuthSession` (no `AuthProvider`) |
+| `AdminShell.tsx` | Sidebar `#0B3554` + header; sesión `AuthSession` + enlace a Mi perfil |
 | `ContentProvider.tsx` | Overlay CMS local: slider, categorías, footer, banners de página y equipo |
 | `CategoryCollage.tsx` | Collage 2×2 de productos/marcas de la línea |
 | `Footer.tsx` | Footer corporativo (ver §5) |
@@ -133,6 +136,7 @@ app/                  # App Router (páginas y layout)
   comparar/             # Comparación de hasta 3 SKUs
   admin/                # login + (panel) protegido
   favoritos/            # Lista persistida
+  cuenta/               # Área cliente (perfil / empresa)
   terminos/ privacidad/ # Políticas
   api/productos/        # GET catálogo (tienda)
 types/admin.ts         # Contrato del panel
@@ -194,9 +198,9 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-15): Ajustes desglosado en Footer y Canales de atención
-(WhatsApp flotante, teléfono, correo y redes). Detalle:
-[`docs/cambios/2026-09-15-ajustes-footer-canales.md`](docs/cambios/2026-09-15-ajustes-footer-canales.md).
+Último avance (2026-09-16): cualquier rol edita su perfil en `/cuenta/perfil`
+(foto, nombre, teléfono; RUC en `/cuenta/empresa`). Detalle:
+[`docs/cambios/2026-09-16-editar-perfil.md`](docs/cambios/2026-09-16-editar-perfil.md).
 
 ## 10. Pendientes conocidos
 

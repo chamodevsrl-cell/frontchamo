@@ -13,8 +13,10 @@ import {
   Search,
   ShoppingCart,
   User,
+  UserRound,
   X,
 } from "lucide-react";
+import AccountAvatar from "@/components/AccountAvatar";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -272,7 +274,7 @@ export default function Navbar() {
                   className="inline-flex flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
                   aria-expanded={accountOpen}
                 >
-                  <User className="h-5 w-5" strokeWidth={2} />
+                  <AccountAvatar photo={user.photo} name={user.name} size={20} />
                   <span className="max-w-[4.5rem] truncate text-[11px] font-semibold">
                     {firstName(user.name)}
                   </span>
@@ -282,6 +284,14 @@ export default function Navbar() {
                     <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
                       {user.email}
                     </p>
+                    <Link
+                      href="/cuenta/perfil"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                    >
+                      <UserRound className="h-4 w-4 text-brand-primary" />
+                      Mi perfil
+                    </Link>
                     {hasPanelSession ? (
                       <Link
                         href="/admin"
@@ -606,6 +616,14 @@ export default function Navbar() {
                   <p className="text-center text-xs text-brand-dark/60">
                     {user.email}
                   </p>
+                  <Link
+                    href="/cuenta/perfil"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
+                  >
+                    <UserRound className="h-5 w-5" strokeWidth={2} />
+                    Mi perfil
+                  </Link>
                   {hasPanelSession ? (
                     <Link
                       href="/admin"

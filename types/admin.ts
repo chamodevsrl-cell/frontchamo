@@ -68,9 +68,11 @@ export interface AuthSession {
    * En producción el backend debería emitirlo como JWT/sesión httpOnly.
    */
   token: string;
-  /** Id del {@link PanelRole} asignado al usuario. */
+  /** Id del primer {@link PanelRole} asignado (`roleIds[0]`) — por compatibilidad. */
   roleId: string;
-  /** Secciones del sidebar habilitadas (copia de `PanelRole.permissions` al login). */
+  /** Todos los {@link PanelRole} asignados al usuario (puede tener más de uno). */
+  roleIds: string[];
+  /** Secciones del sidebar habilitadas (unión de los `permissions` de todos sus roles). */
   permissions: AdminPermission[];
 }
 
@@ -301,22 +303,45 @@ export interface PanelUser {
   name: string;
   /** Correo de acceso (único). */
   email: string;
-  /** Id de {@link PanelRole} asignado. */
-  roleId: string;
+  /** Ids de {@link PanelRole} asignados — puede tener más de uno. */
+  roleIds: string[];
   /** `suspended` bloquea el acceso sin borrar la cuenta. */
   status: PanelUserStatus;
   /** ISO-8601 de alta. */
   createdAt: string;
   /** ISO-8601 del último login, o `null` si nunca entró. */
   lastLoginAt: string | null;
+  /** Teléfono de contacto comercial (editable en Mi perfil). */
+  phone?: string;
+  /** Razón social (editable en Mi empresa). */
+  company?: string;
+  /** RUC (editable en Mi empresa). */
+  ruc?: string;
 }
+
+/** Payload de “Mi perfil” / “Mi empresa” del propio usuario autenticado. */
+export type UpdateOwnProfileInput = {
+  name: string;
+  phone?: string;
+  company?: string;
+  ruc?: string;
+};
 
 /**
  * Payload de alta de usuario. El backend asigna `id`, `createdAt` y
  * `lastLoginAt: null`. `password` no se devuelve nunca en {@link PanelUser}.
  */
-export type CreatePanelUserInput = Pick<PanelUser, "name" | "email" | "roleId"> & {
+export type CreatePanelUserInput = Pick<PanelUser, "name" | "email" | "roleIds"> & {
   password: string;
+};
+
+/**
+ * Payload de edición de usuario (modal "Editar usuario"). Todos los campos son
+ * opcionales — solo se aplican los que vienen definidos. `password` vacío o
+ * ausente deja la contraseña actual sin cambios.
+ */
+export type UpdatePanelUserInput = Partial<Pick<PanelUser, "name" | "email" | "roleIds">> & {
+  password?: string;
 };
 
 /** Sobre JSON de éxito que debe devolver el backend. */

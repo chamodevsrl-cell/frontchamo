@@ -1,15 +1,16 @@
 "use client";
 
+import { loginAdminAction, updateOwnProfileAction } from "@/app/admin/actions";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
-import { loginAdminAction } from "@/app/admin/actions";
 import {
   clearAdminSessionClient,
   persistAdminSession,
@@ -19,17 +20,26 @@ import {
 } from "@/lib/auth";
 import {
   ACCOUNTS_KEY,
+  PROFILES_KEY,
   SESSION_KEY,
+  applyProfileExtras,
   createAccount,
+  emptyProfile,
   hashPassword,
-  normalizeEmail,
   hydrateSessionUser,
+  normalizeEmail,
   parseAccounts,
+  parseProfiles,
   parseSession,
+  profileOf,
   randomSalt,
   toAuthUser,
+  updateAccountProfile,
+  validateProfilePatch,
   verifyAccount,
   type AuthUser,
+  type ProfileExtras,
+  type ProfilePatch,
   type StoredAccount,
 } from "@/lib/auth-local";
 import type { AuthSession } from "@/types/admin";
@@ -42,6 +52,7 @@ type AuthContextValue = {
   user: AuthUser | null;
   /** True si hay sesión del panel (`chamo_admin_session`) — muestra Administrar. */
   hasPanelSession: boolean;
+  panelSession: AuthSession | null;
   ready: boolean;
   openAuth: (mode?: AuthMode) => void;
   closeAuth: () => void;
@@ -53,6 +64,7 @@ type AuthContextValue = {
     password: string,
   ) => Promise<string | null>;
   resetPassword: (email: string, password: string) => Promise<string | null>;
+  updateProfile: (patch: ProfilePatch) => Promise<string | null>;
   logout: () => void;
 };
 
@@ -79,8 +91,21 @@ function panelUserFromSession(session: AuthSession): AuthUser {
     name: session.name,
     email: session.email,
     role: "admin",
+    ...emptyProfile(),
   };
 }
+
+function writeLocal(key: string, value: unknown): boolean {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Disparado al iniciar o cerrar sesión (no en la hidratación inicial) — ver `IntroSplash.tsx`. */
+export const AUTH_TRANSITION_EVENT = "chamo:auth-transition";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -89,7 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<AuthMode>("login");
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hasPanelSession, setHasPanelSession] = useState(false);
+  const [panelSession, setPanelSession] = useState<AuthSession | null>(null);
   const [accounts, setAccounts] = useState<StoredAccount[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, ProfileExtras>>({});
   const [ready, setReady] = useState(false);
 
   const openAuth = useCallback((nextMode: AuthMode = "login") => {
@@ -104,14 +131,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadedAccounts = parseAccounts(window.localStorage.getItem(ACCOUNTS_KEY));
     const loadedSession = parseSession(window.localStorage.getItem(SESSION_KEY));
-    const panelSession = readPanelSession();
+    const loadedProfiles = parseProfiles(window.localStorage.getItem(PROFILES_KEY));
+    const nextPanel = readPanelSession();
+    const hydrated =
+      hydrateSessionUser(loadedSession, loadedAccounts) ??
+      (nextPanel ? panelUserFromSession(nextPanel) : null);
+    const withExtras = hydrated
+      ? applyProfileExtras(hydrated, loadedProfiles[hydrated.id])
+      : null;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setAccounts(loadedAccounts);
-    setHasPanelSession(Boolean(panelSession));
-    setUser(
-      hydrateSessionUser(loadedSession, loadedAccounts) ??
-        (panelSession ? panelUserFromSession(panelSession) : null),
-    );
+    setProfiles(loadedProfiles);
+    setPanelSession(nextPanel);
+    setHasPanelSession(Boolean(nextPanel));
+    setUser(withExtras);
     setReady(true);
   }, []);
 
@@ -127,6 +160,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       window.localStorage.removeItem(SESSION_KEY);
     }
+  }, [user, ready]);
+
+  const authTransitionState = useRef<{ started: boolean; hadUser: boolean }>({
+    started: false,
+    hadUser: false,
+  });
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!authTransitionState.current.started) {
+      authTransitionState.current = { started: true, hadUser: Boolean(user) };
+      return;
+    }
+    const hasUser = Boolean(user);
+    if (authTransitionState.current.hadUser !== hasUser) {
+      window.dispatchEvent(new Event(AUTH_TRANSITION_EVENT));
+    }
+    authTransitionState.current.hadUser = hasUser;
   }, [user, ready]);
 
   useEffect(() => {
@@ -147,17 +198,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  const persistUser = useCallback((account: StoredAccount) => {
-    setUser(toAuthUser(account));
-    setIsOpen(false);
-  }, []);
+  const persistUser = useCallback(
+    (account: StoredAccount, extras?: ProfileExtras) => {
+      setUser(applyProfileExtras(toAuthUser(account), extras ?? profiles[account.id]));
+      setIsOpen(false);
+    },
+    [profiles],
+  );
 
-  const applyPanelSession = useCallback((session: AuthSession) => {
-    persistAdminSession(session);
-    setHasPanelSession(true);
-    setUser(panelUserFromSession(session));
-    setIsOpen(false);
-  }, []);
+  const applyPanelSession = useCallback(
+    (session: AuthSession, extras?: ProfileExtras) => {
+      persistAdminSession(session);
+      setPanelSession(session);
+      setHasPanelSession(true);
+      setUser(
+        applyProfileExtras(
+          panelUserFromSession(session),
+          extras ?? profiles[session.id],
+        ),
+      );
+      setIsOpen(false);
+    },
+    [profiles],
+  );
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -212,9 +275,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [accounts, persistUser],
   );
 
+  const updateProfile = useCallback(
+    async (patch: ProfilePatch) => {
+      if (!user) return "Inicia sesión para editar tu perfil.";
+      const requirePhone = hasPanelSession || user.role === "admin";
+      const invalid = validateProfilePatch(patch, { requirePhone });
+      if (invalid) return invalid;
+
+      const extras = profileOf(patch);
+      const nextUser: AuthUser = {
+        ...user,
+        name: patch.name.trim(),
+        ...extras,
+      };
+      const nextProfiles = { ...profiles, [user.id]: extras };
+      const accountMatch = accounts.find(
+        (account) => account.id === user.id || account.email === user.email,
+      );
+      let nextAccounts = accounts;
+      if (accountMatch) {
+        const result = updateAccountProfile(accounts, accountMatch.id, {
+          name: nextUser.name,
+          ...extras,
+        });
+        if (!result.ok) return result.message;
+        nextAccounts = result.accounts;
+      }
+
+      if (!writeLocal(PROFILES_KEY, nextProfiles)) {
+        return "No se pudo guardar (la foto es muy pesada). Prueba una imagen más liviana.";
+      }
+      if (accountMatch && !writeLocal(ACCOUNTS_KEY, nextAccounts)) {
+        return "No se pudo guardar (la foto es muy pesada). Prueba una imagen más liviana.";
+      }
+      if (!writeLocal(SESSION_KEY, nextUser)) {
+        return "No se pudo guardar (la foto es muy pesada). Prueba una imagen más liviana.";
+      }
+
+      setProfiles(nextProfiles);
+      setAccounts(nextAccounts);
+      setUser(nextUser);
+
+      if (hasPanelSession) {
+        const panel = await updateOwnProfileAction(user.id, {
+          name: nextUser.name,
+          phone: extras.phone,
+          company: extras.company,
+          ruc: extras.ruc,
+        });
+        if (panel.ok) {
+          persistAdminSession(panel.session);
+          setPanelSession(panel.session);
+          setUser(
+            applyProfileExtras(panelUserFromSession(panel.session), extras),
+          );
+        }
+      }
+      return null;
+    },
+    [accounts, hasPanelSession, profiles, user],
+  );
+
   const logout = useCallback(() => {
     setUser(null);
     setHasPanelSession(false);
+    setPanelSession(null);
     clearAdminSessionClient();
     void import("@/lib/auth").then(({ logoutAdmin }) => {
       void logoutAdmin();
@@ -227,6 +352,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mode,
       user,
       hasPanelSession,
+      panelSession,
       ready,
       openAuth,
       closeAuth,
@@ -234,6 +360,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       resetPassword,
+      updateProfile,
       logout,
     }),
     [
@@ -241,12 +368,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mode,
       user,
       hasPanelSession,
+      panelSession,
       ready,
       openAuth,
       closeAuth,
       login,
       register,
       resetPassword,
+      updateProfile,
       logout,
     ],
   );

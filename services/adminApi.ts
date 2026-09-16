@@ -32,6 +32,8 @@ import type {
   Product,
   ProductFilters,
   UpdateCategoryInput,
+  UpdateOwnProfileInput,
+  UpdatePanelUserInput,
 } from "@/types/admin";
 
 /** Latencia artificial para emular red. No usar en `getAdminSession()`. */
@@ -268,7 +270,7 @@ function seedUsers(): PanelUser[] {
       id: "usr_winter",
       name: MOCK_WINTER_NAME,
       email: MOCK_WINTER_EMAIL,
-      roleId: "role_admin",
+      roleIds: ["role_admin"],
       status: "active",
       createdAt: "2026-09-15T10:00:00.000Z",
       lastLoginAt: null,
@@ -277,7 +279,7 @@ function seedUsers(): PanelUser[] {
       id: "usr_admin_local",
       name: "Admin Demo",
       email: MOCK_ADMIN_EMAIL,
-      roleId: "role_admin",
+      roleIds: ["role_admin"],
       status: "active",
       createdAt: "2026-09-11T12:00:00.000Z",
       lastLoginAt: "2026-09-15T08:30:00.000Z",
@@ -286,7 +288,7 @@ function seedUsers(): PanelUser[] {
       id: "usr_editor_demo",
       name: "Katia Ríos (demo)",
       email: "katia.demo@local.test",
-      roleId: "role_editor",
+      roleIds: ["role_editor"],
       status: "active",
       createdAt: "2026-09-12T15:00:00.000Z",
       lastLoginAt: "2026-09-14T19:10:00.000Z",
@@ -295,7 +297,7 @@ function seedUsers(): PanelUser[] {
       id: "usr_almacen_demo",
       name: "Julio Paredes (demo)",
       email: "julio.demo@local.test",
-      roleId: "role_almacen",
+      roleIds: ["role_almacen"],
       status: "suspended",
       createdAt: "2026-09-13T10:00:00.000Z",
       lastLoginAt: null,
@@ -328,16 +330,24 @@ function sessionRoleFromPermissions(permissions: AdminPermission[]): AuthSession
   return "editor";
 }
 
-function buildSession(user: PanelUser, role: PanelRole): AuthSession {
+function buildSession(user: PanelUser, roles: PanelRole[]): AuthSession {
+  const permissions = Array.from(
+    new Set(roles.flatMap((role) => role.permissions)),
+  );
   return {
     id: user.id,
     name: user.name,
     email: user.email,
-    role: sessionRoleFromPermissions(role.permissions),
-    roleId: role.id,
-    permissions: [...role.permissions],
+    role: sessionRoleFromPermissions(permissions),
+    roleId: user.roleIds[0] ?? "",
+    roleIds: [...user.roleIds],
+    permissions,
     token: `mock.jwt.${user.id}`,
   };
+}
+
+function rolesOf(user: PanelUser): PanelRole[] {
+  return rolesDb.filter((role) => user.roleIds.includes(role.id));
 }
 
 function findUserByLogin(identifier: string): PanelUser | undefined {
@@ -375,12 +385,12 @@ export async function loginAdmin(
       "Esta cuenta está suspendida. Un administrador debe reactivarla.",
     );
   }
-  const role = rolesDb.find((item) => item.id === user.roleId);
-  if (!role) {
+  const roles = rolesOf(user);
+  if (roles.length === 0) {
     throw new AdminApiError("FORBIDDEN", "El rol de esta cuenta ya no existe.");
   }
   user.lastLoginAt = new Date().toISOString();
-  return buildSession(user, role);
+  return buildSession(user, roles);
 }
 
 /**
@@ -632,14 +642,17 @@ export async function createUser(input: CreatePanelUserInput): Promise<PanelUser
   if (usersDb.some((user) => user.name.toLowerCase() === name.toLowerCase())) {
     throw new AdminApiError("CONFLICT", `Ya existe un usuario llamado ${name}.`);
   }
-  if (!rolesDb.some((role) => role.id === input.roleId)) {
-    throw new AdminApiError("VALIDATION", "El rol seleccionado no existe.");
+  if (input.roleIds.length === 0) {
+    throw new AdminApiError("VALIDATION", "Asigna al menos un rol.");
+  }
+  if (input.roleIds.some((roleId) => !rolesDb.some((role) => role.id === roleId))) {
+    throw new AdminApiError("VALIDATION", "Uno de los roles seleccionados no existe.");
   }
   const created: PanelUser = {
     id: newId("usr"),
     name,
     email,
-    roleId: input.roleId,
+    roleIds: [...input.roleIds],
     status: "active",
     createdAt: new Date().toISOString(),
     lastLoginAt: null,
@@ -647,6 +660,112 @@ export async function createUser(input: CreatePanelUserInput): Promise<PanelUser
   usersDb.push(created);
   passwordsByUserId.set(created.id, password);
   return created;
+}
+
+/**
+ * PUT /api/v1/users/:userId
+ * Body: {@link UpdatePanelUserInput}
+ *
+ * Edición completa desde el modal "Editar usuario" del panel — distinto de
+ * `updateOwnProfile` (que es la propia cuenta editando su nombre/teléfono).
+ * Cualquier campo ausente se deja sin tocar; `password` vacío no cambia nada.
+ */
+export async function updateUser(
+  userId: string,
+  input: UpdatePanelUserInput,
+): Promise<PanelUser> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/users/:id', { method: "PUT" })
+  await delay();
+  const user = usersDb.find((item) => item.id === userId);
+  if (!user) {
+    throw new AdminApiError("NOT_FOUND", `No existe el usuario ${userId}.`);
+  }
+
+  if (input.name !== undefined) {
+    const name = input.name.trim();
+    if (!name) {
+      throw new AdminApiError("VALIDATION", "El nombre es obligatorio.");
+    }
+    if (
+      usersDb.some(
+        (item) => item.id !== userId && item.name.toLowerCase() === name.toLowerCase(),
+      )
+    ) {
+      throw new AdminApiError("CONFLICT", `Ya existe un usuario llamado ${name}.`);
+    }
+    user.name = name;
+  }
+
+  if (input.email !== undefined) {
+    const email = normalizeEmail(input.email);
+    if (!email.includes("@")) {
+      throw new AdminApiError("VALIDATION", "Correo no válido.");
+    }
+    if (usersDb.some((item) => item.id !== userId && item.email.toLowerCase() === email)) {
+      throw new AdminApiError("CONFLICT", `Ya existe un usuario con correo ${email}.`);
+    }
+    user.email = email;
+  }
+
+  if (input.roleIds !== undefined) {
+    if (input.roleIds.length === 0) {
+      throw new AdminApiError("VALIDATION", "Asigna al menos un rol.");
+    }
+    if (input.roleIds.some((roleId) => !rolesDb.some((role) => role.id === roleId))) {
+      throw new AdminApiError("VALIDATION", "Uno de los roles seleccionados no existe.");
+    }
+    user.roleIds = [...input.roleIds];
+  }
+
+  if (input.password) {
+    if (input.password.length < 6) {
+      throw new AdminApiError(
+        "VALIDATION",
+        "La contraseña debe tener al menos 6 caracteres.",
+      );
+    }
+    passwordsByUserId.set(user.id, input.password);
+  }
+
+  return { ...user };
+}
+
+/**
+ * PUT /api/v1/users/me
+ * Body: {@link UpdateOwnProfileInput}
+ *
+ * Cualquier rol del panel puede editar su propio nombre / teléfono / empresa.
+ * La foto vive en el cliente (`chamo-profiles-v1`) para no inflar la cookie.
+ */
+export async function updateOwnProfile(
+  userId: string,
+  input: UpdateOwnProfileInput,
+): Promise<AuthSession> {
+  await delay();
+  const user = usersDb.find((item) => item.id === userId);
+  if (!user) {
+    throw new AdminApiError("NOT_FOUND", "No encontramos tu usuario del panel.");
+  }
+  const name = input.name.trim();
+  if (name.length < 2) {
+    throw new AdminApiError("VALIDATION", "Escribe tu nombre (mínimo 2 caracteres).");
+  }
+  const taken = usersDb.some(
+    (item) =>
+      item.id !== userId && item.name.toLowerCase() === name.toLowerCase(),
+  );
+  if (taken) {
+    throw new AdminApiError("CONFLICT", `Ya existe un usuario llamado ${name}.`);
+  }
+  user.name = name;
+  if (input.phone !== undefined) user.phone = input.phone.trim();
+  if (input.company !== undefined) user.company = input.company.trim();
+  if (input.ruc !== undefined) user.ruc = input.ruc.trim();
+  const roles = rolesOf(user);
+  if (roles.length === 0) {
+    throw new AdminApiError("NOT_FOUND", "El rol del usuario ya no existe.");
+  }
+  return buildSession(user, roles);
 }
 
 /**
@@ -665,4 +784,18 @@ export async function updateUserStatus(
   }
   user.status = status;
   return { ...user };
+}
+
+/**
+ * DELETE /api/v1/users/:id
+ */
+export async function deleteUser(userId: string): Promise<void> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/users/:id', { method: "DELETE" })
+  await delay();
+  const index = usersDb.findIndex((item) => item.id === userId);
+  if (index < 0) {
+    throw new AdminApiError("NOT_FOUND", `No existe el usuario ${userId}.`);
+  }
+  usersDb.splice(index, 1);
+  passwordsByUserId.delete(userId);
 }

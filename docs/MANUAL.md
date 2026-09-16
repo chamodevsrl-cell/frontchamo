@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-15**
+Última actualización: **2026-09-16**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -35,6 +35,7 @@ app/categorias/           # Listado + detalle [slug]
 app/catalogo/             # Búsqueda y filtros (API)
 app/carrito/              # Cotización local
 app/favoritos/            # Lista persistida (localStorage)
+app/cuenta/               # Área cliente: resumen, perfil y empresa
 app/comparar/             # Comparación de hasta 3 SKUs
 app/admin/                # Panel: login público + (panel) protegido por cookie
 app/cotizar/              # Formulario + WhatsApp
@@ -50,7 +51,10 @@ components/
   FavoritesProvider.tsx   # Favoritos en localStorage
   CompareProvider.tsx     # Comparar (máx. 3) en localStorage
   ContentProvider.tsx     # Overlay CMS local (slider, categorías, footer, banners de página, equipo)
-  AuthProvider.tsx        # Cuentas locales + sesión de la tienda (`role` admin/customer)
+  AuthProvider.tsx        # Cuentas locales + sesión + updateProfile (cualquier rol)
+  AccountShell.tsx        # Área cliente `/cuenta` (banner, tabs)
+  AccountProfileForm.tsx  # Editar nombre, foto, teléfono / empresa
+  AccountAvatar.tsx       # Avatar (foto, preset o iniciales)
   admin/AdminShell.tsx    # Sidebar + header + banner de pestaña (azul/oro)
   admin/AdminPageHero.tsx # Franja de título de cada sección del panel
   admin/AdminLoginForm.tsx
@@ -67,7 +71,7 @@ components/
   StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
   CategoryIcon.tsx        # Iconos Lucide por categoría
   Reveal.tsx              # Fade/slide al entrar en viewport
-  IntroSplash.tsx         # Puertas (logo y /carrito) + BrandLoader en el resto
+  IntroSplash.tsx         # Puertas (logo y /carrito) + BrandLoader al cruzar admin/perfil/login
   Preloader.tsx           # Carga inicial → BrandLoader
   BrandLoader.tsx         # Logo + engranaje + CARGANDO... (entrada y nav interna)
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
@@ -125,9 +129,19 @@ placeholder hasta ficha oficial del cliente.
   logo oficial (`/logo.png`) entra de izquierda a derecha (`x: -100 → 0`, fade in),
   `/engranaje.png` gira debajo (60×60) y el texto **CARGANDO...** en `brand-gold`.
   A los **2.5 s** hace fade-out y se desmonta (`z-[90]` para cubrir Navbar y WhatsApp).
-- Al navegar a **otras páginas** (Catálogo, Categorías, Ofertas, Nosotros, etc.):
-  el mismo `BrandLoader` de 2.5 s. No se apila con el preloader de la primera
-  carga. Un clic dispara **una sola vez** (el `pathname` no lo repite).
+- El mismo `BrandLoader` de 2.5 s (variante `"load"`) **solo** se ve al cruzar una
+  de estas fronteras — no en cada navegación interna (Catálogo, Categorías,
+  Ofertas, Nosotros, `/cuenta`, `/cuenta/empresa`, etc., no disparan nada):
+  - Entrar **o** salir de `/admin` (panel de administración).
+  - Entrar **o** salir de `/cuenta/perfil` (editar perfil).
+  - Iniciar o cerrar sesión — cualquier cuenta, desde el modal de la tienda o
+    desde “Cerrar sesión” del panel. `AuthProvider` dispara un evento propio
+    (`AUTH_TRANSITION_EVENT`) cuando `user` pasa de `null` a una cuenta o
+    viceversa (comparado contra la hidratación inicial, así un simple refresh
+    no lo dispara); `IntroSplash` lo escucha y reproduce el loader aunque no
+    haya cambio de ruta (p. ej. login desde el modal en la misma página).
+  - `isLoadBoundary(from, to)` en `IntroSplash.tsx` decide esto comparando el
+    pathname anterior y el nuevo.
 - Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
   Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil). Ese clic
   **reclama** la navegación para que, con `prefers-reduced-motion`, no se encadene
@@ -170,7 +184,8 @@ El dashboard pinta **DashboardKPIs** (`totalSales`, `pendingOrders`,
 `lowStockCount`, `newClientsCount`). Productos y pedidos ya listan/crean/cambian
 estado contra el mock. Banners y categorías del CMS local siguen en
 `/admin/banners` y `/admin/categorias`. El resto del menú es placeholder.
-Navegar dentro de `/admin` **no** dispara el BrandLoader de la tienda.
+Navegar **dentro** de `/admin` no dispara el BrandLoader (solo al entrar o salir
+del panel — ver A.5b).
 
 ### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
 
@@ -308,6 +323,12 @@ Piezas clave (v2):
    `getAdminSession()` — sin sesión válida, redirige a `/login`.
 4. Con sesión válida, se renderiza `AdminShell` (sidebar + header) alrededor de la
    página pedida. En la barra de la tienda aparece **Administrar** (ícono de casa).
+   **Mi perfil** (`/cuenta/perfil`) está en el menú de cuenta de la tienda y del panel:
+   cualquier rol (cliente, admin de tienda, Administrador/Editor/Almacén del panel)
+   edita nombre, foto, teléfono y datos de empresa. El banner de `/cuenta` (`AccountShell`)
+   muestra el nombre del usuario y, debajo, su **descripción breve** editable
+   (`bio`, máx. 160 caracteres) en vez del rótulo fijo "Mi cuenta"; también admite
+   una **foto de portada** propia (`banner`, máx. 3.5 MB) como fondo del banner.
 5. "Salir" (tienda o panel) borra cookie + `localStorage` de ambas sesiones.
 
 **Secciones del sidebar — qué es real y qué es placeholder hoy:**
@@ -322,7 +343,7 @@ Piezas clave (v2):
 | Categorías | `/admin/categorias` | ✅ Real — cartas (nombre, descripción, recuento de productos) + modal para editar/agregar; imagen por URL o galería; persiste en CMS (`customCategories`) y en el mock `createCategory`/`updateCategory` |
 | Equipo | `/admin/equipo` | ✅ Real — cartas de colaboradores (se ven en `/nosotros`) |
 | Ajustes | `/admin/ajustes` | ✅ Real — desglose: Footer (`/admin/ajustes/footer`) y Canales de atención (`/admin/ajustes/canales`). `/admin/configuracion` redirige al índice |
-| Usuarios | `/admin/usuarios` | ✅ Real — `getUsers()` + alta (`createUser()` con contraseña) + cambiar estado. Esas cuentas entran por “Mi cuenta” |
+| Usuarios | `/admin/usuarios` | ✅ Real — tarjetas estilo carnet (foto, rol(es), último acceso, estado) desde `AdminUsersCards.tsx`; el modal "Editar" cambia **nombre, correo, contraseña y roles** (`updateUser()`, checkboxes — un usuario puede tener más de un rol), además de habilitar/suspender y **borrar** (`deleteUser()`). Alta (`createUser()`) también admite varios roles a la vez. No se puede deshabilitar, borrar ni cambiar los roles de la propia cuenta logueada. Esas cuentas entran por “Mi cuenta” |
 | Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`). El login copia `permissions` a `AuthSession`; `AdminShell` filtra el sidebar |
 | Marcas, Clientes, Inventario, Ofertas, Reportes | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
 
@@ -361,7 +382,7 @@ Cualquier usuario/contraseña que no coincida devuelve `INVALID_CREDENTIALS`. No
 | --- | --- | --- |
 | Para qué | "Mi cuenta" del sitio público (favoritos, carrito, comparar) | Gestionar el negocio en `/admin` |
 | Dónde vive | `lib/auth-local.ts` | `lib/auth.ts` |
-| Storage | `chamo-accounts-v1` / `chamo-session-v1` (solo `localStorage`) | Cookie `chamo_admin_session` + copia en `localStorage` (`chamo-admin-session-v1`) |
+| Storage | `chamo-accounts-v1` / `chamo-session-v1` / `chamo-profiles-v1` (foto y extras) | Cookie `chamo_admin_session` + copia en `localStorage` (`chamo-admin-session-v1`) |
 | Cómo se entra | Se registra cualquiera desde “Mi cuenta” | Staff del panel, mismo modal (THE WINTER / `Criper@11`) |
 | Quién es "admin" | La primera cuenta creada en ese navegador (`role: "admin"`) | Staff con rol Administrador (p. ej. THE WINTER o `admin@local.test`) |
 | Se cierran juntas? | No — cerrar una no afecta a la otra | |
@@ -472,6 +493,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
+| `/cuenta` | Área cliente: resumen, Mi perfil y Mi empresa (cualquier rol con sesión) |
 | `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
 | `/admin` | Panel (sidebar + dashboard). Requiere cookie `chamo_admin_session`. KPIs del mock `getDashboardKPIs()` |
 | `/admin/login` | Redirige a `/login` (modal de Mi cuenta) |
@@ -489,7 +511,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
-| Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña y cerrar sesión (este navegador) |
+| Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña, **editar perfil** (`/cuenta/perfil`) y cerrar sesión (este navegador) |
 
 ### B.4 Contenido que el negocio puede cambiar sin programar
 

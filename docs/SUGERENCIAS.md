@@ -1,6 +1,62 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-15**
+Última actualización: **2026-09-16**
+
+## 🔑 Editar usuario completo + varios roles por usuario (2026-09-16)
+
+- [x] 2026-09-16 — El modal "Editar usuario" ahora deja cambiar **nombre,
+  correo, contraseña y roles** (antes solo habilitar/deshabilitar y borrar).
+  Al crear un usuario nuevo se puede marcar **más de un rol** (checkboxes en
+  vez de un `<select>` único). `PanelUser.roleId` pasó a `roleIds: string[]`;
+  la sesión hereda la unión de permisos de todos los roles asignados. No
+  puedes cambiar tus propios roles mientras tienes la sesión abierta (mismo
+  criterio que no poder suspenderte/borrarte a ti mismo). Detalle:
+  [`cambios/2026-09-16-editar-usuario-multirol.md`](./cambios/2026-09-16-editar-usuario-multirol.md).
+
+## 🪪 Usuarios del panel en tarjetas estilo carnet (2026-09-16)
+
+- [x] 2026-09-16 — `/admin/usuarios` pasó de tabla a **tarjetas** (foto, rol,
+  último acceso, nombre, correo, estado). "Editar" abre un modal con
+  **habilitar/deshabilitar** y **borrar usuario** (nuevo — antes no se podía
+  borrar, solo suspender). No se puede deshabilitar ni borrar tu propia cuenta
+  logueada. Estilo ajustado a pedido del cliente para parecerse a un carnet de
+  empleado (foto grande superpuesta a una franja de marca, rol en pastilla).
+  Se puede **voltear** (botón circular junto a "Editar", volteo 3D con CSS
+  puro): el reverso muestra rol + descripción + secciones habilitadas,
+  correo/teléfono y fecha de alta. Sin código QR. Proporción **vertical**
+  (240×440), **logo oficial** en vez del texto "Chamo Import" (frente y
+  reverso), y **franja de color por rol** (paleta fija de 8 colores hasheada
+  por `roleId`, así cada rol —Administrador, Editor, Almacén o uno nuevo como
+  "Gerente General"— sale siempre del mismo color). Grilla más junta
+  (`gap-3`), borde azul brillante (`border-2 border-brand-primary`) y logo más
+  grande; en móvil se ven **2 tarjetas por fila** desde el inicio (antes 1).
+  Detalle:
+  [`cambios/2026-09-16-usuarios-tarjetas-modal.md`](./cambios/2026-09-16-usuarios-tarjetas-modal.md).
+
+## 🚪 Animación de entrada solo en transiciones clave (2026-09-16)
+
+- [x] 2026-09-16 — El loader de "CARGANDO..." (`IntroSplash.tsx`) ya no se ve en
+  cada navegación interna (catálogo, categorías, ofertas, `/cuenta`, etc.). Ahora
+  solo aparece al: recargar el navegador (sin cambios, ya era así), hacer clic en
+  el logo, entrar o salir de `/admin`, entrar o salir de `/cuenta/perfil`, e
+  iniciar o cerrar sesión (cualquier cuenta). Detalle:
+  [`cambios/2026-09-16-intro-solo-en-transiciones-clave.md`](./cambios/2026-09-16-intro-solo-en-transiciones-clave.md).
+
+## 👤 Área cliente — editar perfil (2026-09-16)
+
+Referencia de “Mi cuenta / Mi perfil”: cualquier rol (cliente, admin de tienda,
+Administrador/Editor/Almacén del panel) entra a `/cuenta/perfil` y guarda nombre,
+foto y teléfono. RUC/razón social van en `/cuenta/empresa`.
+
+- [x] 2026-09-16 — Página `/cuenta` (resumen, perfil, empresa) + `updateProfile`.
+- [x] 2026-09-16 — Enlace **Mi perfil** en el menú de la tienda y en el del panel.
+- [x] 2026-09-16 — Banner de "Mi cuenta" con **foto de portada propia**
+  (`/cuenta/perfil`, máx. 3.5 MB) y **descripción breve editable** debajo del
+  nombre (en vez del rótulo fijo "Mi cuenta"/"Hola, {nombre}").
+- [ ] Autenticador Google/Microsoft (OTP de app) cuando haya backend de usuarios.
+- [ ] Historial real de pedidos/reseñas (hoy “Mis pedidos” es placeholder).
+
+Detalle: [`cambios/2026-09-16-editar-perfil.md`](./cambios/2026-09-16-editar-perfil.md).
 
 ## 🖱️ Cursor negro/blanco sobre imágenes (2026-09-15)
 
@@ -272,6 +328,8 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 
 ## Hecho recientemente (referencia)
 
+- [x] 2026-09-16 — Cada perfil (cualquier rol) edita su ficha en `/cuenta/perfil`. Nota:
+  [`cambios/2026-09-16-editar-perfil.md`](./cambios/2026-09-16-editar-perfil.md).
 - [x] 2026-09-15 — El admin inicia sesión en el mismo modal de “Mi cuenta”.
   **Comparar** salió de la barra de la tienda. Con sesión del panel aparece
   **Administrar** (ícono de casa). Nota:

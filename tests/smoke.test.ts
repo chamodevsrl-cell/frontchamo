@@ -182,11 +182,68 @@ describe("smoke de catálogo y home", () => {
         name: "Chamo",
         email: "chamo@example.com",
         role: "customer",
+        phone: "",
+        photo: "",
+        company: "",
+        ruc: "",
+        bio: "",
+        banner: "",
       },
       migrated,
     );
     expect(session?.role).toBe("admin");
     expect(session?.id).toBe(migrated[0]?.id);
+    expect(migrated[0]?.phone).toBe("");
+    expect(migrated[0]?.photo).toBe("");
+  });
+
+  it("cualquier cuenta puede actualizar nombre, teléfono y foto de perfil", async () => {
+    const {
+      parseProfiles,
+      updateAccountProfile,
+      validateProfilePatch,
+      emptyProfile,
+    } = await import("@/lib/auth-local");
+    expect(parseProfiles(JSON.stringify({ usr_1: { phone: "959111222" } })).usr_1?.phone).toBe(
+      "959111222",
+    );
+    expect(parseProfiles("no-json")).toEqual({});
+    expect(
+      validateProfilePatch(
+        { name: "A", ...emptyProfile() },
+        { requirePhone: false },
+      ),
+    ).toBe("Escribe tu nombre (mínimo 2 caracteres).");
+    const updated = updateAccountProfile(
+      [
+        {
+          id: "acc_1",
+          name: "Viejo",
+          email: "a@local.test",
+          salt: "s",
+          passwordHash: "h",
+          role: "customer",
+          ...emptyProfile(),
+        },
+      ],
+      "acc_1",
+      {
+        name: "Nuevo Nombre",
+        phone: "+51 959 111 222",
+        photo: "preset:gold",
+        company: "Ferretería Demo",
+        ruc: "20123456789",
+        bio: "",
+        banner: "",
+      },
+    );
+    expect(updated.ok).toBe(true);
+    if (updated.ok) {
+      expect(updated.account.name).toBe("Nuevo Nombre");
+      expect(updated.account.phone).toContain("959");
+      expect(updated.account.photo).toBe("preset:gold");
+      expect(updated.account.company).toBe("Ferretería Demo");
+    }
   });
 
   it("contacto oficial tiene teléfono, horario y WhatsApp", () => {
@@ -223,6 +280,7 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
       role: "admin" as const,
       token: "tok_test",
       roleId: "role_admin",
+      roleIds: ["role_admin"],
       permissions: ["dashboard", "productos", "usuarios", "roles"] as AdminPermission[],
     };
     expect(parseAdminSession(serializeAdminSession(session))).toEqual(session);
@@ -313,7 +371,7 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
     const created = await createUser({
       name: "QA Login",
       email: "qa.login@local.test",
-      roleId: "role_editor",
+      roleIds: ["role_editor"],
       password: "qa-pass-11",
     });
     expect(created.status).toBe("active");
@@ -323,6 +381,64 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
     });
     expect(session.id).toBe(created.id);
     expect(session.role).toBe("editor");
+  });
+
+  it("un usuario puede tener más de un rol y hereda la unión de permisos", async () => {
+    const { createUser, loginAdmin, getRoles } = await import("@/services/adminApi");
+    const roles = await getRoles();
+    const editorRole = roles.find((role) => role.id === "role_editor");
+    const almacenRole = roles.find((role) => role.id === "role_almacen");
+    if (!editorRole || !almacenRole) throw new Error("faltan roles semilla");
+
+    const created = await createUser({
+      name: "QA Multirol",
+      email: "qa.multirol@local.test",
+      roleIds: ["role_editor", "role_almacen"],
+      password: "qa-pass-22",
+    });
+    expect(created.roleIds).toEqual(["role_editor", "role_almacen"]);
+
+    const session = await loginAdmin({
+      email: "qa.multirol@local.test",
+      password: "qa-pass-22",
+    });
+    expect(session.roleIds).toEqual(["role_editor", "role_almacen"]);
+    for (const permission of [...editorRole.permissions, ...almacenRole.permissions]) {
+      expect(session.permissions).toContain(permission);
+    }
+  });
+
+  it("updateUser edita nombre, correo, roles y contraseña de un usuario del panel", async () => {
+    const { createUser, updateUser, loginAdmin, AdminApiError } = await import(
+      "@/services/adminApi"
+    );
+    const created = await createUser({
+      name: "QA Editable",
+      email: "qa.editable@local.test",
+      roleIds: ["role_almacen"],
+      password: "qa-pass-33",
+    });
+
+    const updated = await updateUser(created.id, {
+      name: "QA Editado",
+      email: "qa.editado@local.test",
+      roleIds: ["role_admin"],
+      password: "qa-pass-44",
+    });
+    expect(updated.name).toBe("QA Editado");
+    expect(updated.email).toBe("qa.editado@local.test");
+    expect(updated.roleIds).toEqual(["role_admin"]);
+
+    const session = await loginAdmin({
+      email: "qa.editado@local.test",
+      password: "qa-pass-44",
+    });
+    expect(session.id).toBe(created.id);
+    expect(session.role).toBe("admin");
+
+    await expect(
+      updateUser("usr_no_existe", { name: "X" }),
+    ).rejects.toBeInstanceOf(AdminApiError);
   });
 
   it("getDashboardKPIs expone las 4 cifras del contrato", async () => {

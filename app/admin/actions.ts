@@ -11,9 +11,12 @@ import {
   createRole,
   createUser,
   createCategory,
+  deleteUser,
   loginAdmin,
   updateCategory,
   updateOrderStatus,
+  updateOwnProfile,
+  updateUser,
   updateUserStatus,
 } from "@/services/adminApi";
 import type {
@@ -31,6 +34,8 @@ import type {
   PanelUserStatus,
   Product,
   UpdateCategoryInput,
+  UpdateOwnProfileInput,
+  UpdatePanelUserInput,
 } from "@/types/admin";
 
 function cookieOptions() {
@@ -126,6 +131,35 @@ export async function createUserAction(
   }
 }
 
+export async function updateOwnProfileAction(
+  userId: string,
+  input: UpdateOwnProfileInput,
+): Promise<{ ok: true; session: AuthSession } | { ok: false; message: string }> {
+  try {
+    const session = await updateOwnProfile(userId, input);
+    await setAdminSessionCookie(session);
+    return { ok: true, session };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo guardar el perfil.";
+    return { ok: false, message };
+  }
+}
+
+export async function updateUserAction(
+  userId: string,
+  input: UpdatePanelUserInput,
+): Promise<{ ok: true; user: PanelUser } | { ok: false; message: string }> {
+  try {
+    const user = await updateUser(userId, input);
+    return { ok: true, user };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo actualizar el usuario.";
+    return { ok: false, message };
+  }
+}
+
 export async function updateUserStatusAction(
   userId: string,
   newStatus: PanelUserStatus,
@@ -136,6 +170,19 @@ export async function updateUserStatusAction(
   } catch (cause) {
     const message =
       cause instanceof Error ? cause.message : "No se pudo actualizar el usuario.";
+    return { ok: false, message };
+  }
+}
+
+export async function deleteUserAction(
+  userId: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    await deleteUser(userId);
+    return { ok: true };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo borrar el usuario.";
     return { ok: false, message };
   }
 }
