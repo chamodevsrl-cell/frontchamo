@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-15**
+Última actualización: **2026-09-16**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -35,6 +35,7 @@ app/categorias/           # Listado + detalle [slug]
 app/catalogo/             # Búsqueda y filtros (API)
 app/carrito/              # Cotización local
 app/favoritos/            # Lista persistida (localStorage)
+app/perfil/               # Área de cuenta (perfil, empresa, cotizaciones, favoritos)
 app/comparar/             # Comparación de hasta 3 SKUs
 app/admin/                # Panel: login público + (panel) protegido por cookie
 app/cotizar/              # Formulario + WhatsApp
@@ -43,6 +44,7 @@ types/admin.ts            # Contrato TS del panel (User, Product, Order, KPIs…
 services/adminApi.ts      # Mock `/api/v1` (300 ms) — ver API_CONTRACT.md
 lib/auth.ts               # Sesión del panel (cookie + localStorage)
 lib/auth-local.ts         # Cuentas de la tienda (otro almacén)
+lib/account-profile.ts    # Foto, teléfono, empresa y autenticador (`chamo-profiles-v1`)
 app/terminos/ /privacidad/
 components/
   Navbar.tsx              # Header 3 niveles (categorías = mainCategories)
@@ -50,7 +52,8 @@ components/
   FavoritesProvider.tsx   # Favoritos en localStorage
   CompareProvider.tsx     # Comparar (máx. 3) en localStorage
   ContentProvider.tsx     # Overlay CMS local (slider, categorías, footer, banners de página, equipo)
-  AuthProvider.tsx        # Cuentas locales + sesión de la tienda (`role` admin/customer)
+  AuthProvider.tsx        # Cuentas locales + sesión de la tienda (`role` admin/customer) + `updateProfile()`
+  account/                # Área de cuenta compartida (cliente y usuario)
   admin/AdminShell.tsx    # Sidebar + header + banner de pestaña (azul/oro)
   admin/AdminPageHero.tsx # Franja de título de cada sección del panel
   admin/AdminLoginForm.tsx
@@ -198,6 +201,14 @@ WhatsApp unificado: `data/contact.ts` → `wa.me/51959723602`. Los formularios d
 `window.open`, para no perder el envío por el bloqueador de popups).
 `FavoritesProvider` sincroniza el toast con un `idsRef` para que clics rápidos
 no desfasen “Guardado” / “Quitado”.
+
+El dropdown de "Mi cuenta" (`Navbar.tsx`) muestra **Mi perfil**, **Mi empresa** y
+**Mi carrito** para cualquier cuenta logueada; **Administrar** solo aparece si hay
+sesión del panel (`hasPanelSession`). `app/perfil/page.tsx` es el área de cuenta
+compartida para cliente y usuario: banner (Área cliente / Área usuario), pestañas
+(Resumen, Pedidos, Cotizaciones, Favoritos, Reseñas, Perfil, Empresa), foto,
+nombre, teléfono y RUC. Se edita con `updateProfile()` y queda en
+`chamo-profiles-v1`. Pedidos y reseñas son placeholder hasta el backend.
 
 ### A.7 Slider
 
@@ -470,6 +481,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | --- | --- |
 | `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
+| `/perfil` | Área de cuenta: perfil editable, empresa (RUC), cotizaciones y favoritos. Misma pantalla para cliente y usuario del panel |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/comparar` | Hasta 3 SKUs lado a lado (precios, ficha de ejemplo, WhatsApp) |
@@ -487,7 +499,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/nosotros` | Banner CMS, historia, misión, visión, **equipo de trabajo en cartas** y valores |
 | `/contacto` | Banner CMS **NUESTRO CONTACTO**, tarjetas y mapa leen el footer de Ajustes, formulario WhatsApp |
 | `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** y productos en oferta |
-| `/cotizar` | Formulario mayorista + WhatsApp prellenado |
+| `/cotizar` | Formulario mayorista + WhatsApp prellenado (si hay sesión, usa nombre/teléfono/empresa del perfil) |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
 | Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña y cerrar sesión (este navegador) |
 

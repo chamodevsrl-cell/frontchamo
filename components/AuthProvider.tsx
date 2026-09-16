@@ -29,12 +29,22 @@ import {
   randomSalt,
   toAuthUser,
   verifyAccount,
+  withProfile,
   type AuthUser,
   type StoredAccount,
 } from "@/lib/auth-local";
+import {
+  PROFILES_KEY,
+  emptyAccountProfile,
+  parseProfiles,
+  type AccountProfile,
+  type StoredProfile,
+} from "@/lib/account-profile";
 import type { AuthSession } from "@/types/admin";
 
 export type AuthMode = "login" | "register" | "reset";
+
+export type ProfilePatch = Partial<AccountProfile> & { name?: string };
 
 type AuthContextValue = {
   isOpen: boolean;
@@ -53,6 +63,7 @@ type AuthContextValue = {
     password: string,
   ) => Promise<string | null>;
   resetPassword: (email: string, password: string) => Promise<string | null>;
+  updateProfile: (patch: ProfilePatch) => string | null;
   logout: () => void;
 };
 
@@ -73,13 +84,19 @@ function readPanelSession(): AuthSession | null {
   }
 }
 
-function panelUserFromSession(session: AuthSession): AuthUser {
-  return {
-    id: session.id,
-    name: session.name,
-    email: session.email,
-    role: "admin",
-  };
+function panelUserFromSession(
+  session: AuthSession,
+  overlay?: StoredProfile | null,
+): AuthUser {
+  return withProfile(
+    {
+      id: session.id,
+      name: session.name,
+      email: session.email,
+      role: "admin",
+    },
+    overlay,
+  );
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -90,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hasPanelSession, setHasPanelSession] = useState(false);
   const [accounts, setAccounts] = useState<StoredAccount[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, StoredProfile>>({});
   const [ready, setReady] = useState(false);
 
   const openAuth = useCallback((nextMode: AuthMode = "login") => {
@@ -104,13 +122,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadedAccounts = parseAccounts(window.localStorage.getItem(ACCOUNTS_KEY));
     const loadedSession = parseSession(window.localStorage.getItem(SESSION_KEY));
+    const loadedProfiles = parseProfiles(window.localStorage.getItem(PROFILES_KEY));
     const panelSession = readPanelSession();
+    const overlayEmail = loadedSession?.email ?? panelSession?.email ?? "";
+    const overlay = overlayEmail ? loadedProfiles[overlayEmail] : undefined;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setAccounts(loadedAccounts);
+    setProfiles(loadedProfiles);
     setHasPanelSession(Boolean(panelSession));
     setUser(
-      hydrateSessionUser(loadedSession, loadedAccounts) ??
-        (panelSession ? panelUserFromSession(panelSession) : null),
+      hydrateSessionUser(loadedSession, loadedAccounts, overlay) ??
+        (panelSession ? panelUserFromSession(panelSession, overlay) : null),
     );
     setReady(true);
   }, []);
@@ -119,6 +141,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!ready) return;
     window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
   }, [accounts, ready]);
+
+  useEffect(() => {
+    if (!ready) return;
+    window.localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+  }, [profiles, ready]);
 
   useEffect(() => {
     if (!ready) return;
@@ -147,17 +174,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  const persistUser = useCallback((account: StoredAccount) => {
-    setUser(toAuthUser(account));
-    setIsOpen(false);
-  }, []);
+  const persistUser = useCallback(
+    (account: StoredAccount) => {
+      setUser(toAuthUser(account, profiles[account.email]));
+      setIsOpen(false);
+    },
+    [profiles],
+  );
 
-  const applyPanelSession = useCallback((session: AuthSession) => {
-    persistAdminSession(session);
-    setHasPanelSession(true);
-    setUser(panelUserFromSession(session));
-    setIsOpen(false);
-  }, []);
+  const applyPanelSession = useCallback(
+    (session: AuthSession) => {
+      persistAdminSession(session);
+      setHasPanelSession(true);
+      setUser(panelUserFromSession(session, profiles[session.email]));
+      setIsOpen(false);
+    },
+    [profiles],
+  );
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -212,6 +245,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [accounts, persistUser],
   );
 
+  const updateProfile = useCallback(
+    (patch: ProfilePatch) => {
+      if (!user) return "Inicia sesión para guardar tu perfil.";
+      const nextName = typeof patch.name === "string" ? patch.name.trim() : user.name;
+      if (!nextName) return "Escribe tu nombre.";
+      const nextProfile: StoredProfile = {
+        ...emptyAccountProfile(),
+        ...user,
+        ...patch,
+        name: nextName,
+      };
+      const nextUser: AuthUser = {
+        ...user,
+        ...nextProfile,
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: nextName,
+      };
+      setProfiles((current) => ({ ...current, [user.email]: nextProfile }));
+      setAccounts((current) =>
+        current.map((account) =>
+          account.email === user.email ? { ...account, name: nextName } : account,
+        ),
+      );
+      const panelSession = readPanelSession();
+      if (panelSession && panelSession.email === user.email && panelSession.name !== nextName) {
+        persistAdminSession({ ...panelSession, name: nextName });
+      }
+      setUser(nextUser);
+      return null;
+    },
+    [user],
+  );
+
   const logout = useCallback(() => {
     setUser(null);
     setHasPanelSession(false);
@@ -234,6 +302,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       resetPassword,
+      updateProfile,
       logout,
     }),
     [
@@ -247,6 +316,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       resetPassword,
+      updateProfile,
       logout,
     ],
   );

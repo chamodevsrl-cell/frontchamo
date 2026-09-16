@@ -1,3 +1,10 @@
+import {
+  mergeAccountProfile,
+  parseStoredProfile,
+  type AccountProfile,
+  type StoredProfile,
+} from "@/lib/account-profile";
+
 export const ACCOUNTS_KEY = "chamo-accounts-v1";
 export const SESSION_KEY = "chamo-session-v1";
 
@@ -18,7 +25,7 @@ export type AuthUser = {
   name: string;
   email: string;
   role: AuthRole;
-};
+} & AccountProfile;
 
 export function isAuthRole(value: unknown): value is AuthRole {
   return value === "customer" || value === "admin";
@@ -28,13 +35,31 @@ export function isAdminUser(user: AuthUser | null | undefined): boolean {
   return user?.role === "admin";
 }
 
-export function toAuthUser(account: StoredAccount): AuthUser {
+export function withProfile(
+  user: Pick<AuthUser, "id" | "name" | "email" | "role">,
+  overlay?: StoredProfile | null,
+): AuthUser {
   return {
-    id: account.id,
-    name: account.name,
-    email: account.email,
-    role: account.role,
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    ...mergeAccountProfile(user, overlay),
   };
+}
+
+export function toAuthUser(
+  account: StoredAccount,
+  overlay?: StoredProfile | null,
+): AuthUser {
+  return withProfile(
+    {
+      id: account.id,
+      name: account.name,
+      email: account.email,
+      role: account.role,
+    },
+    overlay,
+  );
 }
 
 /** UUID v4 si el navegador lo soporta; si no, un hex aleatorio del mismo largo. */
@@ -119,12 +144,15 @@ export function parseSession(raw: string | null): AuthUser | null {
       typeof parsed?.email === "string" &&
       parsed.email.includes("@")
     ) {
-      return {
-        id: typeof parsed.id === "string" && parsed.id ? parsed.id : randomId(),
-        name: parsed.name,
-        email: normalizeEmail(parsed.email),
-        role: isAuthRole(parsed.role) ? parsed.role : "customer",
-      };
+      return withProfile(
+        {
+          id: typeof parsed.id === "string" && parsed.id ? parsed.id : randomId(),
+          name: parsed.name,
+          email: normalizeEmail(parsed.email),
+          role: isAuthRole(parsed.role) ? parsed.role : "customer",
+        },
+        parseStoredProfile(parsed),
+      );
     }
     return null;
   } catch {
@@ -133,12 +161,13 @@ export function parseSession(raw: string | null): AuthUser | null {
 }
 
 export function hydrateSessionUser(
-  session: AuthUser | null,
+  session: Pick<AuthUser, "id" | "name" | "email" | "role"> | null,
   accounts: StoredAccount[],
+  overlay?: StoredProfile | null,
 ): AuthUser | null {
   if (!session) return null;
   const match = accounts.find((account) => account.email === session.email);
-  return match ? toAuthUser(match) : session;
+  return match ? toAuthUser(match, overlay) : withProfile(session, overlay);
 }
 
 export async function createAccount(

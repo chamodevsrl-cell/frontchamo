@@ -22,6 +22,7 @@ import {
   ShoppingCart,
   Store,
   Tags,
+  UserCircle,
   UserCog,
   Users,
   Warehouse,
@@ -286,6 +287,13 @@ export default function AdminShell({
                 <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
                   {session.email}
                 </p>
+                <Link
+                  href="/perfil?tab=perfil"
+                  className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                >
+                  <UserCircle className="h-4 w-4 text-brand-primary" />
+                  Mi perfil
+                </Link>
                 <Link
                   href="/"
                   className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"

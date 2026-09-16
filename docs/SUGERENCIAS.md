@@ -1,6 +1,26 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-15**
+Última actualización: **2026-09-16**
+
+## 👤 Área de cuenta: perfil y empresa (2026-09-16)
+
+- [x] 2026-09-16 — `/perfil` dejó de ser de solo lectura. Hay área de cuenta
+  compartida para **cliente** y **usuario** (staff): banner, pestañas, foto,
+  teléfono, Mi empresa (RUC/razón social) y autenticador local. Detalle:
+  [`cambios/2026-09-16-area-cuenta-cliente-usuario.md`](./cambios/2026-09-16-area-cuenta-cliente-usuario.md).
+- [ ] Pedidos y reseñas siguen como placeholder hasta que haya backend.
+- [ ] El autenticador es un flag en este navegador; falta TOTP real en el backend.
+
+## 👤 Menú de cuenta: "Mi perfil" (2026-09-16)
+
+- [x] 2026-09-16 — El dropdown de "Mi cuenta" ahora muestra **Mi perfil**,
+  **Mi empresa** y **Mi carrito** para cualquier cuenta logueada (antes solo
+  tenía correo + Administrar + Cerrar sesión). Nueva página `/perfil`: área de
+  cuenta editable (foto, nombre, teléfono, empresa). Sin admin visible para
+  cuentas `customer`. Detalle:
+  [`cambios/2026-09-16-menu-cuenta-mi-perfil.md`](./cambios/2026-09-16-menu-cuenta-mi-perfil.md)
+  y [`cambios/2026-09-16-area-cuenta-cliente-usuario.md`](./cambios/2026-09-16-area-cuenta-cliente-usuario.md).
+- [x] 2026-09-16 — `updateProfile()` en `AuthProvider` + `chamo-profiles-v1`.
 
 ## 🖱️ Cursor negro/blanco sobre imágenes (2026-09-15)
 

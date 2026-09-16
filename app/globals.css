@@ -51,7 +51,8 @@ html.admin-shell footer {
   display: none !important;
 }
 
-.admin-page-hero {
+.admin-page-hero,
+.account-hero {
   background-color: var(--brand-dark);
   background-image:
     repeating-linear-gradient(

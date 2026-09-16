@@ -67,7 +67,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
-- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `THE WINTER` / `Criper@11`, también `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS local (`chamo-cms-v1`): banners en `/admin/banners`, categorías en `/admin/categorias`, footer en `/admin/ajustes/footer`, canales (WhatsApp/teléfono/correo/redes) en `/admin/ajustes/canales`, equipo en `/admin/equipo`.
+- Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Área de cuenta `/perfil` (perfil editable, empresa, cotizaciones) para cliente y usuario. Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `THE WINTER` / `Criper@11`, también `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS local (`chamo-cms-v1`): banners en `/admin/banners`, categorías en `/admin/categorias`, footer en `/admin/ajustes/footer`, canales (WhatsApp/teléfono/correo/redes) en `/admin/ajustes/canales`, equipo en `/admin/equipo`.
 - **Modal de producto** + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): ficha técnica, relacionados, agregar a cotización y WhatsApp.
 - Modo oscuro: clase `.dark`; `Navbar.tsx` sigue forzando `classList.remove("dark")` en cada mount. Las tarjetas de categoría ya tienen contraste dark por si se reactiva.
 - Hero slider: banners `public/images/slider/baner-1.png` … `baner-3.png` (sin espacios).
@@ -103,8 +103,9 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `IntroSplash.tsx` | Puertas al clic del logo; `/carrito` con el ícono detrás de la costura; resto de páginas → `BrandLoader` |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
-| `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión; `role: "customer" \| "admin"` |
+| `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión + `updateProfile()`; `role: "customer" \| "admin"` |
 | `AuthModal.tsx` | Modal que envuelve `AuthForm`, controlado por `AuthProvider` |
+| `account/` | Área de cuenta en `/perfil` (cliente y usuario): foto, empresa, pestañas |
 | `AuthForm.tsx` | Login / registro / recuperar contraseña (este navegador) |
 | `CompareProvider.tsx` | Comparar hasta 3 SKUs (`chamo-compare-v1`) |
 | `CompareButton.tsx` | Botón de comparar en tarjeta y modal |
@@ -130,6 +131,7 @@ app/                  # App Router (páginas y layout)
   catalogo/             # Búsqueda y filtros
   categorias/           # Listado + [slug]
   carrito/              # Cotización local
+  perfil/               # Área de cuenta (cliente y usuario)
   comparar/             # Comparación de hasta 3 SKUs
   admin/                # login + (panel) protegido
   favoritos/            # Lista persistida

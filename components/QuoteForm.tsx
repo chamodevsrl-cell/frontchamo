@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
+import { useAuth } from "@/components/AuthProvider";
 import { useSiteContent } from "@/components/ContentProvider";
 import { featuredProducts, getProductById } from "@/data/products";
 import { openCmsWhatsapp } from "@/lib/cms";
@@ -14,6 +15,7 @@ const DEFAULT_SKU_PARAM = "sku";
 export default function QuoteForm() {
   const searchParams = useSearchParams();
   const { footer } = useSiteContent();
+  const { user } = useAuth();
   const { lines } = useCart();
   const skuFromUrl = searchParams.get(DEFAULT_SKU_PARAM) ?? "";
   const productFromUrl = skuFromUrl
@@ -31,6 +33,16 @@ export default function QuoteForm() {
   const [sku, setSku] = useState(productFromUrl?.sku ?? "");
   const [qty, setQty] = useState(1);
   const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    setName((current) => current || user.name);
+    setEmail((current) => current || user.email);
+    setPhone((current) => current || user.phone);
+    setCompany((current) => current || user.companyName);
+    setRuc((current) => current || user.ruc);
+    setCity((current) => current || user.city);
+  }, [user]);
 
   const selectedProduct = useMemo(
     () => featuredProducts.find((item) => item.sku === sku),

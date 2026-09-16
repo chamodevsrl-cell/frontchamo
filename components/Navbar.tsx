@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  Building2,
   ChevronDown,
   Heart,
   House,
@@ -13,8 +14,10 @@ import {
   Search,
   ShoppingCart,
   User,
+  UserCircle,
   X,
 } from "lucide-react";
+import AccountAvatar from "@/components/account/AccountAvatar";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -272,7 +275,7 @@ export default function Navbar() {
                   className="inline-flex flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary"
                   aria-expanded={accountOpen}
                 >
-                  <User className="h-5 w-5" strokeWidth={2} />
+                  <AccountAvatar user={user} size={20} />
                   <span className="max-w-[4.5rem] truncate text-[11px] font-semibold">
                     {firstName(user.name)}
                   </span>
@@ -282,11 +285,40 @@ export default function Navbar() {
                     <p className="border-b border-brand-dark/8 px-3 py-2 text-xs text-brand-dark/60">
                       {user.email}
                     </p>
+                    <Link
+                      href="/perfil?tab=perfil"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                    >
+                      <UserCircle className="h-4 w-4 text-brand-primary" />
+                      Mi perfil
+                    </Link>
+                    <Link
+                      href="/perfil?tab=empresa"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                    >
+                      <Building2 className="h-4 w-4 text-brand-primary" />
+                      Mi empresa
+                    </Link>
+                    <Link
+                      href="/carrito"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                    >
+                      <ShoppingCart className="h-4 w-4 text-brand-primary" />
+                      Mi carrito
+                      {count > 0 ? (
+                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary px-1 text-[11px] font-bold text-white">
+                          {count}
+                        </span>
+                      ) : null}
+                    </Link>
                     {hasPanelSession ? (
                       <Link
                         href="/admin"
                         onClick={() => setAccountOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                        className="flex items-center gap-2 border-t border-brand-dark/8 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
                       >
                         <House className="h-4 w-4 text-brand-primary" />
                         Administrar
@@ -298,7 +330,9 @@ export default function Navbar() {
                         logout();
                         setAccountOpen(false);
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-brand-dark hover:bg-brand-gray"
+                      className={`flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-brand-dark hover:bg-brand-gray ${
+                        hasPanelSession ? "" : "border-t border-brand-dark/8"
+                      }`}
                     >
                       <LogOut className="h-4 w-4 text-brand-primary" />
                       Cerrar sesión
@@ -606,6 +640,22 @@ export default function Navbar() {
                   <p className="text-center text-xs text-brand-dark/60">
                     {user.email}
                   </p>
+                  <Link
+                    href="/perfil?tab=perfil"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-dark/10 px-4 py-3 text-sm font-semibold text-brand-dark"
+                  >
+                    <UserCircle className="h-5 w-5 text-brand-primary" strokeWidth={2} />
+                    Mi perfil
+                  </Link>
+                  <Link
+                    href="/perfil?tab=empresa"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-dark/10 px-4 py-3 text-sm font-semibold text-brand-dark"
+                  >
+                    <Building2 className="h-5 w-5 text-brand-primary" strokeWidth={2} />
+                    Mi empresa
+                  </Link>
                   {hasPanelSession ? (
                     <Link
                       href="/admin"

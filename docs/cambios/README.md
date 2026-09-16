@@ -13,6 +13,8 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-16 | Área de cuenta editable para cliente y usuario (perfil, empresa, foto) | [2026-09-16-area-cuenta-cliente-usuario.md](./2026-09-16-area-cuenta-cliente-usuario.md) |
+| 2026-09-16 | Menú de cuenta: "Mi perfil" y "Mi carrito" para el cliente | [2026-09-16-menu-cuenta-mi-perfil.md](./2026-09-16-menu-cuenta-mi-perfil.md) |
 | 2026-09-15 | Ajustes desglosado: Footer y Canales de atención | [2026-09-15-ajustes-footer-canales.md](./2026-09-15-ajustes-footer-canales.md) |
 | 2026-09-15 | Categorías en cartas + imagen por URL/galería en todo el panel | [2026-09-15-categorias-cartas-imagenes.md](./2026-09-15-categorias-cartas-imagenes.md) |
 | 2026-09-15 | Cursor personalizado: negro puro, blanco al pasar sobre imágenes | [2026-09-15-cursor-negro-blanco-imagenes.md](./2026-09-15-cursor-negro-blanco-imagenes.md) |

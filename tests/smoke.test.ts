@@ -189,6 +189,45 @@ describe("smoke de catálogo y home", () => {
     expect(session?.id).toBe(migrated[0]?.id);
   });
 
+  it("el perfil de cuenta fusiona overlay y saluda por apellido", async () => {
+    const { parseProfiles, greetingSurname, mergeAccountProfile } = await import(
+      "@/lib/account-profile"
+    );
+    const { withProfile } = await import("@/lib/auth-local");
+    expect(greetingSurname("Admin Acosta")).toBe("Acosta");
+    expect(greetingSurname("Chamo")).toBe("Chamo");
+    const overlay = parseProfiles(
+      JSON.stringify({
+        "acosta@example.com": {
+          name: "Admin Acosta",
+          phone: "+51999999999",
+          companyName: "Ferretería Acosta",
+          ruc: "20123456789",
+          totpEnabled: true,
+        },
+      }),
+    );
+    expect(overlay["acosta@example.com"]?.phone).toBe("+51999999999");
+    const merged = mergeAccountProfile(
+      { name: "Admin" },
+      overlay["acosta@example.com"],
+    );
+    expect(merged.name).toBe("Admin Acosta");
+    expect(merged.companyName).toBe("Ferretería Acosta");
+    const user = withProfile(
+      {
+        id: "u1",
+        name: "Admin",
+        email: "acosta@example.com",
+        role: "admin",
+      },
+      overlay["acosta@example.com"],
+    );
+    expect(user.phone).toBe("+51999999999");
+    expect(user.totpEnabled).toBe(true);
+    expect(user.avatarPreset).toBe("navy");
+  });
+
   it("contacto oficial tiene teléfono, horario y WhatsApp", () => {
     expect(PHONE_DISPLAY).toContain("959 723 602");
     expect(HOURS_DISPLAY.toLowerCase()).toContain("lun");
