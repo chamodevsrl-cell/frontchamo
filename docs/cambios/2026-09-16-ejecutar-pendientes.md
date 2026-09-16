@@ -3,7 +3,7 @@
 - **Fecha:** 2026-09-16
 - **Solicitud:** EJECUTA TODO (pendientes de SUGERENCIAS / CLAUDE que se pueden hacer sin backend ni datos oficiales del cliente)
 - **Archivos:** `services/adminApi.ts`, `types/admin.ts`, `lib/inbox.ts`, `lib/favorites.ts`, `components/FavoritesProvider.tsx`, `app/reclamaciones/page.tsx`, `app/admin/(panel)/*`
-- **Commit:** (se completa al subir)
+- **Commit:** `dafa7ce`
 
 ## Qué había antes
 
