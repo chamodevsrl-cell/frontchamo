@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-21 | Exclusiones de watcher/índice del editor (Cursor/VS Code) por lentitud reportada | [2026-09-21-exclusiones-editor-vscode.md](./2026-09-21-exclusiones-editor-vscode.md) |
 | 2026-09-16 | Editar usuario completo (nombre/correo/contraseña/roles) + varios roles por usuario | [2026-09-16-editar-usuario-multirol.md](./2026-09-16-editar-usuario-multirol.md) |
 | 2026-09-16 | Usuarios del panel: tarjetas con foto + modal editar/habilitar/borrar | [2026-09-16-usuarios-tarjetas-modal.md](./2026-09-16-usuarios-tarjetas-modal.md) |
 | 2026-09-16 | Animación de entrada solo en transiciones clave (admin, perfil, login/logout) | [2026-09-16-intro-solo-en-transiciones-clave.md](./2026-09-16-intro-solo-en-transiciones-clave.md) |

@@ -1,6 +1,18 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-16**
+Última actualización: **2026-09-21**
+
+## ⚡ Exclusiones de editor para lentitud en Cursor (2026-09-21)
+
+- [x] 2026-09-21 — Se agregó `.vscode/settings.json` excluyendo `node_modules`,
+  `.next` y `coverage` del watcher/índice/búsqueda de Cursor/VS Code, ante
+  reporte de comandos lentos. Detalle:
+  [`cambios/2026-09-21-exclusiones-editor-vscode.md`](./cambios/2026-09-21-exclusiones-editor-vscode.md).
+- [ ] Pendiente que el usuario confirme si además agrega exclusión de
+  `node_modules`/`.next` en el antivirus (Windows Defender) — no se puede
+  hacer desde el repo.
+- [ ] Pendiente confirmar si `npm run dev` está usando Turbopack (Next 16) o
+  cayó al bundler clásico de Webpack.
 
 ## 🔑 Editar usuario completo + varios roles por usuario (2026-09-16)
 

@@ -260,6 +260,12 @@ npm run lint
 npm test         # Vitest smoke (slider, categorías, búsqueda)
 ```
 
+`.vscode/settings.json` excluye `node_modules`, `.next` y `coverage` del
+watcher/índice/búsqueda del editor (Cursor/VS Code) para evitar lentitud al
+ejecutar comandos. Si persiste la lentitud, revisar exclusiones de antivirus
+(Windows Defender) para esas mismas carpetas — fuera del alcance del repo.
+Detalle: [`cambios/2026-09-21-exclusiones-editor-vscode.md`](cambios/2026-09-21-exclusiones-editor-vscode.md).
+
 ---
 
 ### A.12 🎛️ Dashboard — Panel de administración
