@@ -337,7 +337,8 @@ abierto. El menú desplegable de la cuenta (foto/avatar) ya no repite ese enlace
 | --- | --- | --- |
 | Dashboard | `/admin` | ✅ Real — KPIs desde `getDashboardKPIs()` (mock) |
 | Productos → Ver productos | `/admin/productos` | ✅ Real — `getProducts({ q })`, búsqueda por SKU/nombre/marca |
-| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes por **galería/carpetas** (máx **60 MB** por imagen, `MAX_PRODUCT_IMAGE_BYTES` en `lib/cms-image.ts`) o **URL**; `createProduct()` se llama al terminar la fase 4; el `<select>` de categoría une `getCategories()` + líneas del CMS. Fase 3 suma **En oferta + precio anterior + % de descuento** (badge "-X% OFF", independiente del precio anterior); Fase 4 suma **Presentaciones de venta** (unidad/docena/caja o una creada a mano, con su contenido) |
+| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes por **galería/carpetas** (máx **60 MB** por imagen, `MAX_PRODUCT_IMAGE_BYTES` en `lib/cms-image.ts`) o **URL**; `createProduct()` se llama al terminar la fase 4; el `<select>` de categoría une `getCategories()` + líneas del CMS. Fase 3 suma **En oferta + precio anterior + % de descuento** (badge "-X% OFF", independiente del precio anterior); Fase 4 suma **Presentaciones de venta**, con las unidades saliendo del catálogo de `getUnits()` (gestionado en Productos → Unidades de medida) o creadas al toque con el campo de texto libre |
+| Productos → Unidades de medida | `/admin/productos/unidades` | ✅ Real — `getUnits()` / `createUnit()` / `deleteUnit()`. Unidad, Docena y Caja vienen de fábrica y no se pueden borrar; las que se agregan quedan disponibles al toque como preset en la Fase 4 del wizard de producto |
 | Productos → Ver productos (acciones) | `/admin/productos` | ✅ Real — cada fila tiene **Ver** (modal de solo lectura), **Editar** (`/admin/productos/[id]/editar`, mismo wizard precargado, llama `updateProduct()`) y **Eliminar** (confirmación, `deleteProduct()`) — `components/admin/AdminProductsTable.tsx` |
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
 | Ofertas | `/admin/ofertas` | ✅ Real — editor del **banner de 4 secciones** de `/ofertas` (`AdminOffersBannerEditor.tsx`, 4 casillas fijas) + lista de solo lectura de los productos con `badge === "oferta"` del catálogo público — ver debajo |
@@ -680,6 +681,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/login` | Redirige a `/login` (modal de Mi cuenta) |
 | `/admin/productos` | Listado mock (`getProducts`). Query `?q=` |
 | `/admin/productos/nuevo` | Alta mock (`createProduct`) |
+| `/admin/productos/unidades` | Catálogo de unidades de medida reutilizables en "Presentaciones de venta" (`getUnits`/`createUnit`/`deleteUnit`) |
 | `/admin/pedidos` | Pedidos mock + cambio de estado |
 | `/admin/ofertas` | Editor del banner de 4 secciones de `/ofertas` (foto + producto o URL en cada una) + lista de productos en oferta del catálogo público |
 | `/admin/banners` | Cartas para editar el slider del home y los banners de Nosotros/Contacto/Ofertas/Catálogo |

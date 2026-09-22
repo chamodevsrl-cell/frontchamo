@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import AdminNewProductForm from "@/components/admin/AdminNewProductForm";
-import { getCategories, getProduct } from "@/services/adminApi";
+import { getCategories, getProduct, getUnits } from "@/services/adminApi";
 
 export default async function AdminEditarProductoPage({
   params,
@@ -8,7 +8,11 @@ export default async function AdminEditarProductoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [categories, product] = await Promise.all([getCategories(), getProduct(id)]);
+  const [categories, units, product] = await Promise.all([
+    getCategories(),
+    getUnits(),
+    getProduct(id),
+  ]);
   if (!product) notFound();
-  return <AdminNewProductForm categories={categories} product={product} />;
+  return <AdminNewProductForm categories={categories} units={units} product={product} />;
 }

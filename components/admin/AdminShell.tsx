@@ -65,6 +65,7 @@ const NAV: NavItem[] = [
     children: [
       { href: "/admin/productos", label: "Ver productos" },
       { href: "/admin/productos/nuevo", label: "Crear producto" },
+      { href: "/admin/productos/unidades", label: "Unidades de medida" },
     ],
   },
   { href: "/admin/categorias", label: "Categorías", icon: FolderTree, permission: "categorias" },

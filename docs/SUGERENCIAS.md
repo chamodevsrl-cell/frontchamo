@@ -2,6 +2,20 @@
 
 Última actualización: **2026-09-22**
 
+## 📏 Nueva sección "Unidades de medida" en el panel (2026-09-22)
+
+- [x] 2026-09-22 — Las 3 unidades de la Fase 4 del wizard de producto
+  ("Presentaciones de venta") estaban hardcodeadas en el componente, sin
+  forma de agregar una nueva de manera reutilizable. Ahora hay un catálogo
+  real en `/admin/productos/unidades` (`getUnits()`/`createUnit()`/
+  `deleteUnit()`, mismo patrón mock que Roles/Categorías) — Unidad, Docena
+  y Caja vienen de fábrica y no se pueden borrar; lo que se agregue ahí
+  aparece al toque como preset en el wizard. Detalle:
+  [`cambios/2026-09-22-unidades-de-medida.md`](./cambios/2026-09-22-unidades-de-medida.md).
+- [ ] El campo de texto libre del wizard para crear una unidad "al vuelo"
+  se mantuvo, pero esa unidad no queda guardada en el catálogo — si se
+  usa seguido, conviene agregarla primero en Unidades de medida.
+
 ## 🛠️ Fix: guardar en el panel ya no rompe la página si falta espacio (2026-09-22)
 
 - [x] 2026-09-22 — Guardar cualquier cosa del CMS local (banners, equipo,

@@ -19,11 +19,13 @@ import type {
   AuthSession,
   Category,
   CreateCategoryInput,
+  CreateMeasurementUnitInput,
   CreatePanelRoleInput,
   CreatePanelUserInput,
   CreateProductInput,
   DashboardKPIs,
   LoginCredentials,
+  MeasurementUnit,
   Order,
   OrderStatus,
   PanelRole,
@@ -315,11 +317,20 @@ function seedUsers(): PanelUser[] {
   ];
 }
 
+function seedUnits(): MeasurementUnit[] {
+  return [
+    { id: "unit_unidad", name: "Unidad", isSystem: true, createdAt: "2026-09-11T12:00:00.000Z" },
+    { id: "unit_docena", name: "Docena", isSystem: true, createdAt: "2026-09-11T12:00:00.000Z" },
+    { id: "unit_caja", name: "Caja", isSystem: true, createdAt: "2026-09-11T12:00:00.000Z" },
+  ];
+}
+
 const productsDb: Product[] = seedProducts();
 const ordersDb: Order[] = seedOrders(productsDb);
 const categoriesDb: Category[] = seedCategories();
 const rolesDb: PanelRole[] = seedRoles();
 const usersDb: PanelUser[] = seedUsers();
+const unitsDb: MeasurementUnit[] = seedUnits();
 
 /** Contraseñas del mock. Nunca viajan en {@link PanelUser} ni en la sesión. */
 const passwordsByUserId = new Map<string, string>([
@@ -673,6 +684,57 @@ export async function createRole(input: CreatePanelRoleInput): Promise<PanelRole
   };
   rolesDb.push(created);
   return created;
+}
+
+/**
+ * GET /api/v1/units
+ */
+export async function getUnits(): Promise<MeasurementUnit[]> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/units')
+  await delay();
+  return [...unitsDb];
+}
+
+/**
+ * POST /api/v1/units
+ * Body: {@link CreateMeasurementUnitInput}
+ */
+export async function createUnit(
+  input: CreateMeasurementUnitInput,
+): Promise<MeasurementUnit> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/units')
+  await delay();
+  const name = input.name.trim();
+  if (!name) {
+    throw new AdminApiError("VALIDATION", "El nombre de la unidad es obligatorio.");
+  }
+  if (unitsDb.some((unit) => unit.name.toLowerCase() === name.toLowerCase())) {
+    throw new AdminApiError("CONFLICT", `Ya existe una unidad llamada ${name}.`);
+  }
+  const created: MeasurementUnit = {
+    id: newId("unit"),
+    name,
+    isSystem: false,
+    createdAt: new Date().toISOString(),
+  };
+  unitsDb.push(created);
+  return created;
+}
+
+/**
+ * DELETE /api/v1/units/:unitId
+ */
+export async function deleteUnit(unitId: string): Promise<void> {
+  // TODO Backend: Reemplazar mock con fetch(`/api/v1/units/${unitId}`, { method: "DELETE" })
+  await delay();
+  const index = unitsDb.findIndex((unit) => unit.id === unitId);
+  if (index === -1) {
+    throw new AdminApiError("NOT_FOUND", "La unidad ya no existe.");
+  }
+  if (unitsDb[index].isSystem) {
+    throw new AdminApiError("FORBIDDEN", "Esta unidad viene por defecto y no se puede borrar.");
+  }
+  unitsDb.splice(index, 1);
 }
 
 /**

@@ -16,6 +16,11 @@ const HEROES: { href: string; exact?: boolean; title: string; action?: AdminHero
       title: "Nuevo producto",
     },
     {
+      href: "/admin/productos/unidades",
+      exact: true,
+      title: "Unidades de medida",
+    },
+    {
       href: "/admin/productos",
       title: "Productos",
       action: { href: "/admin/productos/nuevo", label: "Crear producto" },

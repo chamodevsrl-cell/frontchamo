@@ -1,10 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
-import type { PackagingLine } from "@/types/admin";
-
-/** Unidades sugeridas; el campo de al lado sigue siendo texto libre para crear una nueva. */
-const PACKAGING_PRESETS = ["Unidad", "Docena", "Caja"];
+import type { MeasurementUnit, PackagingLine } from "@/types/admin";
 
 type SpecRow = { label: string; value: string };
 
@@ -14,6 +12,7 @@ export default function AdminProductFormStepEspecs({
   onUpdateSpec,
   onRemoveSpec,
   packaging,
+  units,
   customUnit,
   setCustomUnit,
   onAddPackagingUnit,
@@ -25,6 +24,8 @@ export default function AdminProductFormStepEspecs({
   onUpdateSpec: (index: number, field: "label" | "value", value: string) => void;
   onRemoveSpec: (index: number) => void;
   packaging: PackagingLine[];
+  /** Catálogo gestionado en `/admin/productos/unidades`; reemplaza los 3 presets fijos de antes. */
+  units: MeasurementUnit[];
   customUnit: string;
   setCustomUnit: (value: string) => void;
   onAddPackagingUnit: (unit: string) => void;
@@ -81,24 +82,30 @@ export default function AdminProductFormStepEspecs({
         </h3>
         <p className="text-sm text-brand-dark/60">
           ¿Sale por unidad, docena, caja…? Agrega una presentación y describe
-          qué trae. También puedes crear una unidad propia (p. ej.
-          &ldquo;Rollo&rdquo;, &ldquo;Par&rdquo;, &ldquo;Galón&rdquo;).
+          qué trae. Las unidades salen de{" "}
+          <Link
+            href="/admin/productos/unidades"
+            className="font-semibold text-brand-primary hover:underline"
+          >
+            Unidades de medida
+          </Link>{" "}
+          — si te falta una, también puedes crearla al toque acá abajo.
         </p>
 
         <div className="mt-2 flex flex-wrap gap-2">
-          {PACKAGING_PRESETS.map((preset) => {
+          {units.map((unit) => {
             const already = packaging.some(
-              (row) => row.unit.toLowerCase() === preset.toLowerCase(),
+              (row) => row.unit.toLowerCase() === unit.name.toLowerCase(),
             );
             return (
               <button
-                key={preset}
+                key={unit.id}
                 type="button"
                 disabled={already}
-                onClick={() => onAddPackagingUnit(preset)}
+                onClick={() => onAddPackagingUnit(unit.name)}
                 className="rounded-full border border-brand-primary/30 px-3 py-1 text-xs font-semibold text-brand-primary hover:bg-brand-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                + {preset}
+                + {unit.name}
               </button>
             );
           })}

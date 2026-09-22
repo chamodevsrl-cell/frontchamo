@@ -1,7 +1,7 @@
 import AdminNewProductForm from "@/components/admin/AdminNewProductForm";
-import { getCategories } from "@/services/adminApi";
+import { getCategories, getUnits } from "@/services/adminApi";
 
 export default async function AdminNuevoProductoPage() {
-  const categories = await getCategories();
-  return <AdminNewProductForm categories={categories} />;
+  const [categories, units] = await Promise.all([getCategories(), getUnits()]);
+  return <AdminNewProductForm categories={categories} units={units} />;
 }

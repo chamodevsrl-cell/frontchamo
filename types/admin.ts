@@ -106,6 +106,25 @@ export interface PackagingLine {
 }
 
 /**
+ * Unidad de medida gestionada desde el panel (`/admin/productos/unidades`),
+ * para reutilizar el mismo nombre entre productos en vez de escribirlo cada
+ * vez en la fase "Especs" del alta. `unit` en {@link PackagingLine} sigue
+ * siendo texto libre — esto es solo un catálogo de sugerencias reutilizable.
+ */
+export interface MeasurementUnit {
+  id: string;
+  /** Nombre visible (p. ej. "Unidad", "Docena", "Caja", "Rollo"). */
+  name: string;
+  /** `true` para las 3 unidades base sembradas — no se pueden borrar. */
+  isSystem: boolean;
+  /** ISO-8601 de alta. */
+  createdAt: string;
+}
+
+/** Payload de alta de unidad. El backend asigna `id`, `createdAt` e `isSystem: false`. */
+export type CreateMeasurementUnitInput = Omit<MeasurementUnit, "id" | "createdAt" | "isSystem">;
+
+/**
  * Producto del catálogo admin.
  * Independiente de `FeaturedProduct` de la tienda: el backend puede mapear
  * ambos desde la misma tabla, pero el panel necesita estos campos de gestión.

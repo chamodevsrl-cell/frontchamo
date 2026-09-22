@@ -10,6 +10,7 @@ import { MAX_PRODUCT_IMAGE_BYTES, readCmsImageFile } from "@/lib/cms-image";
 import type {
   Category,
   CreateProductInput,
+  MeasurementUnit,
   PackagingLine,
   Product,
   ProductStatus,
@@ -33,10 +34,13 @@ type SpecRow = { label: string; value: string };
 
 export default function AdminNewProductForm({
   categories,
+  units,
   product,
 }: {
   /** Viene de `getCategories()` (mock) — no importar `mainCategories` directo aquí. */
   categories: Category[];
+  /** Viene de `getUnits()` (mock) — catálogo gestionado en `/admin/productos/unidades`. */
+  units: MeasurementUnit[];
   /** Si viene, el formulario edita este producto en vez de crear uno nuevo. */
   product?: Product;
 }) {
@@ -334,6 +338,7 @@ export default function AdminNewProductForm({
               onUpdateSpec={updateSpec}
               onRemoveSpec={removeSpec}
               packaging={packaging}
+              units={units}
               customUnit={customUnit}
               setCustomUnit={setCustomUnit}
               onAddPackagingUnit={addPackagingUnit}

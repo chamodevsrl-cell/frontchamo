@@ -268,6 +268,46 @@ soft-delete (`status: "archived"`) en vez de borrar filas.
 
 ---
 
+## Unidades de medida
+
+Tipo: `MeasurementUnit` en `types/admin.ts`. Catálogo reutilizable para el
+`unit` (texto libre) de `PackagingLine` — gestionado en
+`/admin/productos/unidades`, usado por el `<select>`/pills de "Presentaciones
+de venta" en la Fase 4 del alta/edición de producto.
+
+### `GET /api/v1/units`
+
+Front: `getUnits()`.
+
+**Respuesta `200`:**
+
+```json
+{
+  "ok": true,
+  "data": [
+    { "id": "unit_unidad", "name": "Unidad", "isSystem": true, "createdAt": "2026-09-11T12:00:00.000Z" },
+    { "id": "unit_docena", "name": "Docena", "isSystem": true, "createdAt": "2026-09-11T12:00:00.000Z" },
+    { "id": "unit_caja", "name": "Caja", "isSystem": true, "createdAt": "2026-09-11T12:00:00.000Z" }
+  ]
+}
+```
+
+### `POST /api/v1/units`
+
+Front: `createUnit(input)` → `createUnitAction`. Body: `{ "name": "Rollo" }`.
+Queda con `isSystem: false`.
+
+**Errores:** `400 VALIDATION` (nombre vacío), `409 CONFLICT` (nombre
+duplicado, sin distinguir mayúsculas/minúsculas).
+
+### `DELETE /api/v1/units/:unitId`
+
+Front: `deleteUnit(id)` → `deleteUnitAction`, con confirmación en el panel.
+**Errores:** `404 NOT_FOUND`, `403 FORBIDDEN` (si `isSystem` es `true` — las
+3 unidades sembradas de fábrica, Unidad/Docena/Caja, no se pueden borrar).
+
+---
+
 ## Categorías
 
 Tipo: `Category` en `types/admin.ts`. El CMS de banners/textos del home
@@ -495,6 +535,7 @@ endpoint (queda en el cliente, `chamo-profiles-v1`) para no inflar la cookie.
 | `/admin` | Cookie de sesión | `getDashboardKPIs` |
 | `/admin/productos` | Cookie + permiso `productos` | `getProducts({ q })` |
 | `/admin/productos/nuevo` | Cookie + permiso `productos` | `createProduct` |
+| `/admin/productos/unidades` | Cookie + permiso `productos` | `getUnits` / `createUnit` / `deleteUnit` |
 | `/admin/pedidos` | Cookie + permiso `pedidos` | `getOrders` / `updateOrderStatus` |
 | `/admin/usuarios` | Cookie + permiso `usuarios` | `getUsers` / `createUser` |
 | `/admin/roles` | Cookie + permiso `roles` | `getRoles` / `createRole` |

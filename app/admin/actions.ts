@@ -9,9 +9,11 @@ import {
 import {
   createProduct,
   createRole,
+  createUnit,
   createUser,
   createCategory,
   deleteProduct,
+  deleteUnit,
   deleteUser,
   loginAdmin,
   updateCategory,
@@ -25,10 +27,12 @@ import type {
   AuthSession,
   Category,
   CreateCategoryInput,
+  CreateMeasurementUnitInput,
   CreatePanelRoleInput,
   CreatePanelUserInput,
   CreateProductInput,
   LoginCredentials,
+  MeasurementUnit,
   Order,
   OrderStatus,
   PanelRole,
@@ -144,6 +148,32 @@ export async function createRoleAction(
     return { ok: true, role };
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "No se pudo crear el rol.";
+    return { ok: false, message };
+  }
+}
+
+export async function createUnitAction(
+  input: CreateMeasurementUnitInput,
+): Promise<{ ok: true; unit: MeasurementUnit } | { ok: false; message: string }> {
+  try {
+    const unit = await createUnit(input);
+    return { ok: true, unit };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo crear la unidad.";
+    return { ok: false, message };
+  }
+}
+
+export async function deleteUnitAction(
+  unitId: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    await deleteUnit(unitId);
+    return { ok: true };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo borrar la unidad.";
     return { ok: false, message };
   }
 }
