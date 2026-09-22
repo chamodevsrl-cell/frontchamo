@@ -93,7 +93,7 @@ export default function OffersBanner({
       <Reveal>
         <ul
           aria-label="Ofertas destacadas"
-          className="grid grid-cols-2 gap-[3px] overflow-hidden rounded-2xl border-2 border-brand-dark/20 bg-brand-dark/20 shadow-[0_12px_32px_rgba(11,53,84,0.18)] sm:grid-cols-4"
+          className="grid grid-cols-2 gap-[3px] overflow-hidden rounded-2xl border-[3px] border-brand-dark/30 bg-brand-dark/20 shadow-[0_12px_32px_rgba(11,53,84,0.18)] sm:border-4 sm:grid-cols-4"
         >
           {tiles.map(({ tile, product }) => {
             const url = tile.url.trim();

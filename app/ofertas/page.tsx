@@ -17,15 +17,17 @@ export default function OfertasPage() {
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
-        <OffersBanner
-          title="OFERTAS"
-          stamp={{ lead: "OFERTAS", accent: "DESCUENTOS", variant: "offer" }}
-          subtitle="Selección con descuento referencial para mayoristas. Stock y precios de ejemplo."
-          crumbs={[
-            { href: "/", label: "Inicio" },
-            { label: "Ofertas" },
-          ]}
-        />
+        <div className="mb-8 border-b-[3px] border-brand-dark/15 pb-8 sm:mb-10 sm:border-b-4 sm:pb-10">
+          <OffersBanner
+            title="OFERTAS"
+            stamp={{ lead: "OFERTAS", accent: "DESCUENTOS", variant: "offer" }}
+            subtitle="Selección con descuento referencial para mayoristas. Stock y precios de ejemplo."
+            crumbs={[
+              { href: "/", label: "Inicio" },
+              { label: "Ofertas" },
+            ]}
+          />
+        </div>
         <Reveal delayMs={80}>
           <div>
             <ProductCatalog products={offers} />
