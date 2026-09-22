@@ -19,6 +19,8 @@ export default function AdminProductFormStepPrecios({
   setIsOnOffer,
   oldPrice,
   setOldPrice,
+  discountPercent,
+  setDiscountPercent,
 }: {
   price: string;
   setPrice: (value: string) => void;
@@ -34,6 +36,8 @@ export default function AdminProductFormStepPrecios({
   setIsOnOffer: (value: boolean) => void;
   oldPrice: string;
   setOldPrice: (value: string) => void;
+  discountPercent: string;
+  setDiscountPercent: (value: string) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -110,22 +114,42 @@ export default function AdminProductFormStepPrecios({
           En oferta
         </label>
         {isOnOffer ? (
-          <label className="mt-3 block text-sm font-semibold">
-            Precio anterior (S/)
-            <input
-              value={oldPrice}
-              onChange={(event) => setOldPrice(event.target.value)}
-              type="number"
-              min={0}
-              step="0.01"
-              placeholder="Precio antes del descuento"
-              className="mt-1 w-full max-w-xs rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-            />
-            <span className="mt-1 block text-xs font-normal text-brand-dark/50">
-              Debe ser mayor que el precio de arriba para que se vea el
-              descuento en la tienda.
-            </span>
-          </label>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-semibold">
+              Precio anterior (S/)
+              <input
+                value={oldPrice}
+                onChange={(event) => setOldPrice(event.target.value)}
+                type="number"
+                min={0}
+                step="0.01"
+                placeholder="Precio antes del descuento"
+                className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
+              />
+              <span className="mt-1 block text-xs font-normal text-brand-dark/50">
+                Debe ser mayor que el precio de arriba para que se vea el
+                descuento en la tienda.
+              </span>
+            </label>
+            <label className="block text-sm font-semibold">
+              % de descuento (badge)
+              <input
+                value={discountPercent}
+                onChange={(event) => setDiscountPercent(event.target.value)}
+                type="number"
+                min={0}
+                max={100}
+                step="1"
+                placeholder="Ej. 20"
+                className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
+              />
+              <span className="mt-1 block text-xs font-normal text-brand-dark/50">
+                Texto del badge &ldquo;-X% OFF&rdquo; en la tarjeta y el
+                modal. No se calcula solo — escríbelo aunque ya hayas puesto
+                el precio anterior.
+              </span>
+            </label>
+          </div>
         ) : null}
       </div>
     </div>

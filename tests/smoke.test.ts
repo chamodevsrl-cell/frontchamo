@@ -506,6 +506,7 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
       isFeatured: false,
       isOnOffer: false,
       oldPrice: null,
+      discountPercent: null,
       packaging: [],
       specs: [],
     });
@@ -550,7 +551,6 @@ describe("CMS local (footer, banners de página, equipo)", () => {
     expect(pages.map((page) => page.id)).toEqual([
       "nosotros",
       "contacto",
-      "ofertas",
       "catalogo",
     ]);
   });

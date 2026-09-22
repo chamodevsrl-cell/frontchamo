@@ -212,7 +212,7 @@ solo WhatsApp), hay que diseñar ese endpoint desde cero; no hay contrato previo
 | `AdminOrdersTable.tsx` | `orders: Order[]`, `statusFilter: string` | `app/admin/(panel)/pedidos/page.tsx` awaits `getOrders(statusFilter)` |
 | `app/admin/(panel)/productos/page.tsx` | (server) lee `?q=` y awaits `getProducts({ q })` | — |
 | `SiteContentEditor.tsx` | `section: "banners" \| "categories"` | textos de categorías (los banners del home pasaron a `AdminBannersStudio`) |
-| `AdminPlaceholder.tsx` | `title: string`, `description: string` | usado por Marcas/Clientes/Inventario/Ofertas/Reportes — sin datos reales aún |
+| `AdminPlaceholder.tsx` | `title: string`, `description: string` | usado por Marcas/Clientes/Inventario/Reportes — sin datos reales aún (Ofertas ya no es placeholder, ver `AdminOffersBannerEditor.tsx`) |
 
 Todas las funciones de datos (`getDashboardKPIs`, `getProducts`, `createProduct`,
 `getOrders`, `updateOrderStatus`, `getCategories`, `loginAdmin`) viven en

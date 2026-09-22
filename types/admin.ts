@@ -143,6 +143,8 @@ export interface Product {
   isOnOffer: boolean;
   /** Precio antes del descuento. Solo se usa/muestra si `isOnOffer` es true. */
   oldPrice: number | null;
+  /** Porcentaje de descuento (0–100, no un monto) para el badge "-X% OFF". Independiente de `oldPrice`. */
+  discountPercent: number | null;
   /** Presentaciones de venta (unidad/docena/caja o una creada a mano) y su contenido. */
   packaging: PackagingLine[];
   /** Ficha técnica (tabla de la fase "Especs"). Puede quedar vacía. */

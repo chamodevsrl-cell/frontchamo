@@ -84,6 +84,9 @@ export default function AdminNewProductForm({
   const [isFeatured, setIsFeatured] = useState(product?.isFeatured ?? false);
   const [isOnOffer, setIsOnOffer] = useState(product?.isOnOffer ?? false);
   const [oldPrice, setOldPrice] = useState(product?.oldPrice ? String(product.oldPrice) : "");
+  const [discountPercent, setDiscountPercent] = useState(
+    product?.discountPercent ? String(product.discountPercent) : "",
+  );
 
   // Fase 4 — Especs + presentaciones de venta
   const [specs, setSpecs] = useState<SpecRow[]>(product?.specs ?? []);
@@ -204,6 +207,8 @@ export default function AdminNewProductForm({
       isFeatured,
       isOnOffer,
       oldPrice: isOnOffer && Number(oldPrice) > 0 ? Number(oldPrice) : null,
+      discountPercent:
+        isOnOffer && Number(discountPercent) > 0 ? Number(discountPercent) : null,
       packaging: packaging.filter((row) => row.unit.trim() && row.content.trim()),
       specs: specs.filter((row) => row.label.trim() && row.value.trim()),
     };
@@ -317,6 +322,8 @@ export default function AdminNewProductForm({
               setIsOnOffer={setIsOnOffer}
               oldPrice={oldPrice}
               setOldPrice={setOldPrice}
+              discountPercent={discountPercent}
+              setDiscountPercent={setDiscountPercent}
             />
           ) : null}
 
@@ -393,6 +400,7 @@ export default function AdminNewProductForm({
           sku={sku}
           price={Number(price) || 0}
           oldPrice={Number(oldPrice) || 0}
+          discountPercent={Number(discountPercent) || 0}
           isFeatured={isFeatured}
           isOnOffer={isOnOffer}
         />

@@ -16,6 +16,7 @@ export default function AdminProductPreviewCard({
   sku,
   price,
   oldPrice,
+  discountPercent,
   isFeatured,
   isOnOffer,
 }: {
@@ -25,6 +26,7 @@ export default function AdminProductPreviewCard({
   sku: string;
   price: number;
   oldPrice: number;
+  discountPercent: number;
   isFeatured: boolean;
   isOnOffer: boolean;
 }) {
@@ -51,7 +53,7 @@ export default function AdminProductPreviewCard({
             ) : null}
             {isOnOffer ? (
               <span className="inline-block rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 uppercase">
-                Oferta
+                {discountPercent > 0 ? `-${discountPercent}% OFF` : "Oferta"}
               </span>
             ) : null}
           </div>

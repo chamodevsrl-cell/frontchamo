@@ -106,6 +106,7 @@ function seedProducts(): Product[] {
       isFeatured: item.badge === "destacado" || index < 3,
       isOnOffer,
       oldPrice: isOnOffer ? item.oldPrice : null,
+      discountPercent: isOnOffer ? (item.discountPercent ?? null) : null,
       packaging: [
         { unit: "Unidad", content: item.packaging.unidad },
         { unit: "Docena", content: item.packaging.docena },

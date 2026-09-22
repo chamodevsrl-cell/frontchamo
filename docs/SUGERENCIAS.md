@@ -2,6 +2,36 @@
 
 Última actualización: **2026-09-22**
 
+## 🧹 Ofertas: se quita el banner anterior + límite 3-4 imágenes (2026-09-22)
+
+- [x] 2026-09-22 — Ya no existe el banner de una sola imagen para Ofertas
+  (se quitó de `/admin/banners` → "Otras páginas"); la franja de imágenes
+  es ahora la única forma de personalizar esa parte de `/ofertas`, con
+  fallback a un banner simple sin foto si hay menos de 3 imágenes
+  completas. Límite: mínimo 3, máximo 4 (el botón "Agregar imagen" se
+  deshabilita al llegar a 4). De paso se corrigió un bug real: una imagen
+  sin foto subida tumbaba `next/image` en la tienda pública. Detalle:
+  [`cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md`](./cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md).
+
+## 🏷️ Ofertas: editor propio en /admin/ofertas + % de descuento (2026-09-22)
+
+- [x] 2026-09-22 — El editor de la franja de imágenes se movió de
+  `/admin/banners` a `/admin/ofertas` (ya tenía su propio permiso `ofertas`
+  en el sidebar, separado de `banners`). Esa página también lista, de solo
+  lectura, los productos en oferta del catálogo público, con un aviso claro
+  de que todavía no es lo mismo que "Productos" del panel. El wizard de
+  producto (Fase 3) suma un campo **% de descuento** independiente del
+  precio anterior, que alimenta el badge "-X% OFF". Detalle:
+  [`cambios/2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md`](./cambios/2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md).
+- [ ] **El pendiente real de fondo:** unificar el catálogo del panel
+  (`services/adminApi.ts`, mock en memoria) con el catálogo público
+  (`data/products.ts`, array estático) para que marcar "En oferta" en
+  `/admin/productos` se refleje solo en `/ofertas` y en la lista de
+  `/admin/ofertas`. Es trabajo de "conectar el backend real", no algo para
+  resolver a medias solo para Ofertas — ver
+  [`API_CONTRACT_TIENDA.md` §2](../API_CONTRACT_TIENDA.md#2-catálogo-público)
+  y `docs/backend-handoff/MAPA-CONEXION.md`.
+
 ## 🖼️ Ofertas: franja de imágenes enlazadas a producto o URL (2026-09-22)
 
 - [x] 2026-09-22 — El banner de `/ofertas` ahora puede reemplazarse por una

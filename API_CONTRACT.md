@@ -205,6 +205,7 @@ debe envolverlo:
         "isFeatured": true,
         "isOnOffer": true,
         "oldPrice": 105.0,
+        "discountPercent": 20,
         "packaging": [
           { "unit": "Unidad", "content": "1 taladro + llave mandril" },
           { "unit": "Docena", "content": "12 unidades (caja mayorista)" },
@@ -218,10 +219,12 @@ debe envolverlo:
 }
 ```
 
-`isOnOffer` + `oldPrice` alimentan el badge "Oferta" y el precio tachado.
-`packaging` es una lista libre (no solo unidad/docena/caja): `unit` es texto,
-así el panel puede crear una presentación de venta nueva (p. ej. "Rollo",
-"Par"). `oldPrice` es `null` cuando `isOnOffer` es `false`.
+`isOnOffer` + `oldPrice` alimentan el badge "Oferta" y el precio tachado;
+`discountPercent` (0–100, número entero, independiente de `oldPrice` — no se
+calcula solo) es el texto del badge "-X% OFF". `packaging` es una lista
+libre (no solo unidad/docena/caja): `unit` es texto, así el panel puede
+crear una presentación de venta nueva (p. ej. "Rollo", "Par"). `oldPrice` y
+`discountPercent` son `null` cuando `isOnOffer` es `false`.
 
 Al conectar el fetch, `getProducts` debe devolver `data.items`.
 

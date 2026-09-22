@@ -3,16 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSiteContent } from "@/components/ContentProvider";
-import SitePageBanner from "@/components/SitePageBanner";
 import type { PageBannerCrumb } from "@/components/PageBanner";
 import ProductModal from "@/components/ProductModal";
-import StampHeading from "@/components/StampHeading";
+import StampHeading, { StampBand } from "@/components/StampHeading";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CmsImage from "@/components/CmsImage";
 import Reveal from "@/components/Reveal";
 import { formatPrice } from "@/lib/format";
 import { getProductById, type FeaturedProduct } from "@/data/products";
 import type { CmsOfferBannerTile } from "@/lib/cms";
+
+/** La franja necesita al menos esta cantidad de imágenes resueltas para reemplazar el banner normal. */
+const MIN_TILES = 3;
+/** Nunca se muestran más de esta cantidad, aunque el CMS tenga más guardadas. */
+const MAX_TILES = 4;
 
 type ResolvedTile = { tile: CmsOfferBannerTile; product: FeaturedProduct | null };
 
@@ -66,23 +70,33 @@ export default function OffersBanner({
 
   if (!ready) return null;
 
-  const tiles: ResolvedTile[] = cms.offerBanner.flatMap((tile) => {
+  const resolved: ResolvedTile[] = cms.offerBanner.flatMap((tile) => {
+    if (!tile.image.trim()) return [];
     const product = tile.productId ? (getProductById(tile.productId) ?? null) : null;
     const hasDestination = Boolean(tile.url.trim()) || Boolean(product);
     return hasDestination ? [{ tile, product }] : [];
   });
 
-  if (tiles.length === 0) {
+  if (resolved.length < MIN_TILES) {
     return (
-      <SitePageBanner
-        pageId="ofertas"
-        title={title}
-        stamp={stamp}
-        subtitle={subtitle}
-        crumbs={crumbs}
-      />
+      <StampBand crumbs={crumbs}>
+        {stamp ? (
+          <StampHeading lead={stamp.lead} accent={stamp.accent} variant={stamp.variant} />
+        ) : (
+          <h1 className="font-display text-3xl font-extrabold text-brand-dark uppercase dark:text-white">
+            {title}
+          </h1>
+        )}
+        {subtitle ? (
+          <p className="mt-6 max-w-xl text-sm text-brand-dark/70 sm:text-base dark:text-white/70">
+            {subtitle}
+          </p>
+        ) : null}
+      </StampBand>
     );
   }
+
+  const tiles = resolved.slice(0, MAX_TILES);
 
   return (
     <>
