@@ -30,7 +30,7 @@ Hoy un admin que edita `/admin/banners`, `/admin/categorias`,
 
 | Pieza | Vive hoy en (código) | Endpoint(s) | Contrato |
 | --- | --- | --- | --- |
-| Slider, categorías (overrides), footer, banners de página (incl. Ofertas), equipo | `components/ContentProvider.tsx` (`localStorage: chamo-cms-v1`), `lib/cms.ts` (tipo `CmsState`) | `GET/PUT /api/v1/site-content` | [`API_CONTRACT_TIENDA.md` §1](../../API_CONTRACT_TIENDA.md#1-contenido-del-sitio-cms-del-panel) |
+| Slider, categorías (overrides), footer, banners de página (incl. Ofertas), equipo, banner de 4 secciones de Ofertas | `components/ContentProvider.tsx` (`localStorage: chamo-cms-v1`), `lib/cms.ts` (tipo `CmsState`) | `GET/PUT /api/v1/site-content` | [`API_CONTRACT_TIENDA.md` §1](../../API_CONTRACT_TIENDA.md#1-contenido-del-sitio-cms-del-panel) |
 
 Lo editan (sin cambios de UI necesarios, todos pasan por `useSiteContent()`):
 `AdminBannersStudio.tsx`, `AdminCategoriesCards.tsx`,

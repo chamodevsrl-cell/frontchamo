@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-22 | Ofertas: rediseño del banner — sin panel oscuro, 4 secciones con borde | [2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md](./2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md) |
 | 2026-09-22 | Se revierte la franja de imágenes de Ofertas (a rediseñar desde cero) | [2026-09-22-ofertas-revertir-franja-imagenes.md](./2026-09-22-ofertas-revertir-franja-imagenes.md) |
 | 2026-09-22 | Ofertas: se quita el banner anterior + límite de 3-4 imágenes + fix de imagen vacía | [2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md](./2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md) |
 | 2026-09-22 | Ofertas: editor de franja movido a /admin/ofertas + % de descuento en productos | [2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md](./2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md) |

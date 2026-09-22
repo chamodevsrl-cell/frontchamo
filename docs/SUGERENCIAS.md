@@ -2,7 +2,19 @@
 
 Última actualización: **2026-09-22**
 
-## ↩️ Ofertas: se revierte la franja de imágenes, se rediseña desde cero (2026-09-22)
+## 🟦 Ofertas: banner rediseñado en 4 secciones, sin panel (2026-09-22)
+
+- [x] 2026-09-22 — Después de revertir la franja original (ver la entrada
+  de abajo), se rediseñó desde cero: **sin panel oscuro** de título; el
+  título/breadcrumb van arriba en banda simple y debajo un banner de
+  **4 secciones fijas** con líneas divisorias, cada una con su propia foto y
+  su propio producto o URL de destino. Editor en `/admin/ofertas`
+  (`AdminOffersBannerEditor.tsx`, siempre 4 casillas, sin agregar/quitar).
+  Con menos de 4 secciones completas, `/ofertas` sigue mostrando el banner
+  normal de una imagen. Detalle:
+  [`cambios/2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md`](./cambios/2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md).
+
+## ↩️ [SUPERADO] Ofertas: se revierte la franja de imágenes, se rediseña desde cero (2026-09-22)
 
 - [x] 2026-09-22 — El usuario pidió deshacer por completo la franja de
   imágenes de Ofertas (las tres entradas de abajo marcadas **[REVERTIDO]**)
@@ -14,10 +26,8 @@
   el campo **% de descuento** del wizard de producto y la página
   `/admin/ofertas` con su lista de solo lectura de productos en oferta.
   Detalle: [`cambios/2026-09-22-ofertas-revertir-franja-imagenes.md`](./cambios/2026-09-22-ofertas-revertir-franja-imagenes.md).
-- [ ] Cuando se retome el diseño de esta pieza, partir de la referencia
-  visual que ya mandó el usuario (panel oscuro + fila de imágenes con enlace
-  a producto/URL) — el historial de la versión anterior queda en las tres
-  notas de cambios de abajo por si sirve de punto de partida.
+  **Superado por la entrada de arriba** — el banner de Ofertas ya no es el
+  normal solo, ahora puede ser el de 4 secciones.
 
 ## 🧹 [REVERTIDO] Ofertas: se quita el banner anterior + límite 3-4 imágenes (2026-09-22)
 

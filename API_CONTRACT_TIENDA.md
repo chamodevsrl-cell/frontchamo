@@ -68,7 +68,10 @@ Front: reemplaza la lectura de `window.localStorage.getItem(CMS_KEY)` en
       "paymentMethods": [{ "id": "yape", "label": "Yape", "hint": "…", "image": "" }]
     },
     "pageBanners": [{ "id": "categorias", "src": "…", "alt": "…", "hidden": false }],
-    "team": [{ "id": "…", "name": "…", "role": "…", "photo": "…", "hidden": false }]
+    "team": [{ "id": "…", "name": "…", "role": "…", "photo": "…", "hidden": false }],
+    "offerBanner": [
+      { "id": "…", "image": "…", "alt": "…", "label": "…", "productId": "sku-123", "url": "" }
+    ]
   }
 }
 ```
@@ -77,8 +80,16 @@ Forma exacta = tipo `CmsState` en [`lib/cms.ts`](./lib/cms.ts). Si el backend
 no tiene fila guardada todavía, devolver `emptyCmsState` (mismo archivo) para
 que el front caiga en los valores de fábrica (`data/home.ts`, `data/media.ts`,
 `data/page-banners.ts`, `data/team.ts`). `pageBanners` incluye `"ofertas"` —
-el banner ancho de `/ofertas` se edita igual que Nosotros/Contacto/Catálogo,
-no tiene contrato aparte.
+el banner ancho normal de `/ofertas` se edita igual que
+Nosotros/Contacto/Catálogo.
+
+`offerBanner`: siempre trae **4** elementos (una por cada sección fija del
+banner alternativo de `/ofertas` — reemplaza el banner normal cuando las 4
+tienen `image` y destino). `productId` apunta a un `FeaturedProduct.id` del
+catálogo (§2), no a un producto del panel admin. `url` es opcional: si viene
+con contenido, la sección navega ahí en vez de abrir el producto de
+`productId` (URL absoluta `http(s)://…` o ruta interna del sitio, p. ej.
+`/categorias/electricos`).
 
 ### `PUT /api/v1/site-content`
 
