@@ -90,6 +90,10 @@ export default function OffersBanner({
 
   return (
     <>
+      <h1 className="mb-4 text-center font-display text-3xl font-extrabold tracking-tight uppercase text-brand-dark sm:mb-6 sm:text-4xl lg:text-5xl dark:text-white">
+        ¡Mega <span className="text-brand-gold">ofertas</span>!
+      </h1>
+
       <Reveal>
         <ul
           aria-label="Ofertas destacadas"

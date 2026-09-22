@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-22 | Ofertas: título "¡Mega ofertas!" arriba de la grilla de 4 secciones | [2026-09-22-ofertas-titulo-mega-ofertas.md](./2026-09-22-ofertas-titulo-mega-ofertas.md) |
 | 2026-09-22 | Ofertas: separador entre la grilla y las tarjetas + bordes más gruesos | [2026-09-22-ofertas-separador-bordes-mas-gruesos.md](./2026-09-22-ofertas-separador-bordes-mas-gruesos.md) |
 | 2026-09-22 | Ofertas: la grilla de 4 secciones reemplaza el banner completo (sin título encima) | [2026-09-22-ofertas-4-secciones-sin-titulo-encima.md](./2026-09-22-ofertas-4-secciones-sin-titulo-encima.md) |
 | 2026-09-22 | Fix: guardar en el panel rompía la página cuando el navegador se quedaba sin espacio | [2026-09-22-fix-crash-localstorage-lleno.md](./2026-09-22-fix-crash-localstorage-lleno.md) |
