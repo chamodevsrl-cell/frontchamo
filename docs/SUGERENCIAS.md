@@ -2,6 +2,18 @@
 
 Última actualización: **2026-09-22**
 
+## 🖼️ Ofertas: franja de imágenes enlazadas a producto o URL (2026-09-22)
+
+- [x] 2026-09-22 — El banner de `/ofertas` ahora puede reemplazarse por una
+  franja de imágenes subidas desde `/admin/banners`, cada una enlazada a un
+  producto (clic abre ese producto en el modal) **o** a una URL personalizada
+  (interna o externa, escrita a mano — gana sobre el producto elegido). Si no
+  hay imágenes cargadas, se ve el banner normal de siempre. Detalle:
+  [`cambios/2026-09-22-franja-imagenes-ofertas.md`](./cambios/2026-09-22-franja-imagenes-ofertas.md).
+- [ ] Ideas para después: reordenar las imágenes (hoy solo agregar/quitar,
+  quedan en el orden en que se agregaron); permitir la misma franja en otras
+  páginas si el negocio lo pide (hoy es específica de Ofertas).
+
 ## 📁 Carpeta de handoff para el backend dev (2026-09-22)
 
 - [x] 2026-09-22 — Nueva `docs/backend-handoff/`: `README.md` (entry point,

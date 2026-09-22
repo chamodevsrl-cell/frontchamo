@@ -83,6 +83,23 @@ export type CmsPageBannerOverride = {
 
 export type CmsTeamMember = TeamMember;
 
+/** Imagen de la franja de ofertas (/ofertas) que enlaza a un producto o a una URL. */
+export type CmsOfferBannerTile = {
+  id: string;
+  image: string;
+  alt: string;
+  /** `FeaturedProduct.id` (data/products.ts) al que lleva esta imagen. */
+  productId: string;
+  /**
+   * URL o ruta destino (p. ej. `/categorias/electricos`, `https://wa.me/…`).
+   * Si viene con contenido, gana sobre `productId` — la imagen navega ahí en
+   * vez de abrir el modal del producto.
+   */
+  url: string;
+  /** Texto sobre la imagen; si queda vacío se usa el nombre del producto. */
+  label: string;
+};
+
 export type CmsState = {
   slides: CmsSlideOverride[];
   categories: CmsCategoryOverride[];
@@ -90,6 +107,7 @@ export type CmsState = {
   footer: CmsFooter;
   pageBanners: CmsPageBannerOverride[];
   team: CmsTeamMember[];
+  offerBanner: CmsOfferBannerTile[];
 };
 
 export type ResolvedPageBanner = {
@@ -139,6 +157,7 @@ export const emptyCmsState: CmsState = {
   footer: defaultFooter(),
   pageBanners: [],
   team: defaultTeam.map((member) => ({ ...member })),
+  offerBanner: [],
 };
 
 export function parseCms(raw: string | null): CmsState {
@@ -162,6 +181,16 @@ export function parseCms(raw: string | null): CmsState {
       team: Array.isArray(parsed.team)
         ? parsed.team.filter(isTeamMember)
         : defaultTeam.map((member) => ({ ...member })),
+      offerBanner: Array.isArray(parsed.offerBanner)
+        ? parsed.offerBanner.filter(isOfferBannerTile).map((tile) => ({
+            id: tile.id,
+            image: tile.image,
+            productId: typeof tile.productId === "string" ? tile.productId : "",
+            url: typeof tile.url === "string" ? tile.url : "",
+            alt: typeof tile.alt === "string" ? tile.alt : "",
+            label: typeof tile.label === "string" ? tile.label : "",
+          }))
+        : [],
     };
   } catch {
     return cloneCms(emptyCmsState);
@@ -215,6 +244,16 @@ function isTeamMember(value: unknown): value is CmsTeamMember {
     typeof member.name === "string" &&
     typeof member.role === "string" &&
     typeof member.photo === "string"
+  );
+}
+
+function isOfferBannerTile(value: unknown): value is CmsOfferBannerTile {
+  const tile = value as CmsOfferBannerTile;
+  return (
+    !!tile &&
+    typeof tile.id === "string" &&
+    tile.id.length > 0 &&
+    typeof tile.image === "string"
   );
 }
 

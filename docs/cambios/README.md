@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-22 | Ofertas: banner reemplazado por franja de imágenes que enlazan a un producto | [2026-09-22-franja-imagenes-ofertas.md](./2026-09-22-franja-imagenes-ofertas.md) |
 | 2026-09-22 | Carpeta de handoff para el backend dev (`docs/backend-handoff/`) + fix de choque de nombres de endpoint | [2026-09-22-carpeta-backend-handoff.md](./2026-09-22-carpeta-backend-handoff.md) |
 | 2026-09-22 | Contrato HTTP de la tienda pública (`API_CONTRACT_TIENDA.md`) + `// TODO Backend` en el código | [2026-09-22-contrato-api-tienda-backend-ready.md](./2026-09-22-contrato-api-tienda-backend-ready.md) |
 | 2026-09-22 | Split de componentes grandes del panel (AdminNewProductForm, AdminUsersCards) | [2026-09-22-split-admin-componentes-grandes.md](./2026-09-22-split-admin-componentes-grandes.md) |

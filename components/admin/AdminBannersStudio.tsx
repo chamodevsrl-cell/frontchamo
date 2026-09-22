@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, RotateCcw, Save } from "lucide-react";
+import { ChevronDown, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { useSiteContent } from "@/components/ContentProvider";
 import CmsImage from "@/components/CmsImage";
 import CmsImageField, { fieldClass } from "@/components/admin/CmsImageField";
 import { slides as defaultSlides } from "@/data/media";
 import { pageBannerCatalog } from "@/data/page-banners";
-import type { CmsPageBannerOverride, CmsState } from "@/lib/cms";
+import { featuredProducts } from "@/data/products";
+import type { CmsOfferBannerTile, CmsPageBannerOverride, CmsState } from "@/lib/cms";
 
 type SlideDraft = {
   id: number;
@@ -66,6 +67,7 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
   const { saveCms } = useSiteContent();
   const [slides, setSlides] = useState(() => slidesFromCms(cms));
   const [pages, setPages] = useState(() => pagesFromCms(cms));
+  const [offerTiles, setOfferTiles] = useState<CmsOfferBannerTile[]>(cms.offerBanner);
   const [openId, setOpenId] = useState<string | null>("home-1");
   const [notice, setNotice] = useState("");
 
@@ -83,6 +85,7 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
         alt: page.alt,
         hidden: page.hidden,
       })),
+      offerBanner: offerTiles,
     });
     setNotice("Banners guardados en este navegador.");
   }
@@ -90,16 +93,43 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
   function restore() {
     setSlides(slidesFromCms({ ...cms, slides: [], pageBanners: [] }));
     setPages(pagesFromCms({ ...cms, slides: [], pageBanners: [] }));
-    saveCms({ slides: [], pageBanners: [] });
+    setOfferTiles([]);
+    saveCms({ slides: [], pageBanners: [], offerBanner: [] });
     setNotice("Volviste a los banners del código.");
+  }
+
+  function addOfferTile() {
+    const firstProduct = featuredProducts[0];
+    setOfferTiles((current) => [
+      ...current,
+      {
+        id: `offer_${Date.now()}`,
+        image: "",
+        alt: "",
+        label: "",
+        productId: firstProduct?.id ?? "",
+        url: "",
+      },
+    ]);
+  }
+
+  function updateOfferTile(id: string, patch: Partial<CmsOfferBannerTile>) {
+    setOfferTiles((current) =>
+      current.map((tile) => (tile.id === id ? { ...tile, ...patch } : tile)),
+    );
+  }
+
+  function removeOfferTile(id: string) {
+    setOfferTiles((current) => current.filter((tile) => tile.id !== id));
   }
 
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="max-w-2xl text-sm text-brand-dark/70">
-          Abre una tarjeta para cambiar la imagen del slider de inicio o el
-          banner de Nosotros, Contacto, Ofertas y Catálogo.
+          Abre una tarjeta para cambiar la imagen del slider de inicio, la
+          franja de imágenes de Ofertas o el banner de Nosotros, Contacto,
+          Ofertas y Catálogo.
         </p>
         <div className="flex flex-wrap gap-2">
           <button
@@ -194,6 +224,108 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
             );
           })}
         </ul>
+      </section>
+
+      <section>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-bold text-brand-dark">
+              Ofertas — franja de imágenes
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-brand-dark/65">
+              Reemplaza el banner de Ofertas por una franja de imágenes; cada
+              una lleva al producto que elijas al hacer clic. Si no agregas
+              ninguna, se sigue mostrando el banner normal de Ofertas.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addOfferTile}
+            disabled={featuredProducts.length === 0}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-brand-primary/30 px-3 py-1.5 text-sm font-semibold text-brand-primary hover:bg-brand-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Plus className="h-4 w-4" />
+            Agregar imagen
+          </button>
+        </div>
+
+        {offerTiles.length === 0 ? (
+          <p className="mt-4 rounded-xl border border-dashed border-brand-dark/15 bg-brand-gray/40 px-4 py-6 text-center text-sm text-brand-dark/55">
+            Sin imágenes todavía — se ve el banner normal de Ofertas.
+          </p>
+        ) : (
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {offerTiles.map((tile, index) => (
+              <li
+                key={tile.id}
+                className="space-y-3 rounded-2xl border border-brand-dark/10 bg-white p-4 shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold tracking-wide text-brand-dark/50 uppercase">
+                    Imagen {index + 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeOfferTile(tile.id)}
+                    className="rounded-lg p-1.5 text-brand-dark/40 hover:bg-red-50 hover:text-red-600"
+                    aria-label="Quitar imagen"
+                  >
+                    <Trash2 className="h-4 w-4" strokeWidth={2} />
+                  </button>
+                </div>
+                <CmsImageField
+                  value={tile.image}
+                  onChange={(image) => updateOfferTile(tile.id, { image })}
+                  label=""
+                  previewClassName="h-32 w-full"
+                />
+                <label className="block text-xs font-bold tracking-wide text-brand-dark/60 uppercase">
+                  Texto sobre la imagen (opcional)
+                  <input
+                    className={`${fieldClass} mt-1`}
+                    value={tile.label}
+                    onChange={(event) =>
+                      updateOfferTile(tile.id, { label: event.target.value })
+                    }
+                    placeholder="Si lo dejas vacío, usa el nombre del producto"
+                  />
+                </label>
+                <label className="block text-xs font-bold tracking-wide text-brand-dark/60 uppercase">
+                  Producto al que lleva
+                  <select
+                    className={`${fieldClass} mt-1`}
+                    value={tile.productId}
+                    disabled={tile.url.trim().length > 0}
+                    onChange={(event) =>
+                      updateOfferTile(tile.id, { productId: event.target.value })
+                    }
+                  >
+                    {featuredProducts.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name} — {product.sku}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-xs font-bold tracking-wide text-brand-dark/60 uppercase">
+                  URL personalizada (opcional)
+                  <input
+                    className={`${fieldClass} mt-1`}
+                    value={tile.url}
+                    onChange={(event) =>
+                      updateOfferTile(tile.id, { url: event.target.value })
+                    }
+                    placeholder="https://wa.me/51959723602 o /categorias/electricos"
+                  />
+                  <span className="mt-1 block text-[11px] font-normal normal-case text-brand-dark/45">
+                    Si la completas, la imagen lleva a esta URL en vez del
+                    producto de arriba.
+                  </span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section>
