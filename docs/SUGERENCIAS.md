@@ -2,6 +2,17 @@
 
 Última actualización: **2026-09-22**
 
+## 📁 Carpeta de handoff para el backend dev (2026-09-22)
+
+- [x] 2026-09-22 — Nueva `docs/backend-handoff/`: `README.md` (entry point,
+  orden de lectura, cómo buscar los `// TODO Backend`) y
+  `MAPA-CONEXION.md` (tabla única: pieza → archivo de código → endpoint →
+  contrato, en orden de prioridad). `docs/README.md` y `CLAUDE.md` ahora
+  apuntan ahí. De paso se encontró y corrigió un choque de nombres: el
+  catálogo público usaba el mismo path (`/api/v1/products`) que el panel
+  admin con una forma de datos distinta — se movió a `/api/v1/catalog`.
+  Detalle: [`cambios/2026-09-22-carpeta-backend-handoff.md`](./cambios/2026-09-22-carpeta-backend-handoff.md).
+
 ## 🔌 Contrato HTTP de la tienda pública + TODOs en código (2026-09-22)
 
 - [x] 2026-09-22 — Nuevo [`API_CONTRACT_TIENDA.md`](../API_CONTRACT_TIENDA.md):

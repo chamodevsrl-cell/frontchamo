@@ -470,8 +470,10 @@ manteniendo la forma `FeaturedProduct[]`; el resto de la tienda
 (`ProductCatalog.tsx`, `CatalogFilters.tsx`, `ProductModal.tsx`, etc.) no
 cambia si esa forma se mantiene. El detalle por id y los relacionados
 (`getProductById`, `getRelatedProducts`) hoy **no** pasan por ninguna ruta
-HTTP — el contrato agrega `GET /api/v1/products/:id` y
-`GET /api/v1/products/:id/related` para eso.
+HTTP — el contrato agrega `GET /api/v1/catalog/:id` y
+`GET /api/v1/catalog/:id/related` para eso (namespace `catalog`, no
+`products`, para no pisar la ruta del panel — ver la nota al inicio de
+`API_CONTRACT_TIENDA.md` §2).
 
 #### A.13.3 Cuentas de la tienda (clientes)
 

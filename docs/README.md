@@ -34,6 +34,9 @@ Cualquier sesión (Claude Code, Cursor u otra) debe mantenerlas al día junto co
 **Memoria de agentes:** [`../CLAUDE.md`](../CLAUDE.md) + [`../AGENTS.md`](../AGENTS.md)
 resumen este mismo esquema para que cualquier sesión lo retome sin contexto previo.
 
-**Handover de backend:** [`../FRONTEND_DOCUMENTATION.md`](../FRONTEND_DOCUMENTATION.md)
-(variables por componente + cómo conectar cada pieza + manual de uso completo) y
-[`../API_CONTRACT.md`](../API_CONTRACT.md) (especificación HTTP exacta del panel).
+**Handover de backend:** empezar por [`backend-handoff/README.md`](./backend-handoff/README.md)
+(entry point: en qué orden leer todo y el mapa de conexión pieza → endpoint →
+archivo). Documentos que indexa: [`../FRONTEND_DOCUMENTATION.md`](../FRONTEND_DOCUMENTATION.md)
+(variables por componente + manual de uso completo), [`../API_CONTRACT.md`](../API_CONTRACT.md)
+(panel admin) y [`../API_CONTRACT_TIENDA.md`](../API_CONTRACT_TIENDA.md) (CMS,
+catálogo, cuentas, carrito/favoritos/comparar de la tienda).

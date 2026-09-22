@@ -899,7 +899,7 @@ export const featuredProducts: FeaturedProduct[] = [
 
 export const homeFeaturedProducts = featuredProducts.slice(0, 8);
 
-// TODO Backend: reemplazar con fetch(`/api/v1/products/${id}`) — ver API_CONTRACT_TIENDA.md §2.
+// TODO Backend: reemplazar con fetch(`/api/v1/catalog/${id}`) — ver API_CONTRACT_TIENDA.md §2.
 // Llamado en varios lugares del cliente (CartProvider, FavoritesProvider, CompareProvider,
 // ProductModal) para resolver un productId guardado al FeaturedProduct completo.
 export function getProductById(id: string) {
@@ -948,7 +948,7 @@ export function searchCatalog({
 
 /**
  * Productos de la misma categoría (excluye el actual).
- * TODO Backend: reemplazar con fetch(`/api/v1/products/${product.id}/related?limit=${limit}`)
+ * TODO Backend: reemplazar con fetch(`/api/v1/catalog/${product.id}/related?limit=${limit}`)
  * — ver API_CONTRACT_TIENDA.md §2.
  */
 export function getRelatedProducts(

@@ -109,17 +109,25 @@ de `setCms` con la respuesta. Los componentes del panel que ya editan esto
 
 ## 2. Catálogo público
 
+> ⚠️ **No usar `/api/v1/products`** para nada de esta sección — ese path ya
+> es del panel admin en `API_CONTRACT.md` (`Product[]`, requiere sesión de
+> panel). El catálogo público usa el namespace `/api/v1/catalog` a propósito,
+> para no pisar la ruta del panel ni mezclar los dos tipos (`Product` del
+> panel vs. `FeaturedProduct` de la tienda — ver `FRONTEND_DOCUMENTATION.md`
+> §2, "Dos sistemas de datos que no hay que confundir").
+
 Hoy `featuredProducts` es un array estático en `data/products.ts`, servido
 por `app/api/productos/route.ts` vía `searchCatalog()`. El detalle de un
 producto y sus relacionados **no pasan por esa ruta** — `getProductById()` y
 `getRelatedProducts()` leen el mismo array en el cliente. Para un backend
 real, los tres deben ser HTTP.
 
-### `GET /api/v1/products`
+### `GET /api/v1/catalog`
 
 Front: reemplaza `searchCatalog({ q, category, brand })`, usado hoy por
 `GET /api/productos` (`app/api/productos/route.ts`) y consumido por
-`ProductCatalog.tsx` / `CatalogFilters.tsx` en `/catalogo`.
+`ProductCatalog.tsx` / `CatalogFilters.tsx` en `/catalogo`. Público — sin
+auth.
 
 **Query:** `?q=&category=&brand=` (los tres opcionales; `category` es el
 `slug`, `brand` el nombre exacto). `q` busca en nombre, marca, SKU,
@@ -132,12 +140,12 @@ Forma exacta = tipo `FeaturedProduct` en [`data/products.ts`](./data/products.ts
 ya consumen `ProductCard.tsx` y `ProductModal.tsx`, no cambia nada de UI si
 se mantiene).
 
-### `GET /api/v1/products/:id`
+### `GET /api/v1/catalog/:id`
 
 Front: reemplaza `getProductById(id)`. Usado por `ProductModal.tsx`,
 `CartProvider.tsx`, `FavoritesProvider.tsx` y `CompareProvider.tsx` para
 resolver un id guardado (carrito/favoritos/comparar solo guardan `productId`,
-no el producto completo) al objeto `FeaturedProduct` completo.
+no el producto completo) al objeto `FeaturedProduct` completo. Público.
 
 **Respuesta `200`:** `{ "ok": true, "data": { /* FeaturedProduct */ } }`
 
@@ -145,11 +153,11 @@ no el producto completo) al objeto `FeaturedProduct` completo.
 `getProductById` devuelve `undefined` la línea de carrito/favorito se omite
 en vez de romper — mantener ese comportamiento con un 404 silencioso).
 
-### `GET /api/v1/products/:id/related`
+### `GET /api/v1/catalog/:id/related`
 
 Front: reemplaza `getRelatedProducts(product, limit)`, usado en el modal de
 producto ("También te puede interesar"). Query opcional `?limit=4` (default
-4). Misma categoría, excluyendo el propio id.
+4). Misma categoría, excluyendo el propio id. Público.
 
 **Respuesta `200`:** `{ "ok": true, "data": [ /* FeaturedProduct[] */ ] }`
 
@@ -158,7 +166,7 @@ producto ("También te puede interesar"). Query opcional `?limit=4` (default
 `app/api/productos/route.ts` deja de importar `data/products.ts` y hace
 `fetch` (o llama directo a la capa de datos real) manteniendo la forma de
 salida `{ products: FeaturedProduct[] }` que ya consume el front, **o** se
-apunta el front directo a `/api/v1/products` y se borra esa ruta intermedia —
+apunta el front directo a `/api/v1/catalog` y se borra esa ruta intermedia —
 cualquiera de las dos funciona, la segunda es más simple.
 
 ---

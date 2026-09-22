@@ -9,7 +9,10 @@ trabajo leyendo solo este archivo + `AGENTS.md`.
 
 > Referencia técnica completa (variables por componente, cómo conectar el backend,
 > manual de uso): [`FRONTEND_DOCUMENTATION.md`](FRONTEND_DOCUMENTATION.md). Contrato
-> HTTP exacto del panel admin: [`API_CONTRACT.md`](API_CONTRACT.md).
+> HTTP exacto: [`API_CONTRACT.md`](API_CONTRACT.md) (panel admin) y
+> [`API_CONTRACT_TIENDA.md`](API_CONTRACT_TIENDA.md) (tienda pública). Punto de
+> entrada para quien conecte el backend:
+> [`docs/backend-handoff/README.md`](docs/backend-handoff/README.md).
 
 ## 1. Stack tecnológico
 

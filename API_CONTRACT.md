@@ -479,8 +479,10 @@ endpoint (queda en el cliente, `chamo-profiles-v1`) para no inflar la cookie.
 3. En `lib/auth.ts` / `app/admin/actions.ts`, dejar de escribir la cookie
    desde el cliente; el `Set-Cookie` del login basta. Marcar
    `httpOnly: true`.
-4. No mezclar este contrato con `GET /api/productos` (catálogo público de
-   la tienda, `FeaturedProduct`).
+4. No mezclar este contrato con el catálogo público de la tienda
+   (`FeaturedProduct`, namespace `/api/v1/catalog` — ver
+   `API_CONTRACT_TIENDA.md` §2). `/api/v1/products` de este documento es
+   **solo del panel** (`Product`, requiere sesión de panel).
 
 ## Rutas del panel (front)
 

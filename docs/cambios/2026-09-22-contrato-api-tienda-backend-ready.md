@@ -35,11 +35,13 @@ cada función mock).
 - **§1 Contenido del sitio (CMS)** — `GET/PUT /api/v1/site-content`, forma
   exacta = `CmsState` (`lib/cms.ts`). Marcado como prioridad 1 (ya lo decía
   `MANUAL.md` §A.13.5: es lo más urgente si el cliente opera el sitio).
-- **§2 Catálogo público** — `GET /api/v1/products`, `GET
-  /api/v1/products/:id`, `GET /api/v1/products/:id/related` (hoy
+- **§2 Catálogo público** — `GET /api/v1/catalog`, `GET
+  /api/v1/catalog/:id`, `GET /api/v1/catalog/:id/related` (hoy
   `searchCatalog`/`getProductById`/`getRelatedProducts` de
   `data/products.ts`, los dos últimos **no** pasaban por ninguna ruta HTTP
-  todavía).
+  todavía). Namespace `catalog` a propósito, distinto de `/api/v1/products`
+  del panel (mismo path, dos shapes distintas — se corrigió un choque de
+  nombres que tenía la primera versión de este contrato).
 - **§3 Cuentas de la tienda** — `POST /api/v1/store/register|login|logout`,
   `GET /api/v1/store/session`, `PATCH /api/v1/store/profile`. Nota explícita:
   el hash de contraseña debe pasar del cliente (`hashPassword()` en
