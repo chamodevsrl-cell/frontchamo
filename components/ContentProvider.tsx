@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -26,6 +27,13 @@ import {
   type ResolvedPageBanner,
 } from "@/lib/cms";
 
+/**
+ * `null` si se guardó bien; un mensaje para mostrar al admin si no (p. ej.
+ * `localStorage` sin espacio por fotos muy pesadas) — nunca lanza, para no
+ * tumbar la página con una excepción no atrapada.
+ */
+type SaveCmsResult = string | null;
+
 type ContentContextValue = {
   ready: boolean;
   cms: CmsState;
@@ -34,15 +42,31 @@ type ContentContextValue = {
   footer: CmsFooter;
   pageBanners: ResolvedPageBanner[];
   team: CmsTeamMember[];
-  saveCms: (patch: Partial<CmsState>) => void;
+  saveCms: (patch: Partial<CmsState>) => SaveCmsResult;
   resetCms: () => void;
 };
 
 const ContentContext = createContext<ContentContextValue | null>(null);
 
+function persistCms(next: CmsState): SaveCmsResult {
+  try {
+    window.localStorage.setItem(CMS_KEY, JSON.stringify(next));
+    return null;
+  } catch (cause) {
+    if (cause instanceof DOMException && (cause.name === "QuotaExceededError" || cause.code === 22)) {
+      return "No se pudo guardar: las imágenes son muy pesadas para el almacenamiento de este navegador. Usa fotos más livianas o menos imágenes e intenta de nuevo.";
+    }
+    return "No se pudo guardar los cambios en este navegador.";
+  }
+}
+
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [cms, setCms] = useState<CmsState>(() => cloneCms(emptyCmsState));
   const [ready, setReady] = useState(false);
+  const cmsRef = useRef(cms);
+  useEffect(() => {
+    cmsRef.current = cms;
+  }, [cms]);
 
   useEffect(() => {
     // TODO Backend: Reemplazar con fetch('/api/v1/site-content') — ver API_CONTRACT_TIENDA.md §1.
@@ -51,18 +75,17 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     setReady(true);
   }, []);
 
-  useEffect(() => {
-    if (!ready) return;
-    // TODO Backend: Reemplazar con fetch('/api/v1/site-content', { method: 'PUT', body: patch }) — ver API_CONTRACT_TIENDA.md §1.
-    window.localStorage.setItem(CMS_KEY, JSON.stringify(cms));
-  }, [cms, ready]);
-
-  const saveCms = useCallback((patch: Partial<CmsState>) => {
-    setCms((prev) => ({ ...prev, ...patch }));
+  // TODO Backend: Reemplazar con fetch('/api/v1/site-content', { method: 'PUT', body: patch }) — ver API_CONTRACT_TIENDA.md §1.
+  const saveCms = useCallback((patch: Partial<CmsState>): SaveCmsResult => {
+    const next = { ...cmsRef.current, ...patch };
+    setCms(next);
+    return persistCms(next);
   }, []);
 
   const resetCms = useCallback(() => {
-    setCms(cloneCms(emptyCmsState));
+    const next = cloneCms(emptyCmsState);
+    setCms(next);
+    persistCms(next);
   }, []);
 
   const slides = useMemo(

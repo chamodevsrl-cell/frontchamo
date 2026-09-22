@@ -46,11 +46,18 @@ function AdminOffersBannerEditorForm({
   const { saveCms } = useSiteContent();
   const [tiles, setTiles] = useState<CmsOfferBannerTile[]>(() => toFourTiles(initial));
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
 
   const filledCount = tiles.filter((tile) => tile.image.trim()).length;
 
   function persist() {
-    saveCms({ offerBanner: tiles });
+    const saveError = saveCms({ offerBanner: tiles });
+    if (saveError) {
+      setError(saveError);
+      setNotice("");
+      return;
+    }
+    setError("");
     setNotice("Banner de Ofertas guardado en este navegador.");
   }
 
@@ -96,6 +103,11 @@ function AdminOffersBannerEditorForm({
       {notice ? (
         <p role="status" className="mt-3 text-sm font-medium text-brand-primary">
           {notice}
+        </p>
+      ) : null}
+      {error ? (
+        <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          {error}
         </p>
       ) : null}
 

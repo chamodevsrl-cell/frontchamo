@@ -21,17 +21,24 @@ function AdminChannelsSettingsForm({
   saveCms,
 }: {
   initial: CmsFooter;
-  saveCms: (patch: { footer: CmsFooter }) => void;
+  saveCms: (patch: { footer: CmsFooter }) => string | null;
 }) {
   const [footer, setFooter] = useState<CmsFooter>(() => structuredClone(initial));
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
 
   function update<K extends keyof CmsFooter>(key: K, value: CmsFooter[K]) {
     setFooter((current) => ({ ...current, [key]: value }));
   }
 
   function persist() {
-    saveCms({ footer });
+    const saveError = saveCms({ footer });
+    if (saveError) {
+      setError(saveError);
+      setNotice("");
+      return;
+    }
+    setError("");
     setNotice("Canales guardados. El botón flotante, llamadas, correo y redes usan estos datos.");
   }
 
@@ -48,6 +55,7 @@ function AdminChannelsSettingsForm({
     };
     setFooter(next);
     saveCms({ footer: next });
+    setError("");
     setNotice("Volviste a los canales del código (data/contact.ts).");
   }
 
@@ -80,6 +88,11 @@ function AdminChannelsSettingsForm({
       {notice ? (
         <p role="status" className="text-sm font-medium text-brand-primary">
           {notice}
+        </p>
+      ) : null}
+      {error ? (
+        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          {error}
         </p>
       ) : null}
 

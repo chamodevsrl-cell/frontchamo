@@ -54,7 +54,7 @@ function AdminCategoriesCardsForm({
   cmsCategories: CmsCategoryOverride[];
   customCategories: CmsCustomCategory[];
   categories: { slug: string; label: string; eyebrow: string; image: string }[];
-  saveCms: (patch: Partial<CmsState>) => void;
+  saveCms: (patch: Partial<CmsState>) => string | null;
 }) {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [notice, setNotice] = useState("");
@@ -109,9 +109,10 @@ function AdminCategoriesCardsForm({
         categories.map((item) => item.slug),
       );
 
+    let saveError: string | null = null;
     if (DEFAULT_SLUGS.has(slug)) {
       const previous = cmsCategories.find((item) => item.slug === slug);
-      saveCms({
+      saveError = saveCms({
         categories: [
           ...cmsCategories.filter((item) => item.slug !== slug),
           {
@@ -127,7 +128,7 @@ function AdminCategoriesCardsForm({
       });
     } else {
       const previous = customCategories.find((item) => item.slug === slug);
-      saveCms({
+      saveError = saveCms({
         customCategories: [
           ...customCategories.filter((item) => item.slug !== slug),
           {
@@ -142,6 +143,12 @@ function AdminCategoriesCardsForm({
           },
         ],
       });
+    }
+
+    if (saveError) {
+      setSaving(false);
+      setError(saveError);
+      return;
     }
 
     const result = isNew

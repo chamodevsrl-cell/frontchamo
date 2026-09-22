@@ -22,9 +22,16 @@ function AdminTeamCardsForm({ initial }: { initial: TeamMember[] }) {
     initial.map((member) => ({ ...member })),
   );
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
 
   function persist() {
-    saveCms({ team: members });
+    const saveError = saveCms({ team: members });
+    if (saveError) {
+      setError(saveError);
+      setNotice("");
+      return;
+    }
+    setError("");
     setNotice("Equipo guardado. Se ve en Nosotros, sección Trabajo.");
   }
 
@@ -32,6 +39,7 @@ function AdminTeamCardsForm({ initial }: { initial: TeamMember[] }) {
     const next = defaultTeam.map((member) => ({ ...member }));
     setMembers(next);
     saveCms({ team: next });
+    setError("");
     setNotice("Volviste al equipo de ejemplo.");
   }
 
@@ -89,6 +97,11 @@ function AdminTeamCardsForm({ initial }: { initial: TeamMember[] }) {
       {notice ? (
         <p role="status" className="text-sm font-medium text-brand-primary">
           {notice}
+        </p>
+      ) : null}
+      {error ? (
+        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          {error}
         </p>
       ) : null}
 

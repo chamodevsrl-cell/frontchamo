@@ -68,9 +68,10 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
   const [pages, setPages] = useState(() => pagesFromCms(cms));
   const [openId, setOpenId] = useState<string | null>("home-1");
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
 
   function persist() {
-    saveCms({
+    const saveError = saveCms({
       slides: slides.map((slide) => ({
         id: slide.id,
         src: slide.src,
@@ -84,6 +85,12 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
         hidden: page.hidden,
       })),
     });
+    if (saveError) {
+      setError(saveError);
+      setNotice("");
+      return;
+    }
+    setError("");
     setNotice("Banners guardados en este navegador.");
   }
 
@@ -91,6 +98,7 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
     setSlides(slidesFromCms({ ...cms, slides: [], pageBanners: [] }));
     setPages(pagesFromCms({ ...cms, slides: [], pageBanners: [] }));
     saveCms({ slides: [], pageBanners: [] });
+    setError("");
     setNotice("Volviste a los banners del código.");
   }
 
@@ -128,6 +136,11 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
       {notice ? (
         <p role="status" className="text-sm font-medium text-brand-primary">
           {notice}
+        </p>
+      ) : null}
+      {error ? (
+        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          {error}
         </p>
       ) : null}
 

@@ -2,6 +2,20 @@
 
 Última actualización: **2026-09-22**
 
+## 🛠️ Fix: guardar en el panel ya no rompe la página si falta espacio (2026-09-22)
+
+- [x] 2026-09-22 — Guardar cualquier cosa del CMS local (banners, equipo,
+  footer, canales, categorías, el banner de 4 secciones de Ofertas) podía
+  tumbar la página entera con la pantalla de error de Next.js si
+  `localStorage` se quedaba sin espacio (fotos muy pesadas). Ahora
+  `saveCms()` atrapa el error y cada formulario muestra un aviso rojo claro
+  en vez de romperse — y ya no dice "Guardado" si en realidad no se guardó.
+  Detalle: [`cambios/2026-09-22-fix-crash-localstorage-lleno.md`](./cambios/2026-09-22-fix-crash-localstorage-lleno.md).
+- [ ] Pendiente real de fondo: mientras las imágenes se guarden como base64
+  en `localStorage` (no en un backend/bucket real), el cupo se puede volver
+  a llenar — solo evita el crash, no el límite en sí. Ver
+  [`API_CONTRACT_TIENDA.md` §5](../API_CONTRACT_TIENDA.md#5-imágenes-subidas-desde-el-panel).
+
 ## 🟦 Ofertas: banner rediseñado en 4 secciones, sin panel (2026-09-22)
 
 - [x] 2026-09-22 — Después de revertir la franja original (ver la entrada
