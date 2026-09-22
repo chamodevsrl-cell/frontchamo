@@ -354,9 +354,9 @@ abierto. El menú desplegable de la cuenta (foto/avatar) ya no repite ese enlace
 `/ofertas` cuando las **4 casillas fijas** (Sección 1 a 4) tienen foto y un
 destino (producto o URL) — con menos de 4 completas, cae al banner normal
 de una sola imagen (editable en `/admin/banners`, sin panel de "Agregar
-imagen": son siempre 4). Sin panel de título oscuro a un costado — el
-título/breadcrumb van arriba, estilo "banda simple", y abajo las 4 fotos
-en grilla con líneas divisorias finas. CMS: `CmsOfferBannerTile[]`
+imagen": son siempre 4). La grilla de 4 fotos con líneas divisorias
+**reemplaza el banner entero** — sin panel de título oscuro ni banda de
+título/breadcrumb encima, a diferencia del banner normal. CMS: `CmsOfferBannerTile[]`
 (`lib/cms.ts`, campo `offerBanner` de `CmsState`) —
 `{ id, image, alt, label, productId, url }`; si `url` tiene contenido, gana
 sobre `productId` (el `<select>` de producto se deshabilita en el panel).

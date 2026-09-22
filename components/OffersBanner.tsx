@@ -6,7 +6,6 @@ import { useSiteContent } from "@/components/ContentProvider";
 import SitePageBanner from "@/components/SitePageBanner";
 import type { PageBannerCrumb } from "@/components/PageBanner";
 import ProductModal from "@/components/ProductModal";
-import StampHeading, { StampBand } from "@/components/StampHeading";
 import CmsImage from "@/components/CmsImage";
 import Reveal from "@/components/Reveal";
 import { formatPrice } from "@/lib/format";
@@ -91,21 +90,6 @@ export default function OffersBanner({
 
   return (
     <>
-      <StampBand crumbs={crumbs}>
-        {stamp ? (
-          <StampHeading lead={stamp.lead} accent={stamp.accent} variant={stamp.variant} />
-        ) : (
-          <h1 className="font-display text-3xl font-extrabold text-brand-dark uppercase dark:text-white">
-            {title}
-          </h1>
-        )}
-        {subtitle ? (
-          <p className="mt-6 max-w-xl text-sm text-brand-dark/70 sm:text-base dark:text-white/70">
-            {subtitle}
-          </p>
-        ) : null}
-      </StampBand>
-
       <Reveal>
         <ul
           aria-label="Ofertas destacadas"
