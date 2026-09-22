@@ -19,14 +19,21 @@
 ## 🟦 Ofertas: banner rediseñado en 4 secciones, sin panel (2026-09-22)
 
 - [x] 2026-09-22 — Después de revertir la franja original (ver la entrada
-  de abajo), se rediseñó desde cero: **sin panel oscuro** de título; el
-  título/breadcrumb van arriba en banda simple y debajo un banner de
-  **4 secciones fijas** con líneas divisorias, cada una con su propia foto y
-  su propio producto o URL de destino. Editor en `/admin/ofertas`
-  (`AdminOffersBannerEditor.tsx`, siempre 4 casillas, sin agregar/quitar).
-  Con menos de 4 secciones completas, `/ofertas` sigue mostrando el banner
-  normal de una imagen. Detalle:
-  [`cambios/2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md`](./cambios/2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md).
+  de abajo), se rediseñó desde cero en varias vueltas hasta el diseño
+  actual: **sin panel oscuro** de título; cuando las 4 secciones fijas
+  (foto + producto o URL cada una) están completas, la página muestra un
+  `<h1>` **"¡Mega ofertas!"** y debajo la grilla de 4 fotos con **bordes
+  gruesos** y líneas divisorias — reemplaza el banner entero, no queda
+  nada de la banda de título vieja. Una línea divisoria (mismo grosor que
+  el borde de la grilla) la separa de la lista de productos en oferta de
+  abajo. Editor en `/admin/ofertas` (`AdminOffersBannerEditor.tsx`, siempre
+  4 casillas, sin agregar/quitar). Con menos de 4 secciones completas,
+  `/ofertas` sigue mostrando el banner normal de una imagen. Vueltas de
+  este rediseño, en orden:
+  [1](./cambios/2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md) →
+  [2](./cambios/2026-09-22-ofertas-4-secciones-sin-titulo-encima.md) →
+  [3](./cambios/2026-09-22-ofertas-separador-bordes-mas-gruesos.md) →
+  [4](./cambios/2026-09-22-ofertas-titulo-mega-ofertas.md).
 
 ## ↩️ [SUPERADO] Ofertas: se revierte la franja de imágenes, se rediseña desde cero (2026-09-22)
 

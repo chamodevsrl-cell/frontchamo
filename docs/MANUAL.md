@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-21**
+Última actualización: **2026-09-22**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -354,20 +354,39 @@ abierto. El menú desplegable de la cuenta (foto/avatar) ya no repite ese enlace
 `/ofertas` cuando las **4 casillas fijas** (Sección 1 a 4) tienen foto y un
 destino (producto o URL) — con menos de 4 completas, cae al banner normal
 de una sola imagen (editable en `/admin/banners`, sin panel de "Agregar
-imagen": son siempre 4). La grilla de 4 fotos con líneas divisorias
-**reemplaza el banner entero** — sin panel de título oscuro ni banda de
-título/breadcrumb encima, a diferencia del banner normal. CMS: `CmsOfferBannerTile[]`
-(`lib/cms.ts`, campo `offerBanner` de `CmsState`) —
-`{ id, image, alt, label, productId, url }`; si `url` tiene contenido, gana
-sobre `productId` (el `<select>` de producto se deshabilita en el panel).
-Front público: `components/OffersBanner.tsx`, usado en
+imagen": son siempre 4). Cuando está activo, la página muestra un
+**`<h1>` "¡Mega ofertas!"** (con "ofertas" en `brand-gold`) y debajo la
+grilla de 4 fotos con bordes gruesos (`border-[3px]`/`border-4`) y líneas
+divisorias — sin panel de título oscuro ni banda de breadcrumb, ese modo
+**reemplaza el banner entero** por completo. Una línea divisoria del mismo
+grosor separa la grilla de la lista de productos en oferta que sigue
+debajo. CMS: `CmsOfferBannerTile[]` (`lib/cms.ts`, campo `offerBanner` de
+`CmsState`) — `{ id, image, alt, label, productId, url }`; si `url` tiene
+contenido, gana sobre `productId` (el `<select>` de producto se deshabilita
+en el panel). Front público: `components/OffersBanner.tsx`, usado en
 `app/ofertas/page.tsx`. `/admin/ofertas` también lista (solo lectura) los
 productos con `badge === "oferta"` del catálogo público, con un aviso: esa
 lista **no** se actualiza marcando "En oferta" en `/admin/productos` — son
 dos catálogos separados hasta que haya backend real. El wizard de producto
 (Fase 3) sí tiene **"En oferta" + precio anterior + % de descuento** (badge
-"-X% OFF"). Detalle:
+"-X% OFF").
+
+Guardar cualquier CMS local (este banner, banners normales, equipo, footer,
+canales, categorías) ya no rompe la página si `localStorage` se queda sin
+espacio por fotos muy pesadas — `saveCms()` devuelve un mensaje de error en
+vez de lanzar una excepción, y cada formulario del panel lo muestra en una
+caja roja en vez de decir "Guardado" a medias. Detalle:
+[`docs/cambios/2026-09-22-fix-crash-localstorage-lleno.md`](./cambios/2026-09-22-fix-crash-localstorage-lleno.md).
+
+Historial completo de este banner (varias vueltas de diseño, la vuelta
+actual es la última):
 [`docs/cambios/2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md`](./cambios/2026-09-22-ofertas-rediseno-4-secciones-sin-panel.md)
+→
+[`docs/cambios/2026-09-22-ofertas-4-secciones-sin-titulo-encima.md`](./cambios/2026-09-22-ofertas-4-secciones-sin-titulo-encima.md)
+→
+[`docs/cambios/2026-09-22-ofertas-separador-bordes-mas-gruesos.md`](./cambios/2026-09-22-ofertas-separador-bordes-mas-gruesos.md)
+→
+[`docs/cambios/2026-09-22-ofertas-titulo-mega-ofertas.md`](./cambios/2026-09-22-ofertas-titulo-mega-ofertas.md)
 (el diseño anterior con panel oscuro y 3-4 imágenes variables se probó y se
 revirtió — historial en
 [`docs/cambios/2026-09-22-franja-imagenes-ofertas.md`](./cambios/2026-09-22-franja-imagenes-ofertas.md)
@@ -671,7 +690,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/ajustes/canales` | WhatsApp (botón flotante), teléfono para llamar, correo y redes |
 | `/nosotros` | Banner CMS, historia, misión, visión, **equipo de trabajo en cartas** y valores |
 | `/contacto` | Banner CMS **NUESTRO CONTACTO**, tarjetas y mapa leen el footer de Ajustes, formulario WhatsApp |
-| `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** (o, con las 4 secciones completas en `/admin/ofertas`, ese banner de 4 fotos en su lugar — clic en una abre el producto o la URL asignada) y productos en oferta |
+| `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** (o, con las 4 secciones completas en `/admin/ofertas`, el título **"¡Mega ofertas!"** + una grilla de 4 fotos con borde grueso en su lugar — clic en una abre el producto o la URL asignada) y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
 | Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña, **editar perfil** (`/cuenta/perfil`) y cerrar sesión (este navegador) |
@@ -696,3 +715,10 @@ el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). El CMS local
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
 - Testimonios del home → `data/testimonials.ts` (hoy ejemplo)
 - Historia, misión y visión de `/nosotros` → `data/company.ts` (hoy placeholder)
+
+> ⚠️ Todo lo del CMS local se guarda en el navegador (`localStorage`), que
+> tiene un límite de espacio (unos 5-10 MB según el navegador). Si al subir
+> varias fotos aparece un aviso rojo de "No se pudo guardar: las imágenes
+> son muy pesadas…", hay que sacar alguna foto o usar una más liviana antes
+> de guardar de nuevo — ya no rompe la página, pero el cupo sigue existiendo
+> hasta que las imágenes se guarden en un servidor real (ver A.13).

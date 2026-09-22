@@ -19,7 +19,7 @@ un backend real sin romper nada. Incluye también el manual de uso (tienda + pan
 > cambió, qué falta, bugs abiertos) sigue viviendo en `docs/` (`docs/MANUAL.md`,
 > `docs/SUGERENCIAS.md`, `docs/cambios/`) — no lo duplicamos aquí.
 
-Última actualización: **2026-09-11** (justo después de mergear el panel admin a `main`).
+Última actualización: **2026-09-22**.
 
 ---
 
@@ -355,8 +355,11 @@ pieza más urgente de conectar si el cliente va a operar el sitio en producción
      delivered`, o `cancelled`).
    - **Banners** y **Categorías**: edita los textos/imágenes del home (otro
      almacenamiento local, `chamo-cms-v1` — no se mezcla con el catálogo del panel).
+   - **Ofertas**: editor de un banner de 4 secciones (foto + producto o URL cada
+     una) para `/ofertas` + lista de solo lectura de los productos en oferta del
+     catálogo público (mismo `chamo-cms-v1`).
 5. **Lo que todavía es una pantalla "próximamente"**: Marcas, Clientes, Inventario,
-   Ofertas, Reportes, Configuración.
+   Reportes, Configuración.
 6. **Salir** cierra solo la sesión del panel — "Mi cuenta" de la tienda sigue activa
    si estaba iniciada.
 7. Los datos de Productos/Pedidos viven **en memoria del servidor de desarrollo**:
