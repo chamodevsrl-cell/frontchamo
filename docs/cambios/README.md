@@ -13,7 +13,13 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
-| 2026-09-21 | Exclusiones de watcher/índice del editor (Cursor/VS Code) por lentitud reportada | [2026-09-21-exclusiones-editor-vscode.md](./2026-09-21-exclusiones-editor-vscode.md) |
+| 2026-09-22 | Contrato HTTP de la tienda pública (`API_CONTRACT_TIENDA.md`) + `// TODO Backend` en el código | [2026-09-22-contrato-api-tienda-backend-ready.md](./2026-09-22-contrato-api-tienda-backend-ready.md) |
+| 2026-09-22 | Split de componentes grandes del panel (AdminNewProductForm, AdminUsersCards) | [2026-09-22-split-admin-componentes-grandes.md](./2026-09-22-split-admin-componentes-grandes.md) |
+| 2026-09-21 | MANUAL.md: guía completa para conectar backend (tienda + panel, no solo admin) | [2026-09-21-manual-conectar-backend-tienda.md](./2026-09-21-manual-conectar-backend-tienda.md) |
+| 2026-09-21 | Simplificar animaciones de transición: un solo loader, solo en admin/perfil | [2026-09-21-simplificar-loader-transiciones.md](./2026-09-21-simplificar-loader-transiciones.md) |
+| 2026-09-21 | Productos: Ver/Editar/Eliminar en la lista + oferta + presentaciones de venta | [2026-09-21-productos-crud-oferta-presentaciones.md](./2026-09-21-productos-crud-oferta-presentaciones.md) |
+| 2026-09-21 | Límite de imagen de producto: 60 MB en el wizard de alta | [2026-09-21-limite-imagen-producto-60mb.md](./2026-09-21-limite-imagen-producto-60mb.md) |
+| 2026-09-21 | Header del panel: botón "Ver sitio" (pestaña nueva) + reloj junto al perfil | [2026-09-21-panel-ver-sitio-reloj.md](./2026-09-21-panel-ver-sitio-reloj.md) |
 | 2026-09-16 | Editar usuario completo (nombre/correo/contraseña/roles) + varios roles por usuario | [2026-09-16-editar-usuario-multirol.md](./2026-09-16-editar-usuario-multirol.md) |
 | 2026-09-16 | Usuarios del panel: tarjetas con foto + modal editar/habilitar/borrar | [2026-09-16-usuarios-tarjetas-modal.md](./2026-09-16-usuarios-tarjetas-modal.md) |
 | 2026-09-16 | Animación de entrada solo en transiciones clave (admin, perfil, login/logout) | [2026-09-16-intro-solo-en-transiciones-clave.md](./2026-09-16-intro-solo-en-transiciones-clave.md) |

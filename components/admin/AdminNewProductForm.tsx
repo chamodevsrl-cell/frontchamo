@@ -3,22 +3,22 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ChevronLeft,
-  ChevronRight,
-  FolderOpen,
-  Image as ImageIcon,
-  Link2,
-  Plus,
-  Trash2,
-  X,
-} from "lucide-react";
-import { createProductAction } from "@/app/admin/actions";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { createProductAction, updateProductAction } from "@/app/admin/actions";
 import { useSiteContent } from "@/components/ContentProvider";
-import { readCmsImageFile } from "@/lib/cms-image";
-import type { Category, CreateProductInput, ProductStatus } from "@/types/admin";
-
-const STATUSES: ProductStatus[] = ["active", "draft", "archived"];
+import { MAX_PRODUCT_IMAGE_BYTES, readCmsImageFile } from "@/lib/cms-image";
+import type {
+  Category,
+  CreateProductInput,
+  PackagingLine,
+  Product,
+  ProductStatus,
+} from "@/types/admin";
+import AdminProductFormStepDatos from "./AdminProductFormStepDatos";
+import AdminProductFormStepDetalle from "./AdminProductFormStepDetalle";
+import AdminProductFormStepPrecios from "./AdminProductFormStepPrecios";
+import AdminProductFormStepEspecs from "./AdminProductFormStepEspecs";
+import AdminProductPreviewCard from "./AdminProductPreviewCard";
 
 const STEPS = [
   { id: 1, label: "Datos" },
@@ -31,19 +31,16 @@ type StepId = (typeof STEPS)[number]["id"];
 
 type SpecRow = { label: string; value: string };
 
-function soles(value: number) {
-  return `S/ ${value.toLocaleString("es-PE", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
 export default function AdminNewProductForm({
   categories,
+  product,
 }: {
   /** Viene de `getCategories()` (mock) — no importar `mainCategories` directo aquí. */
   categories: Category[];
+  /** Si viene, el formulario edita este producto en vez de crear uno nuevo. */
+  product?: Product;
 }) {
+  const isEditing = Boolean(product);
   const router = useRouter();
   const { categories: siteCategories } = useSiteContent();
   const categoryOptions = useMemo(() => {
@@ -67,27 +64,31 @@ export default function AdminNewProductForm({
   const [pending, setPending] = useState(false);
 
   // Fase 1 — Datos
-  const [name, setName] = useState("");
-  const [sku, setSku] = useState("");
-  const [brand, setBrand] = useState("");
-  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
-  const [descriptionShort, setDescriptionShort] = useState("");
+  const [name, setName] = useState(product?.name ?? "");
+  const [sku, setSku] = useState(product?.sku ?? "");
+  const [brand, setBrand] = useState(product?.brand ?? "");
+  const [categoryId, setCategoryId] = useState(product?.categoryId ?? categories[0]?.id ?? "");
+  const [descriptionShort, setDescriptionShort] = useState(product?.descriptionShort ?? "");
 
   // Fase 2 — Detalle
-  const [descriptionFull, setDescriptionFull] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [descriptionFull, setDescriptionFull] = useState(product?.descriptionFull ?? "");
+  const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState("");
 
   // Fase 3 — Precios
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
-  const [minStock, setMinStock] = useState("10");
-  const [status, setStatus] = useState<ProductStatus>("active");
-  const [isFeatured, setIsFeatured] = useState(false);
+  const [price, setPrice] = useState(product ? String(product.price) : "");
+  const [stock, setStock] = useState(product ? String(product.stock) : "");
+  const [minStock, setMinStock] = useState(product ? String(product.minStock) : "10");
+  const [status, setStatus] = useState<ProductStatus>(product?.status ?? "active");
+  const [isFeatured, setIsFeatured] = useState(product?.isFeatured ?? false);
+  const [isOnOffer, setIsOnOffer] = useState(product?.isOnOffer ?? false);
+  const [oldPrice, setOldPrice] = useState(product?.oldPrice ? String(product.oldPrice) : "");
 
-  // Fase 4 — Especs
-  const [specs, setSpecs] = useState<SpecRow[]>([]);
+  // Fase 4 — Especs + presentaciones de venta
+  const [specs, setSpecs] = useState<SpecRow[]>(product?.specs ?? []);
+  const [packaging, setPackaging] = useState<PackagingLine[]>(product?.packaging ?? []);
+  const [customUnit, setCustomUnit] = useState("");
 
   async function handleFiles(fileList: FileList) {
     setImageError("");
@@ -97,7 +98,9 @@ export default function AdminNewProductForm({
       return;
     }
     try {
-      const dataUrls = await Promise.all(files.map(readCmsImageFile));
+      const dataUrls = await Promise.all(
+        files.map((file) => readCmsImageFile(file, MAX_PRODUCT_IMAGE_BYTES)),
+      );
       setImages((prev) => [...prev, ...dataUrls]);
     } catch (cause) {
       setImageError(
@@ -145,6 +148,24 @@ export default function AdminNewProductForm({
     setSpecs((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function addPackagingUnit(unit: string) {
+    const trimmed = unit.trim();
+    if (!trimmed) return;
+    if (packaging.some((row) => row.unit.toLowerCase() === trimmed.toLowerCase())) return;
+    setPackaging((prev) => [...prev, { unit: trimmed, content: "" }]);
+    setCustomUnit("");
+  }
+
+  function updatePackagingContent(index: number, content: string) {
+    setPackaging((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, content } : row)),
+    );
+  }
+
+  function removePackaging(index: number) {
+    setPackaging((prev) => prev.filter((_, i) => i !== index));
+  }
+
   function goNext() {
     if (step === 1 && (!name.trim() || !sku.trim() || !brand.trim())) {
       setStepError("Completa nombre, SKU y marca antes de continuar.");
@@ -181,10 +202,15 @@ export default function AdminNewProductForm({
       descriptionShort: descriptionShort.trim(),
       descriptionFull: descriptionFull.trim(),
       isFeatured,
+      isOnOffer,
+      oldPrice: isOnOffer && Number(oldPrice) > 0 ? Number(oldPrice) : null,
+      packaging: packaging.filter((row) => row.unit.trim() && row.content.trim()),
       specs: specs.filter((row) => row.label.trim() && row.value.trim()),
     };
     try {
-      const result = await createProductAction(payload);
+      const result = isEditing
+        ? await updateProductAction(product!.id, payload)
+        : await createProductAction(payload);
       if (!result.ok) {
         setError(result.message);
         return;
@@ -192,7 +218,11 @@ export default function AdminNewProductForm({
       router.replace("/admin/productos");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "No se pudo crear el producto.");
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : `No se pudo ${isEditing ? "guardar" : "crear"} el producto.`,
+      );
     } finally {
       setPending(false);
     }
@@ -208,8 +238,9 @@ export default function AdminNewProductForm({
           ← Volver a productos
         </Link>
         <p className="mt-2 text-sm text-brand-dark/65">
-          Wizard de 4 fases. Llama a <code>createProduct()</code> (mock) recién al
-          terminar la fase 4 — nada se guarda antes.
+          Wizard de 4 fases. Llama a{" "}
+          <code>{isEditing ? "updateProduct()" : "createProduct()"}</code> (mock)
+          recién al terminar la fase 4 — nada se guarda antes.
         </p>
       </div>
 
@@ -240,306 +271,68 @@ export default function AdminNewProductForm({
           ) : null}
 
           {step === 1 ? (
-            <div className="space-y-4">
-              <h2 className="font-display text-lg font-bold text-brand-dark">
-                Fase 1 — Datos principales
-              </h2>
-              <label className="block text-sm font-semibold">
-                Nombre
-                <input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Ej. Taladro percutor 1/2&quot; 750W"
-                  className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm font-semibold">
-                  SKU
-                  <input
-                    value={sku}
-                    onChange={(event) => setSku(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                  />
-                </label>
-                <label className="text-sm font-semibold">
-                  Marca
-                  <input
-                    value={brand}
-                    onChange={(event) => setBrand(event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                  />
-                </label>
-              </div>
-              <label className="block text-sm font-semibold">
-                Categoría
-                <select
-                  value={categoryId}
-                  onChange={(event) => setCategoryId(event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                >
-                  {categoryOptions.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block text-sm font-semibold">
-                Descripción corta
-                <textarea
-                  value={descriptionShort}
-                  onChange={(event) => setDescriptionShort(event.target.value)}
-                  rows={2}
-                  className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                />
-              </label>
-            </div>
+            <AdminProductFormStepDatos
+              categoryOptions={categoryOptions}
+              name={name}
+              setName={setName}
+              sku={sku}
+              setSku={setSku}
+              brand={brand}
+              setBrand={setBrand}
+              categoryId={categoryId}
+              setCategoryId={setCategoryId}
+              descriptionShort={descriptionShort}
+              setDescriptionShort={setDescriptionShort}
+            />
           ) : null}
 
           {step === 2 ? (
-            <div className="space-y-4">
-              <h2 className="font-display text-lg font-bold text-brand-dark">
-                Fase 2 — Detalle e imágenes
-              </h2>
-              <label className="block text-sm font-semibold">
-                Descripción completa
-                <textarea
-                  value={descriptionFull}
-                  onChange={(event) => setDescriptionFull(event.target.value)}
-                  rows={4}
-                  className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                />
-              </label>
-
-              <div>
-                <p className="text-sm font-semibold">Fotos del producto</p>
-                <div
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    if (event.dataTransfer.files.length > 0) {
-                      void handleFiles(event.dataTransfer.files);
-                    }
-                  }}
-                  className="mt-1 flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-brand-dark/20 bg-brand-gray/50 px-4 py-6 text-center"
-                >
-                  <ImageIcon className="h-8 w-8 text-brand-dark/30" strokeWidth={1.5} />
-                  <p className="text-sm text-brand-dark/60">
-                    Arrastra imágenes aquí o
-                  </p>
-                  <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#0e6aad]">
-                    <FolderOpen className="h-4 w-4" />
-                    Galería o carpetas
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={(event) => {
-                        if (event.target.files && event.target.files.length > 0) {
-                          void handleFiles(event.target.files);
-                        }
-                        event.target.value = "";
-                      }}
-                    />
-                  </label>
-                  <p className="text-xs text-brand-dark/40">
-                    En móvil abre la galería/cámara del equipo. También puedes pegar una
-                    URL. La primera imagen es la principal.
-                  </p>
-                </div>
-                <label className="mt-3 block text-sm font-semibold">
-                  <span className="inline-flex items-center gap-1">
-                    <Link2 className="h-3.5 w-3.5" />
-                    O pega una URL / ruta
-                  </span>
-                  <span className="mt-1 flex gap-2">
-                    <input
-                      value={imageUrl}
-                      onChange={(event) => setImageUrl(event.target.value)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          event.preventDefault();
-                          addImageUrl();
-                        }
-                      }}
-                      placeholder="https://… o /images/…"
-                      className="w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                    />
-                    <button
-                      type="button"
-                      onClick={addImageUrl}
-                      className="shrink-0 rounded-lg border border-brand-primary/30 px-3 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/10"
-                    >
-                      Añadir
-                    </button>
-                  </span>
-                </label>
-                {imageError ? (
-                  <p className="mt-2 text-sm text-red-700">{imageError}</p>
-                ) : null}
-
-                {images.length > 0 ? (
-                  <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {images.map((src, index) => (
-                      <div
-                        key={`${index}-${src.slice(-12)}`}
-                        className="group relative overflow-hidden rounded-lg border border-brand-dark/10"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={src} alt={`Imagen ${index + 1}`} className="h-24 w-full object-cover" />
-                        {index === 0 ? (
-                          <span className="absolute top-1 left-1 rounded bg-brand-primary px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                            Principal
-                          </span>
-                        ) : null}
-                        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/50 px-1 py-0.5 opacity-0 transition group-hover:opacity-100">
-                          <button
-                            type="button"
-                            onClick={() => moveImage(index, -1)}
-                            disabled={index === 0}
-                            className="rounded p-1 text-white disabled:opacity-30"
-                            aria-label="Mover a la izquierda"
-                          >
-                            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2.5} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="rounded p-1 text-white hover:text-red-300"
-                            aria-label="Quitar imagen"
-                          >
-                            <X className="h-3.5 w-3.5" strokeWidth={2.5} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveImage(index, 1)}
-                            disabled={index === images.length - 1}
-                            className="rounded p-1 text-white disabled:opacity-30"
-                            aria-label="Mover a la derecha"
-                          >
-                            <ChevronRight className="h-3.5 w-3.5" strokeWidth={2.5} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
+            <AdminProductFormStepDetalle
+              descriptionFull={descriptionFull}
+              setDescriptionFull={setDescriptionFull}
+              images={images}
+              imageUrl={imageUrl}
+              setImageUrl={setImageUrl}
+              imageError={imageError}
+              onFiles={(files) => void handleFiles(files)}
+              onAddImageUrl={addImageUrl}
+              onRemoveImage={removeImage}
+              onMoveImage={moveImage}
+            />
           ) : null}
 
           {step === 3 ? (
-            <div className="space-y-4">
-              <h2 className="font-display text-lg font-bold text-brand-dark">
-                Fase 3 — Precios y stock
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <label className="text-sm font-semibold">
-                  Precio (S/)
-                  <input
-                    value={price}
-                    onChange={(event) => setPrice(event.target.value)}
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                  />
-                </label>
-                <label className="text-sm font-semibold">
-                  Stock
-                  <input
-                    value={stock}
-                    onChange={(event) => setStock(event.target.value)}
-                    type="number"
-                    min={0}
-                    className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                  />
-                </label>
-                <label className="text-sm font-semibold">
-                  Stock mínimo
-                  <input
-                    value={minStock}
-                    onChange={(event) => setMinStock(event.target.value)}
-                    type="number"
-                    min={0}
-                    className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                  />
-                </label>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm font-semibold">
-                  Estado
-                  <select
-                    value={status}
-                    onChange={(event) => setStatus(event.target.value as ProductStatus)}
-                    className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 font-normal"
-                  >
-                    {STATUSES.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="mt-6 flex items-center gap-2 text-sm font-semibold sm:mt-0 sm:self-end">
-                  <input
-                    type="checkbox"
-                    checked={isFeatured}
-                    onChange={(event) => setIsFeatured(event.target.checked)}
-                    className="rounded border-brand-dark/20"
-                  />
-                  Destacado
-                </label>
-              </div>
-            </div>
+            <AdminProductFormStepPrecios
+              price={price}
+              setPrice={setPrice}
+              stock={stock}
+              setStock={setStock}
+              minStock={minStock}
+              setMinStock={setMinStock}
+              status={status}
+              setStatus={setStatus}
+              isFeatured={isFeatured}
+              setIsFeatured={setIsFeatured}
+              isOnOffer={isOnOffer}
+              setIsOnOffer={setIsOnOffer}
+              oldPrice={oldPrice}
+              setOldPrice={setOldPrice}
+            />
           ) : null}
 
           {step === 4 ? (
-            <div className="space-y-4">
-              <h2 className="font-display text-lg font-bold text-brand-dark">
-                Fase 4 — Ficha técnica (Especs)
-              </h2>
-              <p className="text-sm text-brand-dark/60">
-                Pares atributo / valor para la tabla de ficha técnica del modal de
-                producto. Opcional.
-              </p>
-              <div className="space-y-2">
-                {specs.map((row, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <input
-                      value={row.label}
-                      onChange={(event) => updateSpec(index, "label", event.target.value)}
-                      placeholder="Atributo (p. ej. Material)"
-                      className="w-1/3 rounded-lg border border-brand-dark/15 px-3 py-2 text-sm"
-                    />
-                    <input
-                      value={row.value}
-                      onChange={(event) => updateSpec(index, "value", event.target.value)}
-                      placeholder="Valor"
-                      className="flex-1 rounded-lg border border-brand-dark/15 px-3 py-2 text-sm"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeSpec(index)}
-                      className="rounded-lg p-2 text-brand-dark/40 hover:bg-red-50 hover:text-red-600"
-                      aria-label="Quitar fila"
-                    >
-                      <Trash2 className="h-4 w-4" strokeWidth={2} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={addSpec}
-                className="flex items-center gap-1.5 rounded-lg border border-brand-dark/15 px-3 py-2 text-sm font-semibold text-brand-dark hover:bg-brand-gray"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.5} />
-                Agregar especificación
-              </button>
-            </div>
+            <AdminProductFormStepEspecs
+              specs={specs}
+              onAddSpec={addSpec}
+              onUpdateSpec={updateSpec}
+              onRemoveSpec={removeSpec}
+              packaging={packaging}
+              customUnit={customUnit}
+              setCustomUnit={setCustomUnit}
+              onAddPackagingUnit={addPackagingUnit}
+              onUpdatePackagingContent={updatePackagingContent}
+              onRemovePackaging={removePackaging}
+            />
           ) : null}
 
           {error ? (
@@ -583,55 +376,26 @@ export default function AdminNewProductForm({
                 onClick={() => void handleSubmit()}
                 className="rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0e6aad] disabled:opacity-60"
               >
-                {pending ? "Guardando…" : "Crear producto"}
+                {pending
+                  ? "Guardando…"
+                  : isEditing
+                    ? "Guardar cambios"
+                    : "Crear producto"}
               </button>
             )}
           </div>
         </div>
 
-        <aside className="h-fit rounded-2xl border border-brand-dark/10 bg-white p-4 shadow-sm lg:sticky lg:top-4">
-          <p className="text-xs font-semibold tracking-wide text-brand-dark/50 uppercase">
-            Vista previa en la tienda
-          </p>
-          <div className="mt-3 overflow-hidden rounded-xl border border-brand-dark/10">
-            <div className="flex aspect-square items-center justify-center bg-brand-gray">
-              {images[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={images[0]}
-                  alt={name || "Producto"}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <ImageIcon className="h-10 w-10 text-brand-dark/25" strokeWidth={1.5} />
-              )}
-            </div>
-            <div className="space-y-1 p-3">
-              {isFeatured ? (
-                <span className="inline-block rounded-full bg-brand-gold/20 px-2 py-0.5 text-[10px] font-bold text-brand-gold uppercase">
-                  Destacado
-                </span>
-              ) : null}
-              <p className="text-[11px] font-semibold text-brand-dark/50 uppercase">
-                {brand || "Sin marca"}
-              </p>
-              <p className="font-display text-sm font-bold text-brand-dark">
-                {name || "Nombre del producto"}
-              </p>
-              <p className="text-xs text-brand-dark/40">SKU: {sku || "—"}</p>
-              <p className="font-display text-lg font-bold text-brand-primary">
-                {Number(price) > 0 ? soles(Number(price)) : "Consultar"}
-              </p>
-              <button
-                type="button"
-                disabled
-                className="mt-1 w-full rounded-lg bg-brand-primary py-2 text-xs font-semibold text-white opacity-90"
-              >
-                Agregar al carrito
-              </button>
-            </div>
-          </div>
-        </aside>
+        <AdminProductPreviewCard
+          image={images[0]}
+          name={name}
+          brand={brand}
+          sku={sku}
+          price={Number(price) || 0}
+          oldPrice={Number(oldPrice) || 0}
+          isFeatured={isFeatured}
+          isOnOffer={isOnOffer}
+        />
       </div>
     </div>
   );

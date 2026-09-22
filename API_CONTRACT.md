@@ -203,6 +203,13 @@ debe envolverlo:
         "descriptionShort": "Taladro percutor profesional…",
         "descriptionFull": "Taladro percutor profesional para concreto…",
         "isFeatured": true,
+        "isOnOffer": true,
+        "oldPrice": 105.0,
+        "packaging": [
+          { "unit": "Unidad", "content": "1 taladro + llave mandril" },
+          { "unit": "Docena", "content": "12 unidades (caja mayorista)" },
+          { "unit": "Caja", "content": "24 unidades por master box" }
+        ],
         "createdAt": "2026-08-10T12:00:00.000Z"
       }
     ],
@@ -210,6 +217,11 @@ debe envolverlo:
   }
 }
 ```
+
+`isOnOffer` + `oldPrice` alimentan el badge "Oferta" y el precio tachado.
+`packaging` es una lista libre (no solo unidad/docena/caja): `unit` es texto,
+así el panel puede crear una presentación de venta nueva (p. ej. "Rollo",
+"Par"). `oldPrice` es `null` cuando `isOnOffer` es `false`.
 
 Al conectar el fetch, `getProducts` debe devolver `data.items`.
 
@@ -232,17 +244,24 @@ El backend asigna `id` y `createdAt`. **Body:** el resto de campos de `Product`.
 
 **Errores:** `409 CONFLICT` (SKU duplicado), `400 VALIDATION`.
 
-### `GET /api/v1/products/:id` (recomendado)
+### `GET /api/v1/products/:id`
 
-Aún no hay UI de edición; dejar listo para el siguiente sprint.
+Front: `getProduct(id)`. Usada por `/admin/productos/[id]/editar` para
+precargar el wizard en modo edición. Ya tiene UI (Ver/Editar en
+`/admin/productos`) — implementada en el mock (`productsDb.find`), pendiente
+de reemplazar por `fetch`.
 
-### `PUT /api/v1/products/:id` (recomendado)
+### `PUT /api/v1/products/:id`
 
-Mismo body parcial o completo de `Product` sin `id` / `createdAt`.
+Front: `updateProduct(id, input)` → `updateProductAction`. Mismo body parcial
+de `Product` sin `id` / `createdAt` (ver {@link UpdateProductInput}). El mock
+valida SKU duplicado igual que el alta.
 
-### `DELETE /api/v1/products/:id` (recomendado)
+### `DELETE /api/v1/products/:id`
 
-Soft-delete → `status: "archived"` preferible a borrar filas.
+Front: `deleteProduct(id)` → `deleteProductAction`, con confirmación en el
+panel. El mock borra la fila; **recomendado** para el backend real un
+soft-delete (`status: "archived"`) en vez de borrar filas.
 
 ---
 

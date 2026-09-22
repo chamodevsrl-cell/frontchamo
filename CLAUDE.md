@@ -100,7 +100,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `Reveal.tsx` | Fade/slide-up al entrar en viewport (scroll); respeta `prefers-reduced-motion` |
 | `BrandLoader.tsx` | Overlay compartido: logo oficial + engranaje + “CARGANDO...” (2.5 s) |
 | `Preloader.tsx` | Carga inicial: monta `BrandLoader` |
-| `IntroSplash.tsx` | Puertas al clic del logo; `/carrito` con el ícono detrás de la costura; resto de páginas → `BrandLoader` |
+| `IntroSplash.tsx` | Muestra `BrandLoader` **solo** al cruzar hacia/desde `/admin` o `/cuenta/perfil`; ninguna otra navegación (clic en logo, `/carrito`, login/logout) dispara nada |
 | `QuoteForm.tsx` | Formulario mayorista → WhatsApp |
 | `ContactForm.tsx` | Formulario de `/contacto` → WhatsApp |
 | `AuthProvider.tsx` | Cuentas locales (`chamo-accounts-v1`) + sesión; `role: "customer" \| "admin"` |

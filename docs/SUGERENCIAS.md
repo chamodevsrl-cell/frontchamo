@@ -1,18 +1,87 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-21**
+Última actualización: **2026-09-22**
 
-## ⚡ Exclusiones de editor para lentitud en Cursor (2026-09-21)
+## 🔌 Contrato HTTP de la tienda pública + TODOs en código (2026-09-22)
 
-- [x] 2026-09-21 — Se agregó `.vscode/settings.json` excluyendo `node_modules`,
-  `.next` y `coverage` del watcher/índice/búsqueda de Cursor/VS Code, ante
-  reporte de comandos lentos. Detalle:
-  [`cambios/2026-09-21-exclusiones-editor-vscode.md`](./cambios/2026-09-21-exclusiones-editor-vscode.md).
-- [ ] Pendiente que el usuario confirme si además agrega exclusión de
-  `node_modules`/`.next` en el antivirus (Windows Defender) — no se puede
-  hacer desde el repo.
-- [ ] Pendiente confirmar si `npm run dev` está usando Turbopack (Next 16) o
-  cayó al bundler clásico de Webpack.
+- [x] 2026-09-22 — Nuevo [`API_CONTRACT_TIENDA.md`](../API_CONTRACT_TIENDA.md):
+  mismo nivel de detalle que `API_CONTRACT.md` (panel) pero para CMS,
+  catálogo, cuentas y carrito/favoritos/comparar de la tienda — antes solo
+  tenían guía narrativa. Se agregó además `// TODO Backend` junto a cada
+  punto de integración en el código (`ContentProvider.tsx`,
+  `CartProvider.tsx`, `FavoritesProvider.tsx`, `CompareProvider.tsx`,
+  `AuthProvider.tsx`, `app/api/productos/route.ts`, `data/products.ts`,
+  `lib/cms-image.ts`, `lib/auth-local.ts`), mismo patrón que ya usaba
+  `services/adminApi.ts`. Detalle:
+  [`cambios/2026-09-22-contrato-api-tienda-backend-ready.md`](./cambios/2026-09-22-contrato-api-tienda-backend-ready.md).
+- [ ] Pendiente real (no solo documental — el contrato ya está escrito, falta
+  que el backend lo implemente): CMS del panel (`ContentProvider.tsx`,
+  `chamo-cms-v1`), catálogo (`data/products.ts`), cuentas de la tienda
+  (`lib/auth-local.ts`) y carrito/favoritos/comparar siguen 100% en
+  `localStorage`. Orden recomendado en `API_CONTRACT_TIENDA.md` §0: CMS →
+  catálogo → cuentas → carrito.
+
+## 🧩 Split de componentes grandes del panel (2026-09-22)
+
+- [x] 2026-09-22 — `AdminNewProductForm.tsx` (817 líneas) y
+  `AdminUsersCards.tsx` (804 líneas) eran monolíticos. Se dividieron en
+  componentes por paso/pieza sin cambiar comportamiento (verificado en el
+  navegador). Detalle:
+  [`cambios/2026-09-22-split-admin-componentes-grandes.md`](./cambios/2026-09-22-split-admin-componentes-grandes.md).
+
+## 🔌 Manual: guía completa para conectar backend (tienda + panel) (2026-09-21)
+
+- [x] 2026-09-21 — `MANUAL.md` solo explicaba cómo conectar el backend del
+  panel admin (A.12.6). Nueva sección **A.13** cubre el resto del sitio:
+  catálogo público, cuentas de cliente, carrito/favoritos/comparar, CMS del
+  panel y formularios de contacto/cotizar — con tabla de "qué vive dónde hoy"
+  y pasos concretos por pieza. Detalle:
+  [`cambios/2026-09-21-manual-conectar-backend-tienda.md`](./cambios/2026-09-21-manual-conectar-backend-tienda.md).
+
+## 🚪 Simplificar animaciones de transición (2026-09-21)
+
+- [x] 2026-09-21 — Se quitaron las puertas del clic en el logo, la animación
+  especial de `/carrito` y el disparo del loader en login/logout. Ahora
+  `IntroSplash.tsx` solo muestra `BrandLoader` al cruzar hacia/desde `/admin` o
+  `/cuenta/perfil` (más la carga inicial/recarga, que sigue siendo
+  `Preloader.tsx`) — nada más. Se limpió el CSS muerto asociado (~330 líneas en
+  `app/globals.css`) y el evento `AUTH_TRANSITION_EVENT` de `AuthProvider.tsx`
+  (sin otro consumidor). Detalle:
+  [`cambios/2026-09-21-simplificar-loader-transiciones.md`](./cambios/2026-09-21-simplificar-loader-transiciones.md).
+
+## 📦 Productos: Ver/Editar/Eliminar + oferta + presentaciones de venta (2026-09-21)
+
+- [x] 2026-09-21 — `/admin/productos` ya tenía solo una tabla de lectura. Ahora
+  cada fila tiene **Ver** (modal), **Editar** (reusa el wizard de alta,
+  precargado, llama a `updateProduct()`) y **Eliminar** (confirmación,
+  `deleteProduct()`). El wizard suma **"En oferta" + precio anterior** (Fase 3)
+  y **"Presentaciones de venta"** — unidad/docena/caja con su contenido, más
+  poder crear una unidad propia de texto libre (Fase 4). Detalle:
+  [`cambios/2026-09-21-productos-crud-oferta-presentaciones.md`](./cambios/2026-09-21-productos-crud-oferta-presentaciones.md).
+- [ ] `API_CONTRACT.md` ya documenta `GET/PUT/DELETE /api/v1/products/:id`;
+  falta que el backend real los implemente (hoy solo mock en memoria).
+- [ ] El modal "Ver" y la edición no tocan el catálogo público de ejemplo
+  (`data/products.ts`, estático) — sigue siendo una limitación conocida hasta
+  que ambos lean de la misma fuente.
+
+## 🖼️ Límite de imagen de producto: 60 MB (2026-09-21)
+
+- [x] 2026-09-21 — El wizard de alta de producto (fase "Detalle e imágenes")
+  aceptaba imágenes hasta 1.5 MB (default de CMS, pensado para banners/
+  categorías). Ahora tiene su propio límite, `MAX_PRODUCT_IMAGE_BYTES` (60 MB),
+  con aviso en pantalla. Detalle:
+  [`cambios/2026-09-21-limite-imagen-producto-60mb.md`](./cambios/2026-09-21-limite-imagen-producto-60mb.md).
+- [ ] Al conectar backend con subida a bucket real, replicar este límite del
+  lado servidor (hoy solo se valida en el navegador).
+
+## 🕒 Header del panel: "Ver sitio" visible + reloj (2026-09-21)
+
+- [x] 2026-09-21 — Junto al buscador del panel (visible siempre, sin abrir el
+  menú de la cuenta) ahora hay **fecha y hora** en vivo y un botón **Ver sitio**
+  que abre la tienda en pestaña nueva (`target="_blank"`) para revisar cambios
+  sin perder el panel abierto. Se quitó el enlace duplicado que antes vivía
+  dentro del menú desplegable de la cuenta. Detalle:
+  [`cambios/2026-09-21-panel-ver-sitio-reloj.md`](./cambios/2026-09-21-panel-ver-sitio-reloj.md).
 
 ## 🔑 Editar usuario completo + varios roles por usuario (2026-09-16)
 

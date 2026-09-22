@@ -55,6 +55,8 @@ export function CompareProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // TODO Backend (opcional, baja prioridad): con sesión de cliente, fetch('/api/v1/store/compare')
+    // — ver API_CONTRACT_TIENDA.md §4. Es estado efímero de comparación; puede quedarse en localStorage.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setIds(parseIds(window.localStorage.getItem(STORAGE_KEY)));
     setReady(true);

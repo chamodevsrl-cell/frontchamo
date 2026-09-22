@@ -55,6 +55,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Hidratar después del mount para coincidir con el HTML del servidor (badge 0).
+    // TODO Backend: con sesión de cliente, reemplazar con fetch('/api/v1/store/favorites') — ver API_CONTRACT_TIENDA.md §4.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setIds(parseIds(window.localStorage.getItem(STORAGE_KEY)));
     setReady(true);
@@ -66,6 +67,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
+    // TODO Backend: con sesión de cliente, reemplazar/además hacer fetch('/api/v1/store/favorites', { method: 'PUT', body: ids }).
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
   }, [ids, ready]);
 

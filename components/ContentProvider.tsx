@@ -45,6 +45,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // TODO Backend: Reemplazar con fetch('/api/v1/site-content') — ver API_CONTRACT_TIENDA.md §1.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setCms(parseCms(window.localStorage.getItem(CMS_KEY)));
     setReady(true);
@@ -52,6 +53,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
+    // TODO Backend: Reemplazar con fetch('/api/v1/site-content', { method: 'PUT', body: patch }) — ver API_CONTRACT_TIENDA.md §1.
     window.localStorage.setItem(CMS_KEY, JSON.stringify(cms));
   }, [cms, ready]);
 

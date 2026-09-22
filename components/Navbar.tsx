@@ -203,7 +203,6 @@ export default function Navbar() {
         <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-4 py-3.5 sm:gap-5 sm:px-6 lg:gap-8 lg:px-8 xl:px-10">
           <Link
             href="/"
-            data-site-intro
             className="relative flex h-12 w-32 shrink-0 items-center sm:h-14 sm:w-40 lg:w-48"
             aria-label="Chamo Import — inicio"
           >
@@ -355,7 +354,6 @@ export default function Navbar() {
 
             <Link
               href="/carrito"
-              data-cart-intro
               className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
               aria-label={`Carrito, ${count} productos`}
             >
@@ -394,7 +392,6 @@ export default function Navbar() {
             </Link>
             <Link
               href="/carrito"
-              data-cart-intro
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
               aria-label={`Carrito, ${count} productos`}
             >

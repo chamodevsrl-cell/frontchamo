@@ -1,6 +1,7 @@
 export const MAX_CMS_IMAGE_BYTES = 1.5 * 1024 * 1024;
 export const MAX_PROFILE_IMAGE_BYTES = 2.5 * 1024 * 1024;
 export const MAX_BANNER_IMAGE_BYTES = 3.5 * 1024 * 1024;
+export const MAX_PRODUCT_IMAGE_BYTES = 60 * 1024 * 1024;
 
 export function isCmsInlineSrc(src: string) {
   return (
@@ -11,6 +12,13 @@ export function isCmsInlineSrc(src: string) {
   );
 }
 
+/**
+ * Lee el archivo como data URL (base64) para guardarlo directo en el estado/CMS local.
+ * TODO Backend: antes de conectar cualquier endpoint que reciba el resultado de esta función
+ * (productos, perfil, CMS), subir el archivo a `POST /api/v1/uploads` y guardar la URL
+ * devuelta en vez del data URL completo — ver API_CONTRACT_TIENDA.md §5 (no viable en
+ * producción mandar 60 MB en base64 por imagen dentro de un JSON).
+ */
 export function readCmsImageFile(
   file: File,
   maxBytes = MAX_CMS_IMAGE_BYTES,

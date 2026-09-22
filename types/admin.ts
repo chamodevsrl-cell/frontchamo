@@ -96,6 +96,16 @@ export interface ProductSpec {
 }
 
 /**
+ * Presentación de venta (unidad, docena, caja o una personalizada) y qué
+ * trae ese empaque. `unit` es texto libre para poder crear unidades nuevas
+ * (p. ej. "Rollo", "Galón", "Par") además de las 3 sugeridas.
+ */
+export interface PackagingLine {
+  unit: string;
+  content: string;
+}
+
+/**
  * Producto del catálogo admin.
  * Independiente de `FeaturedProduct` de la tienda: el backend puede mapear
  * ambos desde la misma tabla, pero el panel necesita estos campos de gestión.
@@ -129,6 +139,12 @@ export interface Product {
   descriptionFull: string;
   /** Si aparece en destacados / home. */
   isFeatured: boolean;
+  /** Si el SKU está en oferta (badge "Oferta" + precio anterior tachado). */
+  isOnOffer: boolean;
+  /** Precio antes del descuento. Solo se usa/muestra si `isOnOffer` es true. */
+  oldPrice: number | null;
+  /** Presentaciones de venta (unidad/docena/caja o una creada a mano) y su contenido. */
+  packaging: PackagingLine[];
   /** Ficha técnica (tabla de la fase "Especs"). Puede quedar vacía. */
   specs: ProductSpec[];
   /** ISO-8601 de alta (`2026-09-11T18:00:00.000Z`). */
@@ -149,6 +165,9 @@ export interface ProductFilters {
 
 /** Payload de alta. El backend asigna `id` y `createdAt`. */
 export type CreateProductInput = Omit<Product, "id" | "createdAt">;
+
+/** Payload de edición. Cualquier subconjunto de campos editables. */
+export type UpdateProductInput = Partial<Omit<Product, "id" | "createdAt">>;
 
 /** Alta de línea comercial. `id` opcional: si falta, el mock genera el slug. */
 export type CreateCategoryInput = {

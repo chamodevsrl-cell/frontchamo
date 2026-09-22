@@ -504,6 +504,9 @@ describe("contrato admin (tipos + mock API + sesión)", () => {
       descriptionShort: "Corto",
       descriptionFull: "Largo",
       isFeatured: false,
+      isOnOffer: false,
+      oldPrice: null,
+      packaging: [],
       specs: [],
     });
     expect(created.id).toMatch(/^prd_/);

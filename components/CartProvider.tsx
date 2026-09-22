@@ -90,6 +90,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Hidratar después del mount para coincidir con el HTML del servidor (badge 0).
+    // TODO Backend: con sesión de cliente, reemplazar con fetch('/api/v1/store/cart') y
+    // fusionar con lo que haya en localStorage (carrito de invitado) — ver API_CONTRACT_TIENDA.md §4.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setItems(parseCart(window.localStorage.getItem(STORAGE_KEY)));
     setReady(true);
@@ -97,6 +99,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
+    // TODO Backend: con sesión de cliente, reemplazar/además hacer fetch('/api/v1/store/cart', { method: 'PUT', body: items }).
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, ready]);
 

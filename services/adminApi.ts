@@ -34,6 +34,7 @@ import type {
   UpdateCategoryInput,
   UpdateOwnProfileInput,
   UpdatePanelUserInput,
+  UpdateProductInput,
 } from "@/types/admin";
 
 /** Latencia artificial para emular red. No usar en `getAdminSession()`. */
@@ -87,6 +88,7 @@ function seedProducts(): Product[] {
     const minStock = 10;
     const status: Product["status"] =
       item.badge === "oferta" && index > 18 ? "draft" : "active";
+    const isOnOffer = item.badge === "oferta";
     return {
       id: item.id,
       sku: item.sku,
@@ -102,6 +104,13 @@ function seedProducts(): Product[] {
       descriptionShort: shortDescription(item.description),
       descriptionFull: item.description,
       isFeatured: item.badge === "destacado" || index < 3,
+      isOnOffer,
+      oldPrice: isOnOffer ? item.oldPrice : null,
+      packaging: [
+        { unit: "Unidad", content: item.packaging.unidad },
+        { unit: "Docena", content: item.packaging.docena },
+        { unit: "Caja", content: item.packaging.caja },
+      ],
       specs: item.specs,
       createdAt: `2026-08-${String(10 + (index % 18)).padStart(2, "0")}T12:00:00.000Z`,
     };
@@ -464,6 +473,63 @@ export async function createProduct(
   };
   productsDb.unshift(created);
   return created;
+}
+
+/**
+ * GET /api/v1/products/:productId
+ */
+export async function getProduct(productId: string): Promise<Product | null> {
+  // TODO Backend: Reemplazar mock con fetch(`/api/v1/products/${productId}`)
+  await delay();
+  return productsDb.find((product) => product.id === productId) ?? null;
+}
+
+/**
+ * PUT /api/v1/products/:productId
+ * Body: {@link UpdateProductInput}
+ */
+export async function updateProduct(
+  productId: string,
+  input: UpdateProductInput,
+): Promise<Product> {
+  // TODO Backend: Reemplazar mock con fetch(`/api/v1/products/${productId}`)
+  await delay();
+  const index = productsDb.findIndex((product) => product.id === productId);
+  if (index === -1) {
+    throw new AdminApiError("NOT_FOUND", "El producto ya no existe.");
+  }
+  const nextSku = input.sku?.trim();
+  if (
+    nextSku &&
+    productsDb.some(
+      (product) =>
+        product.id !== productId && product.sku.toLowerCase() === nextSku.toLowerCase(),
+    )
+  ) {
+    throw new AdminApiError("CONFLICT", `Ya existe un producto con SKU ${nextSku}.`);
+  }
+  const updated: Product = {
+    ...productsDb[index],
+    ...input,
+    ...(nextSku ? { sku: nextSku } : {}),
+    ...(input.name ? { name: input.name.trim() } : {}),
+    ...(input.brand ? { brand: input.brand.trim() } : {}),
+  };
+  productsDb[index] = updated;
+  return updated;
+}
+
+/**
+ * DELETE /api/v1/products/:productId
+ */
+export async function deleteProduct(productId: string): Promise<void> {
+  // TODO Backend: Reemplazar mock con fetch(`/api/v1/products/${productId}`, { method: "DELETE" })
+  await delay();
+  const index = productsDb.findIndex((product) => product.id === productId);
+  if (index === -1) {
+    throw new AdminApiError("NOT_FOUND", "El producto ya no existe.");
+  }
+  productsDb.splice(index, 1);
 }
 
 /**

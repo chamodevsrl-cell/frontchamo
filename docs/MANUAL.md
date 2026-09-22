@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-16**
+Última actualización: **2026-09-21**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -71,7 +71,7 @@ components/
   StampHeading.tsx        # Encabezado sticker (catálogo, nosotros, ofertas, contacto)
   CategoryIcon.tsx        # Iconos Lucide por categoría
   Reveal.tsx              # Fade/slide al entrar en viewport
-  IntroSplash.tsx         # Puertas (logo y /carrito) + BrandLoader al cruzar admin/perfil/login
+  IntroSplash.tsx         # BrandLoader solo al cruzar admin/perfil (sin recargar)
   Preloader.tsx           # Carga inicial → BrandLoader
   BrandLoader.tsx         # Logo + engranaje + CARGANDO... (entrada y nav interna)
   ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
@@ -125,40 +125,31 @@ placeholder hasta ficha oficial del cliente.
 
 ### A.5b Animaciones de entrada
 
+Un único loader (`BrandLoader`) y **nada más** — no hay otra animación de
+transición en el sitio (se quitaron las puertas del clic en el logo y la
+variante especial de `/carrito`; ver
+[`cambios/2026-09-21-simplificar-loader-transiciones.md`](cambios/2026-09-21-simplificar-loader-transiciones.md)).
+
 - Al **cargar o refrescar** la pestaña: `Preloader` → `BrandLoader` — fondo `#0B3554`,
   logo oficial (`/logo.png`) entra de izquierda a derecha (`x: -100 → 0`, fade in),
   `/engranaje.png` gira debajo (60×60) y el texto **CARGANDO...** en `brand-gold`.
   A los **2.5 s** hace fade-out y se desmonta (`z-[90]` para cubrir Navbar y WhatsApp).
-- El mismo `BrandLoader` de 2.5 s (variante `"load"`) **solo** se ve al cruzar una
-  de estas fronteras — no en cada navegación interna (Catálogo, Categorías,
-  Ofertas, Nosotros, `/cuenta`, `/cuenta/empresa`, etc., no disparan nada):
+- Ese mismo `BrandLoader` (vía `IntroSplash.tsx`, sin recargar la página) **solo**
+  se ve al cruzar una de estas fronteras — nada más, ninguna otra navegación
+  dispara nada (Catálogo, Categorías, Ofertas, Nosotros, `/cuenta`,
+  `/cuenta/empresa`, clic en el logo, `/carrito`, iniciar/cerrar sesión, etc.):
   - Entrar **o** salir de `/admin` (panel de administración).
   - Entrar **o** salir de `/cuenta/perfil` (editar perfil).
-  - Iniciar o cerrar sesión — cualquier cuenta, desde el modal de la tienda o
-    desde “Cerrar sesión” del panel. `AuthProvider` dispara un evento propio
-    (`AUTH_TRANSITION_EVENT`) cuando `user` pasa de `null` a una cuenta o
-    viceversa (comparado contra la hidratación inicial, así un simple refresh
-    no lo dispara); `IntroSplash` lo escucha y reproduce el loader aunque no
-    haya cambio de ruta (p. ej. login desde el modal en la misma página).
   - `isLoadBoundary(from, to)` en `IntroSplash.tsx` decide esto comparando el
-    pathname anterior y el nuevo.
-- Al clic en el **logo**: `IntroSplash` — puertas azules se cierran, gira un engranaje
-  Lucide (`Cog`) y se abren (~2.7s en desktop, un poco menos en móvil). Ese clic
-  **reclama** la navegación para que, con `prefers-reduced-motion`, no se encadene
-  un `BrandLoader` de 2.5 s al llegar a `/`.
-- Al entrar a **`/carrito`**: las mismas puertas, pero el centro es un **carrito**
-  Lucide (`ShoppingCart`) dorado. Entra desde la izquierda y **se estaciona entero
-  detrás (a la izquierda) de la costura dorada**. Al abrirse las puertas, vuelve al
-  **recorrido normal** (centro del hueco y salida a la derecha). Un clic en el navbar
-  dispara la intro **una sola vez** (el cambio de `pathname` no la repite).
-- Mientras corre cualquiera, `html` lleva la clase `intro-playing`
+    pathname anterior y el nuevo; un `click` sobre un link que cruza la frontera
+    lo dispara al instante (sin esperar a que cambie el pathname), y un efecto
+    sobre `usePathname()` es el respaldo para navegación programática.
+- Mientras está visible, `html` lleva la clase `intro-playing`
   (`overflow: hidden !important`) para que el Navbar no libere el scroll del body.
-- Cambiar de producto **dentro del modal** (sin cambiar de ruta) no muestra este loader.
-- Tamaños con `clamp`/`vmin` y `100dvh` para que el engranaje y las puertas entren en
-  móvil y en landscape.
+- Si el usuario pide menos movimiento (`prefers-reduced-motion`), no se muestra
+  (ni este loader al cruzar fronteras ni el de `Preloader` en la carga inicial).
 - Slider, banners de página, categorías, productos y el resto de bloques: `Reveal`
-  (fade + slide-up al entrar en viewport).
-- Si el usuario pide menos movimiento (`prefers-reduced-motion`), no hay animación.
+  (fade + slide-up al entrar en viewport) — esto es aparte y no cambió.
 
 ### A.5c Panel de administración
 
@@ -260,12 +251,6 @@ npm run lint
 npm test         # Vitest smoke (slider, categorías, búsqueda)
 ```
 
-`.vscode/settings.json` excluye `node_modules`, `.next` y `coverage` del
-watcher/índice/búsqueda del editor (Cursor/VS Code) para evitar lentitud al
-ejecutar comandos. Si persiste la lentitud, revisar exclusiones de antivirus
-(Windows Defender) para esas mismas carpetas — fuera del alcance del repo.
-Detalle: [`cambios/2026-09-21-exclusiones-editor-vscode.md`](cambios/2026-09-21-exclusiones-editor-vscode.md).
-
 ---
 
 ### A.12 🎛️ Dashboard — Panel de administración
@@ -337,13 +322,21 @@ Piezas clave (v2):
    una **foto de portada** propia (`banner`, máx. 3.5 MB) como fondo del banner.
 5. "Salir" (tienda o panel) borra cookie + `localStorage` de ambas sesiones.
 
+**Header del panel (`AdminShell.tsx`):** junto al buscador, siempre visible (sin
+abrir ningún menú) hay **fecha y hora** (`clockLabel`, se oculta en móvil,
+`toLocaleString("es-PE", …)`, se refresca cada 30 s) y el botón **Ver sitio**
+(ícono en móvil, ícono + texto desde `sm:`) que abre la tienda en una **pestaña
+nueva** (`target="_blank"`) para poder comparar cambios sin perder el panel
+abierto. El menú desplegable de la cuenta (foto/avatar) ya no repite ese enlace.
+
 **Secciones del sidebar — qué es real y qué es placeholder hoy:**
 
 | Sección | Ruta | Estado |
 | --- | --- | --- |
 | Dashboard | `/admin` | ✅ Real — KPIs desde `getDashboardKPIs()` (mock) |
 | Productos → Ver productos | `/admin/productos` | ✅ Real — `getProducts({ q })`, búsqueda por SKU/nombre/marca |
-| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes por **galería/carpetas** o **URL**; `createProduct()` se llama al terminar la fase 4; el `<select>` de categoría une `getCategories()` + líneas del CMS |
+| Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes por **galería/carpetas** (máx **60 MB** por imagen, `MAX_PRODUCT_IMAGE_BYTES` en `lib/cms-image.ts`) o **URL**; `createProduct()` se llama al terminar la fase 4; el `<select>` de categoría une `getCategories()` + líneas del CMS. Fase 3 suma **En oferta + precio anterior**; Fase 4 suma **Presentaciones de venta** (unidad/docena/caja o una creada a mano, con su contenido) |
+| Productos → Ver productos (acciones) | `/admin/productos` | ✅ Real — cada fila tiene **Ver** (modal de solo lectura), **Editar** (`/admin/productos/[id]/editar`, mismo wizard precargado, llama `updateProduct()`) y **Eliminar** (confirmación, `deleteProduct()`) — `components/admin/AdminProductsTable.tsx` |
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
 | Banners | `/admin/banners` | ✅ Real — cartas para el slider del home y los banners de Nosotros, Contacto, Ofertas y Catálogo (`chamo-cms-v1`) |
 | Categorías | `/admin/categorias` | ✅ Real — cartas (nombre, descripción, recuento de productos) + modal para editar/agregar; imagen por URL o galería; persiste en CMS (`customCategories`) y en el mock `createCategory`/`updateCategory` |
@@ -413,6 +406,139 @@ error esperados. Resumen del "cómo enchufar":
 3. En `lib/auth.ts` / `app/admin/actions.ts`, dejar que el `Set-Cookie` lo mande el
    backend (marcarla `httpOnly: true`) en vez de escribirla desde el cliente.
 4. Borrar `MOCK_ADMIN_EMAIL`/`MOCK_ADMIN_PASSWORD` de `services/adminApi.ts`.
+
+Esto es solo el panel. Para conectar el **resto del sitio** (catálogo público,
+cuentas de cliente, carrito, CMS que edita el panel, etc.) ver **[A.13](#a13-🔌-conectar-un-backend-real--tienda-y-panel)**.
+
+---
+
+### A.13 🔌 Conectar un backend real — tienda y panel
+
+Hoy **nada** del sitio habla con un servidor propio: el panel usa un mock en
+memoria ([A.12.6](#a126-conectar-el-backend-real)) y la tienda pública guarda
+todo en el **`localStorage` del navegador de cada visitante** — sin backend no
+hay nada compartido entre dispositivos, usuarios ni sesiones. Esta sección es
+el mapa completo de qué pieza vive dónde y qué hace falta para reemplazarla.
+
+**Resumen — qué vive dónde hoy:**
+
+| Pieza | Dónde vive hoy | Alcance actual |
+| --- | --- | --- |
+| Panel admin (productos, pedidos, KPIs, usuarios, roles) | `services/adminApi.ts` (mock en memoria del servidor, se resetea al reiniciar `next dev`) | Ver [A.12](#a12-🎛️-dashboard--panel-de-administración) |
+| Catálogo público | `data/products.ts` (array estático) vía `GET /api/productos` | Mismo catálogo de ejemplo para **todos** los visitantes; no se puede editar sin tocar código |
+| Cuentas de la tienda (clientes) | `localStorage` del navegador (`AuthProvider.tsx` + `lib/auth-local.ts`) | Una cuenta creada en un navegador **no existe** en otro dispositivo |
+| Carrito / cotización | `localStorage` (`CartProvider.tsx`) | Se pierde si el cliente cambia de navegador o borra datos del sitio |
+| Favoritos | `localStorage` (`FavoritesProvider.tsx`) | Igual que el carrito |
+| Comparar (hasta 3 SKUs) | `localStorage` (`CompareProvider.tsx`) | Igual que el carrito |
+| CMS del panel (banners, categorías, footer, canales, equipo) | `localStorage` (`ContentProvider.tsx` + `lib/cms.ts`, clave `chamo-cms-v1`) | **Un admin que edita el home solo lo cambia en su propio navegador** — el resto de visitantes sigue viendo el contenido de fábrica |
+| Formularios de Contacto / Cotizar | No se guardan — arman un mensaje y abren WhatsApp (`data/contact.ts` → `openWhatsApp()`) | Sin registro; si se pierde el chat de WhatsApp, se pierde el mensaje |
+
+El punto más importante para el negocio: **el CMS del panel (§A.5c, A.12) no es
+multiusuario ni persistente entre dispositivos todavía** — cualquier cambio que
+el cliente haga en `/admin/banners`, `/admin/categorias`, `/admin/ajustes/*` o
+`/admin/equipo` solo se ve en la computadora donde lo editó, hasta que exista
+backend para el CMS.
+
+> **Contrato HTTP exacto:** las piezas de **A.13.1 a A.13.4** (CMS, catálogo,
+> cuentas, carrito/favoritos/comparar) tienen ahora contrato HTTP completo —
+> endpoint, body y respuesta de ejemplo, igual de detallado que
+> `API_CONTRACT.md` del panel — en
+> [`API_CONTRACT_TIENDA.md`](../API_CONTRACT_TIENDA.md). El código además
+> tiene un comentario `// TODO Backend` junto a cada punto exacto de
+> integración (`ContentProvider.tsx`, `CartProvider.tsx`,
+> `FavoritesProvider.tsx`, `CompareProvider.tsx`, `AuthProvider.tsx`,
+> `app/api/productos/route.ts`, `data/products.ts`, `lib/cms-image.ts`,
+> `lib/auth-local.ts`), mismo patrón que ya usaba `services/adminApi.ts`
+> para el panel. La guía paso a paso de
+> [`FRONTEND_DOCUMENTATION.md` §5](../FRONTEND_DOCUMENTATION.md#5-cómo-conectar-el-backend)
+> sigue vigente como resumen narrativo — acá quedan los links, para no
+> mantener el mismo texto en tres archivos.
+
+#### A.13.1 Panel admin
+
+Ver [A.12.6](#a126-conectar-el-backend-real) (arriba, en este mismo documento)
+y [`FRONTEND_DOCUMENTATION.md` §5.1](../FRONTEND_DOCUMENTATION.md#51-panel-admin-lo-más-directo--ya-está-todo-preparado) —
+reemplazar `services/adminApi.ts` función por función siguiendo
+[`API_CONTRACT.md`](../API_CONTRACT.md).
+
+#### A.13.2 Catálogo de productos (tienda pública)
+
+Contrato exacto: [`API_CONTRACT_TIENDA.md` §2](../API_CONTRACT_TIENDA.md#2-catálogo-público).
+Resumen: `app/api/productos/route.ts` usa `searchCatalog()` sobre
+`data/products.ts` (array estático) — se reemplaza por una consulta real
+manteniendo la forma `FeaturedProduct[]`; el resto de la tienda
+(`ProductCatalog.tsx`, `CatalogFilters.tsx`, `ProductModal.tsx`, etc.) no
+cambia si esa forma se mantiene. El detalle por id y los relacionados
+(`getProductById`, `getRelatedProducts`) hoy **no** pasan por ninguna ruta
+HTTP — el contrato agrega `GET /api/v1/products/:id` y
+`GET /api/v1/products/:id/related` para eso.
+
+#### A.13.3 Cuentas de la tienda (clientes)
+
+Contrato exacto: [`API_CONTRACT_TIENDA.md` §3](../API_CONTRACT_TIENDA.md#3-cuentas-de-la-tienda-clientes).
+Resumen: hoy `AuthForm.tsx` crea la cuenta en `localStorage`
+(`chamo-accounts-v1`, contraseña hasheada **en el cliente** vía
+`hashPassword()` de `lib/auth-local.ts`) — suficiente para demo, no para
+producción. `AuthProvider.tsx` es el punto único a migrar a `fetch()` +
+cookie `httpOnly` (mismo criterio que la sesión del panel).
+
+#### A.13.4 Carrito, favoritos y comparar
+
+Contrato exacto: [`API_CONTRACT_TIENDA.md` §4](../API_CONTRACT_TIENDA.md#4-carrito-favoritos-y-comparar).
+Resumen: `CartProvider.tsx`, `FavoritesProvider.tsx` y `CompareProvider.tsx`
+son 100% `localStorage`, sin backend. Depende de **A.13.3** (cuentas reales)
+para tener sentido — dejar para el final. El contrato ya fija el patrón por
+defecto: invitado sigue en `localStorage`, y al iniciar sesión se fusiona con
+el carrito del servidor.
+
+#### A.13.5 CMS del panel (banners, categorías, footer, canales, equipo)
+
+Esta es la pieza que **más urge** conectar si el cliente va a operar el sitio
+desde `/admin` en producción — hoy sus cambios no se comparten con nadie.
+Contrato exacto ya escrito en
+[`API_CONTRACT_TIENDA.md` §1](../API_CONTRACT_TIENDA.md#1-contenido-del-sitio-cms-del-panel).
+
+1. Implementar `GET/PUT /api/v1/site-content`, que devuelve/recibe la misma
+   forma que hoy tiene el objeto `CmsState` de `lib/cms.ts` (slides,
+   categorías, footer, banners de página, equipo) — body/respuesta de
+   ejemplo en el contrato de arriba.
+2. En `ContentProvider.tsx`, reemplazar la lectura/escritura de
+   `window.localStorage` (clave `CMS_KEY`) por `fetch()` a ese endpoint al
+   montar, y `PUT`/`PATCH` en cada `set...()` que hoy solo actualiza el
+   estado local.
+3. Los componentes del panel que ya editan esto (`AdminBannersStudio.tsx`,
+   `AdminCategoriesCards.tsx`, `AdminFooterSettings.tsx`,
+   `AdminChannelsSettings.tsx`, `AdminTeamCards.tsx`) no necesitan cambios de
+   UI — todos pasan por `useSiteContent()` (`ContentProvider.tsx`).
+4. Importante: una vez conectado, decidir permisos de escritura en el backend
+   (hoy cualquier sesión admin del panel puede editar todo — el contrato de
+   `AdminPermission` en `types/admin.ts` ya distingue por sección, así que el
+   backend puede reusar esos mismos permisos).
+
+#### A.13.6 Formularios de Contacto y Cotizar
+
+`QuoteForm.tsx` y `ContactForm.tsx` arman el mensaje y llaman
+`openWhatsApp()` (`data/contact.ts`) — no hay nada que "conectar" salvo que el
+negocio quiera **guardar un registro** antes de abrir WhatsApp (para que
+aparezca en un futuro `/admin/cotizaciones` o `/admin/contactos` — descartado
+por ahora, ver `docs/SUGERENCIAS.md`). Si se retoma: agregar un
+`POST /api/v1/quotes` / `/api/v1/contacts` que se llame **antes** de
+`openWhatsApp()`, sin bloquear el envío si falla (el mensaje de WhatsApp sigue
+siendo el canal real).
+
+#### A.13.7 Orden recomendado
+
+1. **Panel admin** ([A.12.6](#a126-conectar-el-backend-real)) — ya tiene el
+   contrato más completo escrito (`API_CONTRACT.md`).
+2. **CMS del panel** (A.13.5) — es lo que más se nota si no se conecta (el
+   cliente edita y "no pasa nada" para sus visitantes).
+3. **Catálogo público** (A.13.2) — para que el panel de productos sea la
+   fuente real de lo que se vende, no un mock aparte de `data/products.ts`.
+4. **Cuentas de cliente** (A.13.3) — habilita compras/pedidos reales por
+   cliente.
+5. **Carrito/favoritos/comparar** (A.13.4) — depende de tener cuentas reales.
+6. **Contacto/Cotizar** (A.13.6) — opcional, solo si el negocio quiere
+   historial además de WhatsApp.
 
 ---
 

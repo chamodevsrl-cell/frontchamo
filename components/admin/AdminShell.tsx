@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -89,6 +95,37 @@ function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+/**
+ * Reloj del header vía `useSyncExternalStore` (no `useState` + `setInterval`
+ * en un efecto): el snapshot del servidor es `null` para que la marca del
+ * SSR y la primera pasada de hidratación coincidan sin reloj, y recién
+ * después se activa en el cliente — sin el aviso de setState síncrono en
+ * un efecto ni desajuste de hidratación.
+ *
+ * `getClockSnapshot` devuelve un valor **cacheado**, no `Date.now()` en
+ * caliente: si devolviera la hora actual en cada llamada, `useSyncExternalStore`
+ * la vería cambiar en cada render y entraría en bucle infinito
+ * ("Maximum update depth exceeded"). Solo se actualiza al suscribirse y en
+ * cada tick del intervalo.
+ */
+let cachedClockMs = Date.now();
+
+function subscribeToClock(onStoreChange: () => void) {
+  cachedClockMs = Date.now();
+  onStoreChange();
+  const id = setInterval(() => {
+    cachedClockMs = Date.now();
+    onStoreChange();
+  }, 30_000);
+  return () => clearInterval(id);
+}
+function getClockSnapshot() {
+  return cachedClockMs;
+}
+function getServerClockSnapshot() {
+  return null;
+}
+
 export default function AdminShell({
   children,
   session,
@@ -118,6 +155,23 @@ export default function AdminShell({
   }, [pathname, router, session]);
 
   const displayName = user?.name?.trim() || session.name?.trim() || "Admin";
+
+  const nowMs = useSyncExternalStore(
+    subscribeToClock,
+    getClockSnapshot,
+    getServerClockSnapshot,
+  );
+  const clockLabel = nowMs
+    ? new Date(nowMs)
+        .toLocaleString("es-PE", {
+          weekday: "short",
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+        .replace(/^\p{L}/u, (letter) => letter.toUpperCase())
+    : "";
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -254,6 +308,23 @@ export default function AdminShell({
             />
           </form>
 
+          {clockLabel ? (
+            <span className="hidden shrink-0 text-xs font-medium text-brand-dark/60 md:block">
+              {clockLabel}
+            </span>
+          ) : null}
+
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Ver el sitio web en una pestaña nueva"
+            className="flex shrink-0 items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-brand-dark hover:bg-brand-gray sm:px-3"
+          >
+            <Store className="h-5 w-5 text-brand-primary" strokeWidth={2} />
+            <span className="hidden sm:inline">Ver sitio</span>
+          </a>
+
           <button
             type="button"
             className="relative rounded-lg p-2 text-brand-dark hover:bg-brand-gray"
@@ -292,13 +363,6 @@ export default function AdminShell({
                 >
                   <UserRound className="h-4 w-4 text-brand-primary" />
                   Mi perfil
-                </Link>
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-gray"
-                >
-                  <Store className="h-4 w-4 text-brand-primary" />
-                  Ver el sitio
                 </Link>
                 <button
                   type="button"

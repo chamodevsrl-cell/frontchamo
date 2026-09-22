@@ -11,11 +11,13 @@ import {
   createRole,
   createUser,
   createCategory,
+  deleteProduct,
   deleteUser,
   loginAdmin,
   updateCategory,
   updateOrderStatus,
   updateOwnProfile,
+  updateProduct,
   updateUser,
   updateUserStatus,
 } from "@/services/adminApi";
@@ -36,6 +38,7 @@ import type {
   UpdateCategoryInput,
   UpdateOwnProfileInput,
   UpdatePanelUserInput,
+  UpdateProductInput,
 } from "@/types/admin";
 
 function cookieOptions() {
@@ -88,6 +91,33 @@ export async function createProductAction(
   } catch (cause) {
     const message =
       cause instanceof Error ? cause.message : "No se pudo crear el producto.";
+    return { ok: false, message };
+  }
+}
+
+export async function updateProductAction(
+  productId: string,
+  input: UpdateProductInput,
+): Promise<{ ok: true; product: Product } | { ok: false; message: string }> {
+  try {
+    const product = await updateProduct(productId, input);
+    return { ok: true, product };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo actualizar el producto.";
+    return { ok: false, message };
+  }
+}
+
+export async function deleteProductAction(
+  productId: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    await deleteProduct(productId);
+    return { ok: true };
+  } catch (cause) {
+    const message =
+      cause instanceof Error ? cause.message : "No se pudo borrar el producto.";
     return { ok: false, message };
   }
 }

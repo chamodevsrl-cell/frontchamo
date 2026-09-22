@@ -6,10 +6,14 @@ un backend real sin romper nada. Incluye también el manual de uso (tienda + pan
 
 > **Para el desarrollador de backend:** empieza por [§3](#3-mapa-de-datos--de-dónde-sale-cada-cosa-hoy)
 > y [§4](#4-componentes-y-las-variables-que-usan-por-dominio), y usa
-> [`API_CONTRACT.md`](./API_CONTRACT.md) como la especificación HTTP exacta (bodies,
-> respuestas, códigos de error) del panel admin — este archivo te dice **qué**
-> componente necesita **qué** dato; `API_CONTRACT.md` te dice **cómo** debe verse el
-> JSON de cada endpoint.
+> [`API_CONTRACT.md`](./API_CONTRACT.md) (panel admin) y
+> [`API_CONTRACT_TIENDA.md`](./API_CONTRACT_TIENDA.md) (CMS, catálogo, cuentas,
+> carrito/favoritos/comparar de la tienda) como la especificación HTTP exacta
+> (bodies, respuestas, códigos de error) — este archivo te dice **qué**
+> componente necesita **qué** dato; los `API_CONTRACT*.md` te dicen **cómo**
+> debe verse el JSON de cada endpoint. El código además tiene un comentario
+> `// TODO Backend` junto a cada punto exacto de integración — `grep -r "TODO
+> Backend"` para encontrarlos todos.
 >
 > Este archivo es la foto técnica completa. El proceso de trabajo día a día (qué se
 > cambió, qué falta, bugs abiertos) sigue viviendo en `docs/` (`docs/MANUAL.md`,
@@ -45,7 +49,7 @@ npm test
 | Rutas | `/`, `/catalogo`, `/carrito`, `/favoritos`, `/comparar`, `/categorias`, etc. | `/admin/*` |
 | Tipos de datos | `FeaturedProduct` (`data/products.ts`) | `Product`, `Order`, `Category`, `AuthSession` (`types/admin.ts`) |
 | Sesión | `AuthUser`/`StoredAccount` (`lib/auth-local.ts`), 100% `localStorage` | `AuthSession` (`lib/auth.ts`), cookie `chamo_admin_session` + copia en `localStorage` |
-| Se conecta a backend vía | Parcial: `GET /api/productos` ya existe (`app/api/productos/route.ts`); el resto (carrito, favoritos, comparar, cuentas) sigue en `localStorage`, sin endpoint todavía | `services/adminApi.ts` — contrato completo en `API_CONTRACT.md` |
+| Se conecta a backend vía | `GET /api/productos` ya existe; el resto (carrito, favoritos, comparar, cuentas, CMS) sigue en `localStorage` pero **ya tiene contrato HTTP completo** en `API_CONTRACT_TIENDA.md` — falta implementarlo | `services/adminApi.ts` — contrato completo en `API_CONTRACT.md` |
 
 Son dos catálogos de productos **distintos en el mock** (`FeaturedProduct` para la
 tienda, `Product` para el panel) que hoy leen el mismo `data/products.ts` con formas
@@ -59,13 +63,13 @@ probablemente los unifica en una sola tabla — ver [§5.4](#54-unificar-los-dos
 | Dato | Dónde vive hoy | Tipo / clave | ¿Ya hay endpoint? |
 | --- | --- | --- | --- |
 | Catálogo público | `data/products.ts` (22 SKUs de ejemplo) | `FeaturedProduct[]` | ✅ `GET /api/productos?q=&category=&brand=` |
-| Categorías (tienda) | `data/home.ts` → `mainCategories` | `MainCategory[]` | ❌ estático |
-| Carrito | `localStorage: chamo-cart-v1` | `CartLine[]` (`CartProvider.tsx`) | ❌ |
-| Favoritos | `localStorage: chamo-favorites-v1` | `string[]` (ids) | ❌ |
-| Comparar (máx. 3) | `localStorage: chamo-compare-v1` | `string[]` (ids) | ❌ |
-| Cuentas de la tienda | `localStorage: chamo-accounts-v1` | `StoredAccount[]` (`lib/auth-local.ts`) | ❌ |
-| Sesión de la tienda | `localStorage: chamo-session-v1` | `AuthUser` | ❌ |
-| CMS local (slider, categorías, footer, banners de página, equipo) | `localStorage: chamo-cms-v1` | `CmsState` (`lib/cms.ts`) | ❌ |
+| Categorías (tienda) | `data/home.ts` → `mainCategories`, overrides en CMS | `MainCategory[]` | 🟡 sin implementar — contrato: `API_CONTRACT_TIENDA.md` §1 (`site-content`) |
+| Carrito | `localStorage: chamo-cart-v1` | `CartLine[]` (`CartProvider.tsx`) | 🟡 sin implementar — contrato: `API_CONTRACT_TIENDA.md` §4 |
+| Favoritos | `localStorage: chamo-favorites-v1` | `string[]` (ids) | 🟡 sin implementar — contrato: `API_CONTRACT_TIENDA.md` §4 |
+| Comparar (máx. 3) | `localStorage: chamo-compare-v1` | `string[]` (ids) | 🟡 sin implementar — contrato: `API_CONTRACT_TIENDA.md` §4 |
+| Cuentas de la tienda | `localStorage: chamo-accounts-v1` | `StoredAccount[]` (`lib/auth-local.ts`) | 🟡 sin implementar — contrato: `API_CONTRACT_TIENDA.md` §3 |
+| Sesión de la tienda | `localStorage: chamo-session-v1` | `AuthUser` | 🟡 sin implementar — contrato: `API_CONTRACT_TIENDA.md` §3 |
+| CMS local (slider, categorías, footer, banners de página, equipo) | `localStorage: chamo-cms-v1` | `CmsState` (`lib/cms.ts`) | 🟡 sin implementar — contrato: `API_CONTRACT_TIENDA.md` §1, ver también §5.6 |
 | Sesión del panel admin | Cookie `chamo_admin_session` + `localStorage: chamo-admin-session-v1` | `AuthSession` (`types/admin.ts`) | 🟡 mock, ver §5 |
 | Productos del panel | En memoria (`services/adminApi.ts`, se reinicia con el server) | `Product[]` | 🟡 mock |
 | Pedidos del panel | En memoria (`services/adminApi.ts`) | `Order[]` | 🟡 mock |
@@ -241,25 +245,34 @@ el backend real (ver §5).
 ### 5.2 Tienda pública — catálogo
 
 Ya existe `GET /api/productos?q=&category=&brand=` (`app/api/productos/route.ts`,
-usa `searchCatalog()` de `data/products.ts`). Para un backend real: reemplazar
-`searchCatalog()`/`featuredProducts` por una consulta a base de datos con la misma
-forma `FeaturedProduct[]` — el resto de la tienda (`ProductCatalog`, `ProductCard`,
-`ProductModal`, etc.) no necesita cambios si el shape se mantiene.
+usa `searchCatalog()` de `data/products.ts`). Contrato completo, incluyendo el
+detalle por id y los relacionados (hoy sin ruta HTTP —
+`getProductById`/`getRelatedProducts` leen el array en el cliente):
+[`API_CONTRACT_TIENDA.md` §2](./API_CONTRACT_TIENDA.md#2-catálogo-público).
+Para un backend real: reemplazar `searchCatalog()`/`featuredProducts` por una
+consulta a base de datos con la misma forma `FeaturedProduct[]` — el resto de
+la tienda (`ProductCatalog`, `ProductCard`, `ProductModal`, etc.) no necesita
+cambios si el shape se mantiene.
 
 ### 5.3 Tienda pública — carrito, favoritos, comparar, cuentas
 
-Hoy **100% en `localStorage` del navegador** — no hay ningún endpoint ni mock de red
-para esto (a diferencia del panel admin). Decisiones a tomar antes de conectar:
+Hoy **100% en `localStorage` del navegador**. Contrato completo con
+body/respuesta de ejemplo:
+[`API_CONTRACT_TIENDA.md` §3 (cuentas)](./API_CONTRACT_TIENDA.md#3-cuentas-de-la-tienda-clientes)
+y [§4 (carrito/favoritos/comparar)](./API_CONTRACT_TIENDA.md#4-carrito-favoritos-y-comparar).
 
-- ¿El carrito/favoritos se sincronizan a una cuenta real, o siguen siendo por
-  dispositivo? Si se sincronizan, hace falta un endpoint por recurso
-  (`GET/POST/PUT /api/cart`, `/api/favorites`, etc.) y migrar `CartProvider.tsx` /
+- El carrito/favoritos **sí se sincronizan a la cuenta** una vez que hay sesión de
+  cliente (patrón por defecto documentado en el contrato: invitado sigue en
+  `localStorage`; al iniciar sesión se fusiona con el servidor sumando
+  cantidades repetidas por `productId`). Migrar `CartProvider.tsx` /
   `FavoritesProvider.tsx` / `CompareProvider.tsx` del patrón `useState` +
   `localStorage.setItem` a llamadas de red (mismo patrón que `adminApi.ts`: una
-  capa de funciones intermedia, no `fetch` disperso en los componentes).
+  capa de funciones intermedia, no `fetch` disperso en los componentes) —
+  manteniendo `localStorage` como respaldo cuando no hay sesión.
 - Las cuentas de la tienda (`lib/auth-local.ts`) son una demo funcional (salted
-  SHA-256, sin backend) — no están pensadas para producción tal cual. Cuando haya
-  login real de clientes, lo más simple es que reemplace también al panel admin
+  SHA-256 **en el cliente**, sin backend) — no están pensadas para producción
+  tal cual; el hash debe pasar a hacerse en el servidor. Cuando haya login real
+  de clientes, lo más simple es que reemplace también al panel admin
   (ver §5.4) en vez de mantener un tercer sistema de auth.
 
 ### 5.4 Unificar los dos catálogos y las dos sesiones
@@ -286,6 +299,17 @@ Hoy conviven, a propósito, dos pares de conceptos duplicados:
 - `discountPercent` es un **porcentaje (0–100)**, no un monto en soles.
 - Las imágenes de `FeaturedProduct.images[0]` es siempre la principal — no hay un
   campo `image` aparte (se quitó a propósito, ver `docs/cambios/2026-09-11-backend-ready-fixes.md`).
+
+### 5.6 CMS del panel (banners, categorías, footer, canales, equipo)
+
+Contrato exacto: [`API_CONTRACT_TIENDA.md` §1](./API_CONTRACT_TIENDA.md#1-contenido-del-sitio-cms-del-panel)
+(`GET/PUT /api/v1/site-content`). Guía paso a paso en
+[`docs/MANUAL.md` A.13.5](./docs/MANUAL.md#a135-cms-del-panel-banners-categorías-footer-canales-equipo)
+para no repetirla en dos archivos. Resumen: hoy `ContentProvider.tsx` lee/escribe
+`localStorage` (`chamo-cms-v1`, tipo `CmsState` de `lib/cms.ts`) — **un admin que
+edita `/admin/banners` (o categorías/footer/canales/equipo) solo lo ve en su
+propio navegador**, no hay nada compartido entre visitantes todavía. Es la
+pieza más urgente de conectar si el cliente va a operar el sitio en producción.
 
 ---
 

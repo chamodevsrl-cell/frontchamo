@@ -272,6 +272,10 @@ export function updateAccountProfile(
   return { ok: true, accounts: next, account };
 }
 
+// TODO Backend: esta función hashea la contraseña EN EL CLIENTE — solo válido para el
+// mock/demo. Un backend real debe recibir la contraseña en texto plano por HTTPS y
+// hashearla del lado del servidor (bcrypt/argon2), no reusar hashPassword() de acá.
+// Ver API_CONTRACT_TIENDA.md §3 (POST /api/v1/store/register).
 export async function createAccount(
   accounts: StoredAccount[],
   input: { name: string; email: string; password: string },
@@ -302,6 +306,7 @@ export async function createAccount(
   };
 }
 
+// TODO Backend: reemplazar con fetch('/api/v1/store/login') — ver API_CONTRACT_TIENDA.md §3.
 export async function verifyAccount(
   accounts: StoredAccount[],
   email: string,

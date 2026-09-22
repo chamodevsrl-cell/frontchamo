@@ -7,7 +7,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -104,9 +103,6 @@ function writeLocal(key: string, value: unknown): boolean {
   }
 }
 
-/** Disparado al iniciar o cerrar sesión (no en la hidratación inicial) — ver `IntroSplash.tsx`. */
-export const AUTH_TRANSITION_EVENT = "chamo:auth-transition";
-
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -129,6 +125,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // TODO Backend: reemplazar la hidratación de cuentas/sesión de la tienda (todo este
+    // efecto) con fetch('/api/v1/store/session') — ver API_CONTRACT_TIENDA.md §3. La sesión
+    // del panel (readPanelSession/hasPanelSession) sigue el flujo de API_CONTRACT.md, no cambia acá.
     const loadedAccounts = parseAccounts(window.localStorage.getItem(ACCOUNTS_KEY));
     const loadedSession = parseSession(window.localStorage.getItem(SESSION_KEY));
     const loadedProfiles = parseProfiles(window.localStorage.getItem(PROFILES_KEY));
@@ -160,24 +159,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       window.localStorage.removeItem(SESSION_KEY);
     }
-  }, [user, ready]);
-
-  const authTransitionState = useRef<{ started: boolean; hadUser: boolean }>({
-    started: false,
-    hadUser: false,
-  });
-
-  useEffect(() => {
-    if (!ready) return;
-    if (!authTransitionState.current.started) {
-      authTransitionState.current = { started: true, hadUser: Boolean(user) };
-      return;
-    }
-    const hasUser = Boolean(user);
-    if (authTransitionState.current.hadUser !== hasUser) {
-      window.dispatchEvent(new Event(AUTH_TRANSITION_EVENT));
-    }
-    authTransitionState.current.hadUser = hasUser;
   }, [user, ready]);
 
   useEffect(() => {
@@ -224,6 +205,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
+      // TODO Backend: reemplazar verifyAccount() (hash en el cliente) con
+      // fetch('/api/v1/store/login') — ver API_CONTRACT_TIENDA.md §3.
       const account = await verifyAccount(accounts, email, password);
       if (account) {
         persistUser(account);
@@ -244,6 +227,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(
     async (name: string, email: string, password: string) => {
+      // TODO Backend: reemplazar createAccount() (hash en el cliente) con
+      // fetch('/api/v1/store/register') — ver API_CONTRACT_TIENDA.md §3.
       const result = await createAccount(accounts, { name, email, password });
       if (!result.ok) return result.error;
       setAccounts((current) => [...current, result.account]);
@@ -277,6 +262,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = useCallback(
     async (patch: ProfilePatch) => {
+      // TODO Backend: para cuentas de tienda (no panel), reemplazar el guardado en
+      // localStorage de más abajo con fetch('/api/v1/store/profile', { method: 'PATCH' })
+      // — ver API_CONTRACT_TIENDA.md §3. El bloque `if (hasPanelSession)` de abajo ya usa
+      // updateOwnProfileAction() del panel (API_CONTRACT.md) y no cambia.
       if (!user) return "Inicia sesión para editar tu perfil.";
       const requirePhone = hasPanelSession || user.role === "admin";
       const invalid = validateProfilePatch(patch, { requirePhone });
@@ -337,6 +326,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const logout = useCallback(() => {
+    // TODO Backend: para cuentas de tienda, además llamar fetch('/api/v1/store/logout')
+    // — ver API_CONTRACT_TIENDA.md §3. El logout del panel (abajo) ya sigue API_CONTRACT.md.
     setUser(null);
     setHasPanelSession(false);
     setPanelSession(null);
