@@ -551,6 +551,7 @@ describe("CMS local (footer, banners de página, equipo)", () => {
     expect(pages.map((page) => page.id)).toEqual([
       "nosotros",
       "contacto",
+      "ofertas",
       "catalogo",
     ]);
   });

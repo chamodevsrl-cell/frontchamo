@@ -4,6 +4,7 @@ import { NOSOTROS_BANNER_ALT, NOSOTROS_BANNER_SRC } from "@/data/company";
 export const PAGE_BANNER_IDS = [
   "nosotros",
   "contacto",
+  "ofertas",
   "catalogo",
 ] as const;
 
@@ -31,6 +32,13 @@ export const pageBannerCatalog: readonly PageBannerSeed[] = [
     href: "/contacto",
     src: CONTACT_BANNER_SRC,
     alt: CONTACT_BANNER_ALT,
+  },
+  {
+    id: "ofertas",
+    label: "Ofertas",
+    href: "/ofertas",
+    src: "/images/categorias/pinturas.jpg",
+    alt: "Ofertas y descuentos mayoristas de Chamo Import",
   },
   {
     id: "catalogo",

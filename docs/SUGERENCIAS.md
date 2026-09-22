@@ -2,7 +2,24 @@
 
 Última actualización: **2026-09-22**
 
-## 🧹 Ofertas: se quita el banner anterior + límite 3-4 imágenes (2026-09-22)
+## ↩️ Ofertas: se revierte la franja de imágenes, se rediseña desde cero (2026-09-22)
+
+- [x] 2026-09-22 — El usuario pidió deshacer por completo la franja de
+  imágenes de Ofertas (las tres entradas de abajo marcadas **[REVERTIDO]**)
+  para rediseñarla desde cero. Se borraron `OffersBanner.tsx`,
+  `AdminOffersBannerEditor.tsx` y el campo `offerBanner`/tipo
+  `CmsOfferBannerTile` de `lib/cms.ts`. `/ofertas` volvió a usar el banner
+  ancho normal (`SitePageBanner`, editable en `/admin/banners` igual que
+  Nosotros/Contacto/Catálogo). Se conservó lo que no era parte de la franja:
+  el campo **% de descuento** del wizard de producto y la página
+  `/admin/ofertas` con su lista de solo lectura de productos en oferta.
+  Detalle: [`cambios/2026-09-22-ofertas-revertir-franja-imagenes.md`](./cambios/2026-09-22-ofertas-revertir-franja-imagenes.md).
+- [ ] Cuando se retome el diseño de esta pieza, partir de la referencia
+  visual que ya mandó el usuario (panel oscuro + fila de imágenes con enlace
+  a producto/URL) — el historial de la versión anterior queda en las tres
+  notas de cambios de abajo por si sirve de punto de partida.
+
+## 🧹 [REVERTIDO] Ofertas: se quita el banner anterior + límite 3-4 imágenes (2026-09-22)
 
 - [x] 2026-09-22 — Ya no existe el banner de una sola imagen para Ofertas
   (se quitó de `/admin/banners` → "Otras páginas"); la franja de imágenes
@@ -13,7 +30,11 @@
   sin foto subida tumbaba `next/image` en la tienda pública. Detalle:
   [`cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md`](./cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md).
 
-## 🏷️ Ofertas: editor propio en /admin/ofertas + % de descuento (2026-09-22)
+## 🏷️ [PARCIALMENTE REVERTIDO] Ofertas: editor propio en /admin/ofertas + % de descuento (2026-09-22)
+
+> El editor de franja que se movió acá se borró (ver la entrada de arriba).
+> Lo que sigue vigente de esta nota: el campo **% de descuento** del wizard
+> de producto y la lista de solo lectura de `/admin/ofertas`.
 
 - [x] 2026-09-22 — El editor de la franja de imágenes se movió de
   `/admin/banners` a `/admin/ofertas` (ya tenía su propio permiso `ofertas`
@@ -32,7 +53,7 @@
   [`API_CONTRACT_TIENDA.md` §2](../API_CONTRACT_TIENDA.md#2-catálogo-público)
   y `docs/backend-handoff/MAPA-CONEXION.md`.
 
-## 🖼️ Ofertas: franja de imágenes enlazadas a producto o URL (2026-09-22)
+## 🖼️ [REVERTIDO] Ofertas: franja de imágenes enlazadas a producto o URL (2026-09-22)
 
 - [x] 2026-09-22 — El banner de `/ofertas` ahora puede reemplazarse por una
   franja de imágenes subidas desde `/admin/banners`, cada una enlazada a un

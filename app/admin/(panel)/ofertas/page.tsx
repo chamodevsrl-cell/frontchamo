@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
-import AdminOffersBannerEditor from "@/components/admin/AdminOffersBannerEditor";
 import CmsImage from "@/components/CmsImage";
 import { featuredProducts } from "@/data/products";
 import { formatPrice } from "@/lib/format";
@@ -13,12 +12,13 @@ export default function AdminOfertasPage() {
   return (
     <div className="space-y-6">
       <p className="max-w-3xl text-sm text-brand-dark/70">
-        Campañas y descuentos del catálogo público. La franja de abajo
-        reemplaza el banner de <code>/ofertas</code>; la lista de productos
-        muestra lo que hoy se ve en esa página.
+        Campañas y descuentos del catálogo público. El banner de{" "}
+        <code>/ofertas</code> se edita en{" "}
+        <Link href="/admin/banners" className="font-semibold text-brand-primary hover:underline">
+          Banners
+        </Link>
+        ; la lista de abajo muestra lo que hoy se ve en esa página.
       </p>
-
-      <AdminOffersBannerEditor />
 
       <section className="rounded-2xl border border-brand-dark/10 bg-white p-5 shadow-sm">
         <h2 className="font-display text-lg font-bold text-brand-dark">

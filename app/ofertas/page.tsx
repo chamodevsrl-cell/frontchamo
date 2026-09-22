@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
-import OffersBanner from "@/components/OffersBanner";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
+import SitePageBanner from "@/components/SitePageBanner";
 import { featuredProducts } from "@/data/products";
 
 export const metadata: Metadata = {
@@ -17,7 +17,8 @@ export default function OfertasPage() {
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
       <Navbar />
       <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
-        <OffersBanner
+        <SitePageBanner
+          pageId="ofertas"
           title="OFERTAS"
           stamp={{ lead: "OFERTAS", accent: "DESCUENTOS", variant: "offer" }}
           subtitle="Selección con descuento referencial para mayoristas. Stock y precios de ejemplo."

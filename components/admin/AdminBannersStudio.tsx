@@ -99,12 +99,7 @@ function AdminBannersStudioForm({ cms }: { cms: CmsState }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="max-w-2xl text-sm text-brand-dark/70">
           Abre una tarjeta para cambiar la imagen del slider de inicio o el
-          banner de Nosotros, Contacto y Catálogo. La franja de imágenes de
-          Ofertas (con enlace a producto) ya no se edita acá — se mudó a{" "}
-          <Link href="/admin/ofertas" className="font-semibold text-brand-primary hover:underline">
-            Ofertas
-          </Link>
-          .
+          banner de Nosotros, Contacto, Ofertas y Catálogo.
         </p>
         <div className="flex flex-wrap gap-2">
           <button

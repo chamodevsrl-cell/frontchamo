@@ -174,9 +174,9 @@ raíz del repo.
 El dashboard pinta **DashboardKPIs** (`totalSales`, `pendingOrders`,
 `lowStockCount`, `newClientsCount`). Productos y pedidos ya listan/crean/cambian
 estado contra el mock. Banners y categorías del CMS local siguen en
-`/admin/banners` y `/admin/categorias`; `/admin/ofertas` tiene su propio
-editor de franja de imágenes (ver A.12 más abajo). El resto del menú es
-placeholder.
+`/admin/banners` y `/admin/categorias`; `/admin/ofertas` tiene una lista de
+solo lectura de los productos en oferta (ver A.12 más abajo). El resto del
+menú es placeholder.
 Navegar **dentro** de `/admin` no dispara el BrandLoader (solo al entrar o salir
 del panel — ver A.5b).
 
@@ -340,8 +340,8 @@ abierto. El menú desplegable de la cuenta (foto/avatar) ya no repite ese enlace
 | Productos → Crear producto | `/admin/productos/nuevo` | ✅ Real — wizard de 4 fases (Datos/Detalle/Precios/Especs) con vista previa en vivo; imágenes por **galería/carpetas** (máx **60 MB** por imagen, `MAX_PRODUCT_IMAGE_BYTES` en `lib/cms-image.ts`) o **URL**; `createProduct()` se llama al terminar la fase 4; el `<select>` de categoría une `getCategories()` + líneas del CMS. Fase 3 suma **En oferta + precio anterior + % de descuento** (badge "-X% OFF", independiente del precio anterior); Fase 4 suma **Presentaciones de venta** (unidad/docena/caja o una creada a mano, con su contenido) |
 | Productos → Ver productos (acciones) | `/admin/productos` | ✅ Real — cada fila tiene **Ver** (modal de solo lectura), **Editar** (`/admin/productos/[id]/editar`, mismo wizard precargado, llama `updateProduct()`) y **Eliminar** (confirmación, `deleteProduct()`) — `components/admin/AdminProductsTable.tsx` |
 | Pedidos | `/admin/pedidos` | ✅ Real — `getOrders()` + cambiar estado (`updateOrderStatus`) |
-| Ofertas | `/admin/ofertas` | ✅ Real — editor de la **franja de imágenes** de `/ofertas` (`AdminOffersBannerEditor.tsx`) + lista de solo lectura de los productos con `badge === "oferta"` del catálogo público — ver debajo |
-| Banners | `/admin/banners` | ✅ Real — cartas para el slider del home y los banners de Nosotros, Contacto y Catálogo (`chamo-cms-v1`). Ofertas ya no tiene banner de una sola imagen — se editó su propia franja de imágenes desde `/admin/ofertas` |
+| Ofertas | `/admin/ofertas` | ✅ Real (parcial) — lista de solo lectura de los productos con `badge === "oferta"` del catálogo público, con aviso de que es un catálogo separado del panel — ver debajo. El banner de `/ofertas` se sigue editando en Banners |
+| Banners | `/admin/banners` | ✅ Real — cartas para el slider del home y los banners de Nosotros, Contacto, Ofertas y Catálogo (`chamo-cms-v1`) |
 | Categorías | `/admin/categorias` | ✅ Real — cartas (nombre, descripción, recuento de productos) + modal para editar/agregar; imagen por URL o galería; persiste en CMS (`customCategories`) y en el mock `createCategory`/`updateCategory` |
 | Equipo | `/admin/equipo` | ✅ Real — cartas de colaboradores (se ven en `/nosotros`) |
 | Ajustes | `/admin/ajustes` | ✅ Real — desglose: Footer (`/admin/ajustes/footer`) y Canales de atención (`/admin/ajustes/canales`). `/admin/configuracion` redirige al índice |
@@ -349,30 +349,24 @@ abierto. El menú desplegable de la cuenta (foto/avatar) ya no repite ese enlace
 | Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`). El login copia `permissions` a `AuthSession`; `AdminShell` filtra el sidebar |
 | Marcas, Clientes, Inventario, Reportes | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
 
-**Franja de imágenes de Ofertas** (`/admin/ofertas`, componente
-`AdminOffersBannerEditor.tsx` — antes vivía en `/admin/banners`, se movió
-porque el sidebar ya tiene un permiso `ofertas` propio, distinto de
-`banners`): reemplaza el banner ancho normal de `/ofertas` por una fila de
-imágenes, cada una enlazada a un producto puntual **o** a una URL
-personalizada (clic → abre el producto en el modal, o navega a la URL si se
-completó una). CMS: `CmsOfferBannerTile[]` (`lib/cms.ts`, campo
-`offerBanner` de `CmsState`) — `{ id, image, alt, label, productId, url }`;
-`productId` se resuelve contra `data/products.ts`; si `url` tiene contenido,
-gana sobre `productId` (el `<select>` de producto se deshabilita en el
-panel para dejarlo claro). Necesita **entre 3 y 4** imágenes completas (con
-foto — no solo producto/URL) para reemplazar el banner; con menos de 3, o
-sin ninguna, se ve un banner simple sin foto (ya no existe un banner de una
-sola imagen editable para Ofertas — se quitó de `/admin/banners`). Front
-público: `components/OffersBanner.tsx`, usado en `app/ofertas/page.tsx`.
-`/admin/ofertas` también lista (solo lectura) los productos con
-`badge === "oferta"` del catálogo público, con un aviso: esa lista **no** se
-actualiza marcando "En oferta" en `/admin/productos` — son dos catálogos
-separados hasta que haya backend real. Detalle:
-[`docs/cambios/2026-09-22-franja-imagenes-ofertas.md`](./cambios/2026-09-22-franja-imagenes-ofertas.md)
-y
-[`docs/cambios/2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md`](./cambios/2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md)
-y
-[`docs/cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md`](./cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md).
+**Ofertas** (`/admin/ofertas`): lista de solo lectura de los productos con
+`badge === "oferta"` del catálogo público (`data/products.ts`), con un
+aviso: esa lista **no** se actualiza marcando "En oferta" en
+`/admin/productos` — son dos catálogos separados hasta que haya backend
+real. El wizard de producto (Fase 3) sí tiene **"En oferta" + precio
+anterior + % de descuento** (badge "-X% OFF") desde
+[`docs/cambios/2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md`](./cambios/2026-09-22-ofertas-panel-dedicado-descuento-porcentaje.md).
+
+> Se probó una franja de imágenes con enlace a producto para reemplazar el
+> banner de `/ofertas` (`OffersBanner.tsx` / `AdminOffersBannerEditor.tsx` /
+> campo `offerBanner` del CMS) — se **revirtió** para rediseñarla desde cero.
+> El banner de `/ofertas` volvió a ser el banner ancho normal, editable en
+> `/admin/banners` igual que Nosotros/Contacto/Catálogo. Historial completo
+> en
+> [`docs/cambios/2026-09-22-franja-imagenes-ofertas.md`](./cambios/2026-09-22-franja-imagenes-ofertas.md),
+> [`docs/cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md`](./cambios/2026-09-22-ofertas-quitar-banner-anterior-limite-3-4.md)
+> y
+> [`docs/cambios/2026-09-22-ofertas-revertir-franja-imagenes.md`](./cambios/2026-09-22-ofertas-revertir-franja-imagenes.md).
 
 **Datos:** todo lo "real" arriba corre contra `productsDb`/`ordersDb` **en memoria del
 proceso de Next** (dentro de `services/adminApi.ts`) — se reinician con cada reinicio
@@ -662,8 +656,8 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/productos` | Listado mock (`getProducts`). Query `?q=` |
 | `/admin/productos/nuevo` | Alta mock (`createProduct`) |
 | `/admin/pedidos` | Pedidos mock + cambio de estado |
-| `/admin/ofertas` | Editor de la franja de imágenes de `/ofertas` (foto + producto o URL) + lista de productos en oferta del catálogo público |
-| `/admin/banners` | Cartas para editar el slider del home y los banners de Nosotros/Contacto/Catálogo |
+| `/admin/ofertas` | Lista de solo lectura de los productos en oferta del catálogo público |
+| `/admin/banners` | Cartas para editar el slider del home y los banners de Nosotros/Contacto/Ofertas/Catálogo |
 | `/admin/categorias` | Cartas de líneas: nombre, descripción, cantidad de productos, editar/agregar |
 | `/admin/equipo` | Cartas de colaboradores (alta, foto, cargo, bio) |
 | `/admin/ajustes` | Índice de ajustes (Footer y Canales). Alias: `/admin/configuracion` |
@@ -671,7 +665,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/ajustes/canales` | WhatsApp (botón flotante), teléfono para llamar, correo y redes |
 | `/nosotros` | Banner CMS, historia, misión, visión, **equipo de trabajo en cartas** y valores |
 | `/contacto` | Banner CMS **NUESTRO CONTACTO**, tarjetas y mapa leen el footer de Ajustes, formulario WhatsApp |
-| `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** (o, si el admin cargó imágenes en la franja de Ofertas, esa franja en su lugar — clic en una imagen abre el producto que le hayan asignado) y productos en oferta |
+| `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** y productos en oferta |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
 | `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
 | Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña, **editar perfil** (`/cuenta/perfil`) y cerrar sesión (este navegador) |
@@ -687,8 +681,6 @@ el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). El CMS local
 (`chamo-cms-v1`) cubre:
 
 - Banners (home + páginas) → `/admin/banners`
-- Franja de imágenes de Ofertas (cada imagen enlazada a un producto o a una
-  URL) → `/admin/ofertas`
 - Categorías (cartas, alta y foto) → `/admin/categorias`
 - Footer (dirección, mapa, pagos) → `/admin/ajustes/footer`
 - Canales de atención (WhatsApp, llamadas, correo, redes) → `/admin/ajustes/canales`
