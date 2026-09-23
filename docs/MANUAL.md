@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-22**
+Última actualización: **2026-09-23**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada

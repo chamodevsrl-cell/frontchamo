@@ -1,6 +1,6 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-22**
+Última actualización: **2026-09-23**
 
 ## 📏 Nueva sección "Unidades de medida" en el panel (2026-09-22)
 

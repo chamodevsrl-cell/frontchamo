@@ -27,6 +27,28 @@ te dice en qué orden leerlos y qué archivo de código mirar por cada pieza.
    en prosa de por qué el orden recomendado es ese, o el detalle línea por
    línea de una pieza puntual (por ejemplo A.13.5 para el CMS).
 
+## Novedades para el backend (2026-09-23)
+
+Lo que cambió en el front y te afecta al conectar:
+
+1. **`GET /api/v1/auth/session` ya es obligatorio para la tienda.** Al cargar
+   cualquier página, `AuthProvider` llama a `verifyAdminSessionAction()`
+   (`app/admin/actions.ts`) y solo muestra **Administrar** (en el menú del
+   perfil) si responde `200`. Con `401` borra la sesión local del panel.
+   Mock: `verifyAdminSession(token)` en `services/adminApi.ts` (usuario
+   existe, activo y con rol). Contrato: `API_CONTRACT.md` → Auth.
+2. **`site-content` suma la clave `brands`** (marcas del carrusel "Marcas
+   distribuidoras", editables en `/admin/marcas`, permiso `marcas`). Array
+   ordenado `{ id, name, src, hidden? }`; `src` puede ser data URL base64
+   hasta que exista `POST /api/v1/uploads`. Contrato:
+   `API_CONTRACT_TIENDA.md` §1. Si no hay fila guardada, devolver
+   `emptyCmsState` (trae las 10 marcas de fábrica).
+3. Solo UI (sin impacto en endpoints): Pedidos y Productos del panel se ven
+   como cards en móvil; "Administrar" salió de la barra del Navbar; el
+   carrusel de marcas también aparece en `/ofertas`.
+
+Detalle de cada cambio: `docs/cambios/2026-09-23-*.md`.
+
 ## Cómo está marcado en el código
 
 Cada punto exacto donde hoy hay un mock o `localStorage` que hay que

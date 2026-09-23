@@ -201,9 +201,11 @@ reemplazar una sola imagen cuenta:
 Flujo obligatorio por solicitud: código/asset → nota en `docs/cambios/` → actualizar
 `MANUAL.md` (A y/o B según aplique) → actualizar `SUGERENCIAS.md` → commit + push.
 
-Último avance (2026-09-16): cualquier rol edita su perfil en `/cuenta/perfil`
-(foto, nombre, teléfono; RUC en `/cuenta/empresa`). Detalle:
-[`docs/cambios/2026-09-16-editar-perfil.md`](docs/cambios/2026-09-16-editar-perfil.md).
+Último avance (2026-09-23): marcas del carrusel editables en `/admin/marcas`
+(CMS `brands`); "Administrar" solo con sesión del panel verificada por el
+servidor (`GET /api/v1/auth/session`) y dentro del menú del perfil; Pedidos y
+Productos del panel en cards en móvil. Resumen para el backend:
+[`docs/backend-handoff/README.md`](docs/backend-handoff/README.md) → "Novedades".
 
 ## 10. Pendientes conocidos
 

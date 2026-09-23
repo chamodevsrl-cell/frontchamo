@@ -11,7 +11,7 @@ errores) **no** está acá — está en los contratos; esta tabla es solo el
 
 | Pieza | Vive hoy en (código) | Endpoint(s) | Contrato |
 | --- | --- | --- | --- |
-| Login / logout / sesión del panel | `lib/auth.ts`, `app/admin/actions.ts` | `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`, `GET /api/v1/auth/session` | [`API_CONTRACT.md`](../../API_CONTRACT.md#auth) |
+| Login / logout / sesión del panel | `lib/auth.ts`, `app/admin/actions.ts` (`loginAdminAction`, `verifyAdminSessionAction`), `services/adminApi.ts` (`loginAdmin`, `verifyAdminSession`) | `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`, `GET /api/v1/auth/session` | [`API_CONTRACT.md`](../../API_CONTRACT.md#auth) |
 | KPIs del dashboard | `services/adminApi.ts` → `getDashboardKPIs()` | `GET /api/v1/dashboard/kpis` | [`API_CONTRACT.md`](../../API_CONTRACT.md) |
 | Productos (CRUD) | `services/adminApi.ts`, `components/admin/AdminNewProductForm.tsx`, `AdminProductsTable.tsx`, ruta `app/admin/(panel)/productos/[id]/editar/` | `GET/POST /api/v1/products`, `GET/PUT/DELETE /api/v1/products/:id` | [`API_CONTRACT.md`](../../API_CONTRACT.md) |
 | Categorías (panel) | `services/adminApi.ts` | `GET/POST /api/v1/categories`, `PUT /api/v1/categories/:id` | [`API_CONTRACT.md`](../../API_CONTRACT.md) |
@@ -19,22 +19,34 @@ errores) **no** está acá — está en los contratos; esta tabla es solo el
 | Roles y usuarios del panel | `services/adminApi.ts`, `AdminUsersCards.tsx`, `AdminRolesView.tsx` | `GET/POST /api/v1/roles`, `GET/POST /api/v1/users`, `PUT /api/v1/users/:userId`, `PUT /api/v1/users/:userId/status`, `DELETE /api/v1/users/:userId`, `PUT /api/v1/users/me` | [`API_CONTRACT.md`](../../API_CONTRACT.md) |
 
 **Marcador en código:** `// TODO Backend` al lado de cada función de
-`services/adminApi.ts` (19 en total) y en `app/admin/actions.ts`.
+`services/adminApi.ts` (23 en total) y en `app/admin/actions.ts`.
+
+**Importante — `GET /api/v1/auth/session` ya se usa en la tienda:** al cargar
+cualquier página, `AuthProvider` llama a `verifyAdminSessionAction()` y
+**solo** muestra la opción "Administrar" (menú del perfil) si el servidor
+responde `200`. Con `401` el front borra la sesión local del panel. Hoy el
+mock valida que el usuario exista, no esté suspendido y tenga rol; el backend
+real debe hacer lo mismo con el token (y emitir la cookie `httpOnly` +
+`Secure`, con lo que la copia `chamo-admin-session-v1` en `localStorage`
+deja de hacer falta).
 
 ---
 
 ## 1. Contenido del sitio (CMS) — lo más urgente para el negocio
 
 Hoy un admin que edita `/admin/banners`, `/admin/categorias`,
-`/admin/ajustes/*` o `/admin/equipo` **solo lo ve en su propio navegador**.
+`/admin/ajustes/*`, `/admin/equipo` o `/admin/marcas` **solo lo ve en su
+propio navegador**.
 
 | Pieza | Vive hoy en (código) | Endpoint(s) | Contrato |
 | --- | --- | --- | --- |
-| Slider, categorías (overrides), footer, banners de página (incl. Ofertas), equipo, banner de 4 secciones de Ofertas | `components/ContentProvider.tsx` (`localStorage: chamo-cms-v1`), `lib/cms.ts` (tipo `CmsState`) | `GET/PUT /api/v1/site-content` | [`API_CONTRACT_TIENDA.md` §1](../../API_CONTRACT_TIENDA.md#1-contenido-del-sitio-cms-del-panel) |
+| Slider, categorías (overrides), footer, banners de página (incl. Ofertas), equipo, banner de 4 secciones de Ofertas, **marcas del carrusel** (`brands`) | `components/ContentProvider.tsx` (`localStorage: chamo-cms-v1`), `lib/cms.ts` (tipo `CmsState`) | `GET/PUT /api/v1/site-content` | [`API_CONTRACT_TIENDA.md` §1](../../API_CONTRACT_TIENDA.md#1-contenido-del-sitio-cms-del-panel) |
 
 Lo editan (sin cambios de UI necesarios, todos pasan por `useSiteContent()`):
 `AdminBannersStudio.tsx`, `AdminCategoriesCards.tsx`,
-`AdminFooterSettings.tsx`, `AdminChannelsSettings.tsx`, `AdminTeamCards.tsx`.
+`AdminFooterSettings.tsx`, `AdminChannelsSettings.tsx`, `AdminTeamCards.tsx`,
+`AdminBrandsCards.tsx` (marcas: `brands`, permiso `marcas`; los logos pueden
+venir como data URL base64 → ver §5).
 
 **Marcador en código:** `ContentProvider.tsx` (2 `TODO Backend`, en los
 `useEffect` de lectura y escritura).
