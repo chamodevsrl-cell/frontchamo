@@ -129,8 +129,17 @@ export function getCategoryBySlug(slug: string) {
   return mainCategories.find((category) => category.slug === slug);
 }
 
-/** Logos en public/images/marcas/ */
-export const distributorBrands = [
+/** Marca del carrusel "Marcas distribuidoras". `src`: ruta, URL o data URL (CMS). */
+export type DistributorBrand = {
+  id: string;
+  name: string;
+  src: string;
+  /** Solo CMS: la marca queda guardada pero no sale en el carrusel. */
+  hidden?: boolean;
+};
+
+/** Valores de fábrica (logos en public/images/marcas/). Editables en /admin/marcas. */
+export const distributorBrands: DistributorBrand[] = [
   { id: "indeco", name: "INDECO", src: "/images/marcas/indeco.svg" },
   { id: "bticino", name: "BTICINO", src: "/images/marcas/bticino.svg" },
   { id: "3m", name: "3M", src: "/images/marcas/3m.svg" },

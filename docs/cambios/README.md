@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-23 | Panel: Marcas editables (nueva marca, logo, orden, ocultar) para el carrusel | [2026-09-23-admin-marcas-editables.md](./2026-09-23-admin-marcas-editables.md) |
 | 2026-09-23 | Panel: Pedidos y Productos en cards en móvil/tablet (tabla solo en escritorio) | [2026-09-23-admin-tablas-a-cards-en-movil.md](./2026-09-23-admin-tablas-a-cards-en-movil.md) |
 | 2026-09-23 | "Administrar" solo con sesión del panel verificada por el servidor | [2026-09-23-administrar-solo-con-sesion-verificada.md](./2026-09-23-administrar-solo-con-sesion-verificada.md) |
 | 2026-09-23 | Navbar: "Administrar" solo en el menú del perfil (fuera de la barra) | [2026-09-23-navbar-quitar-administrar-de-la-barra.md](./2026-09-23-navbar-quitar-administrar-de-la-barra.md) |

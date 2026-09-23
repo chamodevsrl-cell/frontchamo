@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { distributorBrands } from "@/data/home";
+import { useSiteContent } from "@/components/ContentProvider";
 import { isBrokenImage } from "@/lib/image";
 
 function BrandCard({
@@ -63,9 +63,13 @@ export default function BrandsCarousel({
   /** "section": franja a todo el ancho (home). "inline": tarjeta dentro de un `main` ya con padding (p. ej. /ofertas). */
   variant?: "section" | "inline";
 }) {
+  // Marcas del CMS (/admin/marcas) o valores de fábrica de data/home.ts.
+  const { brands } = useSiteContent();
   // Duplicado para loop continuo
-  const loop = [...distributorBrands, ...distributorBrands];
+  const loop = [...brands, ...brands];
   const inline = variant === "inline";
+
+  if (brands.length === 0) return null;
 
   return (
     <section
@@ -98,7 +102,11 @@ export default function BrandsCarousel({
           <div className="overflow-hidden">
             <ul className="animate-brands-marquee flex w-max gap-3 py-1 sm:gap-4">
               {loop.map((brand, index) => (
-                <li key={`${brand.id}-${index}`} aria-hidden={index >= distributorBrands.length}>
+                <li
+                  // src en la key: al cambiar el logo en el CMS se reinicia el fallback de error
+                  key={`${brand.id}-${index}-${brand.src.slice(-32)}`}
+                  aria-hidden={index >= brands.length}
+                >
                   <BrandCard name={brand.name} src={brand.src} />
                 </li>
               ))}

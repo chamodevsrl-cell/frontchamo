@@ -9,7 +9,12 @@ import {
   PHONE_DISPLAY,
   SOCIAL_LINKS,
 } from "@/data/contact";
-import { mainCategories, type MainCategory } from "@/data/home";
+import {
+  distributorBrands,
+  mainCategories,
+  type DistributorBrand,
+  type MainCategory,
+} from "@/data/home";
 import { slides as defaultSlides, type Slide } from "@/data/media";
 import {
   pageBannerCatalog,
@@ -83,6 +88,9 @@ export type CmsPageBannerOverride = {
 
 export type CmsTeamMember = TeamMember;
 
+/** Marca del carrusel "Marcas distribuidoras" (home y /ofertas). */
+export type CmsBrand = DistributorBrand;
+
 /** Una de las 4 secciones del banner de /ofertas — enlaza a un producto o a una URL. */
 export type CmsOfferBannerTile = {
   id: string;
@@ -107,6 +115,7 @@ export type CmsState = {
   pageBanners: CmsPageBannerOverride[];
   team: CmsTeamMember[];
   offerBanner: CmsOfferBannerTile[];
+  brands: CmsBrand[];
 };
 
 export type ResolvedPageBanner = {
@@ -149,6 +158,10 @@ export function defaultFooter(): CmsFooter {
   };
 }
 
+export function defaultBrands(): CmsBrand[] {
+  return distributorBrands.map((brand) => ({ ...brand }));
+}
+
 export const emptyCmsState: CmsState = {
   slides: [],
   categories: [],
@@ -157,6 +170,7 @@ export const emptyCmsState: CmsState = {
   pageBanners: [],
   team: defaultTeam.map((member) => ({ ...member })),
   offerBanner: [],
+  brands: defaultBrands(),
 };
 
 export function parseCms(raw: string | null): CmsState {
@@ -190,6 +204,9 @@ export function parseCms(raw: string | null): CmsState {
             label: typeof tile.label === "string" ? tile.label : "",
           }))
         : [],
+      brands: Array.isArray(parsed.brands)
+        ? parsed.brands.filter(isBrand)
+        : defaultBrands(),
     };
   } catch {
     return cloneCms(emptyCmsState);
@@ -243,6 +260,17 @@ function isTeamMember(value: unknown): value is CmsTeamMember {
     typeof member.name === "string" &&
     typeof member.role === "string" &&
     typeof member.photo === "string"
+  );
+}
+
+function isBrand(value: unknown): value is CmsBrand {
+  const brand = value as CmsBrand;
+  return (
+    !!brand &&
+    typeof brand.id === "string" &&
+    brand.id.length > 0 &&
+    typeof brand.name === "string" &&
+    typeof brand.src === "string"
   );
 }
 
@@ -388,6 +416,10 @@ export function mergePageBanners(
 
 export function visibleTeam(members: CmsTeamMember[]): CmsTeamMember[] {
   return members.filter((member) => !member.hidden);
+}
+
+export function visibleBrands(brands: CmsBrand[]): CmsBrand[] {
+  return brands.filter((brand) => !brand.hidden && brand.name.trim().length > 0);
 }
 
 export function phoneDigits(display: string) {

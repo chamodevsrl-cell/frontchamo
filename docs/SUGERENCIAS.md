@@ -523,7 +523,8 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 - [x] 2026-09-10 — Corrección de bugs: intro no scrolleable, formularios WhatsApp sin popup blocker, toast de favoritos a tono
 - [x] 2026-09-10 — Collages de marcas/productos de cada línea en tarjetas y banners de categoría (`CategoryCollage`). Los JPEG de `public/images/categorias/` quedan de fallback.
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
-- [ ] Marcas editables desde `/admin/marcas` (hoy placeholder): subir/cambiar logos, nombre, orden y activo en el CMS local, para que el carrusel del home y el de `/ofertas` las lean de ahí en vez de `distributorBrands` (`data/home.ts`).
+- [x] 2026-09-23 — Marcas editables desde `/admin/marcas`: nueva marca con logo, nombre, orden, ocultar y quitar (CMS local `brands`); el carrusel del home y de `/ofertas` las leen de ahí.
+- [ ] Con backend real: subir los logos a `POST /api/v1/uploads` en vez de guardarlos como data URL en `chamo-cms-v1`.
 - [x] 2026-09-23 — Panel responsive: Pedidos y Productos se ven como **cards** en móvil/tablet (`< lg`); tabla solo en escritorio.
 - [ ] Usar el mismo patrón tabla → cards en cualquier tabla nueva del panel.
 - [x] 2026-09-23 — **Administrar** solo aparece si el servidor valida la sesión del panel (`verifyAdminSessionAction` → mock de `GET /api/v1/auth/session`); una sesión vieja en `localStorage` ya no basta.

@@ -20,7 +20,9 @@ import {
   mergePageBanners,
   mergeSlides,
   parseCms,
+  visibleBrands,
   visibleTeam,
+  type CmsBrand,
   type CmsFooter,
   type CmsState,
   type CmsTeamMember,
@@ -42,6 +44,8 @@ type ContentContextValue = {
   footer: CmsFooter;
   pageBanners: ResolvedPageBanner[];
   team: CmsTeamMember[];
+  /** Marcas visibles del carrusel (CMS o valores de fábrica). */
+  brands: CmsBrand[];
   saveCms: (patch: Partial<CmsState>) => SaveCmsResult;
   resetCms: () => void;
 };
@@ -101,6 +105,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     [cms.pageBanners],
   );
   const team = useMemo(() => visibleTeam(cms.team), [cms.team]);
+  const brands = useMemo(() => visibleBrands(cms.brands), [cms.brands]);
 
   const value = useMemo(
     () => ({
@@ -111,10 +116,11 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       footer: cms.footer,
       pageBanners,
       team,
+      brands,
       saveCms,
       resetCms,
     }),
-    [ready, cms, slides, categories, pageBanners, team, saveCms, resetCms],
+    [ready, cms, slides, categories, pageBanners, team, brands, saveCms, resetCms],
   );
 
   return (

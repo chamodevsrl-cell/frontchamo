@@ -345,10 +345,11 @@ abierto. El menú desplegable de la cuenta (foto/avatar) ya no repite ese enlace
 | Banners | `/admin/banners` | ✅ Real — cartas para el slider del home y los banners de Nosotros, Contacto, Ofertas y Catálogo (`chamo-cms-v1`). El banner de Ofertas es el de una imagen (fallback); el de 4 secciones se arma en `/admin/ofertas` |
 | Categorías | `/admin/categorias` | ✅ Real — cartas (nombre, descripción, recuento de productos) + modal para editar/agregar; imagen por URL o galería; persiste en CMS (`customCategories`) y en el mock `createCategory`/`updateCategory` |
 | Equipo | `/admin/equipo` | ✅ Real — cartas de colaboradores (se ven en `/nosotros`) |
+| Marcas | `/admin/marcas` | ✅ Real — cartas de marcas del carrusel **Marcas distribuidoras** (home y `/ofertas`): **Nueva marca**, logo (archivo o URL, `CmsImageField` en modo `contain`), nombre, orden (flechas ↑/↓), **Ocultar en la web**, Quitar, Guardar y Restaurar (vuelve a las 10 de fábrica). CMS: `brands: CmsBrand[]` en `lib/cms.ts` → `ContentProvider.brands` (solo visibles) → `BrandsCarousel`. Componente `components/admin/AdminBrandsCards.tsx` |
 | Ajustes | `/admin/ajustes` | ✅ Real — desglose: Footer (`/admin/ajustes/footer`) y Canales de atención (`/admin/ajustes/canales`). `/admin/configuracion` redirige al índice |
 | Usuarios | `/admin/usuarios` | ✅ Real — tarjetas estilo carnet (foto, rol(es), último acceso, estado) desde `AdminUsersCards.tsx`; el modal "Editar" cambia **nombre, correo, contraseña y roles** (`updateUser()`, checkboxes — un usuario puede tener más de un rol), además de habilitar/suspender y **borrar** (`deleteUser()`). Alta (`createUser()`) también admite varios roles a la vez. No se puede deshabilitar, borrar ni cambiar los roles de la propia cuenta logueada. Esas cuentas entran por “Mi cuenta” |
 | Roles | `/admin/roles` | ✅ Real — `getRoles()` + alta (`createRole()`). El login copia `permissions` a `AuthSession`; `AdminShell` filtra el sidebar |
-| Marcas, Clientes, Inventario, Reportes | `/admin/marcas`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
+| Clientes, Inventario, Reportes | `/admin/clientes`, etc. | 🚧 Placeholder — pantalla "próximamente", sin datos ni acciones |
 
 **Banner de 4 secciones de Ofertas** (`/admin/ofertas`, componente
 `AdminOffersBannerEditor.tsx`): reemplaza el banner ancho normal de
@@ -689,6 +690,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/banners` | Cartas para editar el slider del home y los banners de Nosotros/Contacto/Ofertas/Catálogo |
 | `/admin/categorias` | Cartas de líneas: nombre, descripción, cantidad de productos, editar/agregar |
 | `/admin/equipo` | Cartas de colaboradores (alta, foto, cargo, bio) |
+| `/admin/marcas` | Marcas del carrusel: subir logo, nombre, orden, ocultar/quitar |
 | `/admin/ajustes` | Índice de ajustes (Footer y Canales). Alias: `/admin/configuracion` |
 | `/admin/ajustes/footer` | Pie de tienda: frase, dirección, mapa, horario y pagos |
 | `/admin/ajustes/canales` | WhatsApp (botón flotante), teléfono para llamar, correo y redes |
@@ -715,6 +717,7 @@ el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). El CMS local
 - Footer (dirección, mapa, pagos) → `/admin/ajustes/footer`
 - Canales de atención (WhatsApp, llamadas, correo, redes) → `/admin/ajustes/canales`
 - Equipo de `/nosotros` → `/admin/equipo`
+- Logos del carrusel **Marcas distribuidoras** (inicio y Ofertas) → `/admin/marcas`
 - Logos de marcas → `public/images/marcas/`
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
 - Testimonios del home → `data/testimonials.ts` (hoy ejemplo)

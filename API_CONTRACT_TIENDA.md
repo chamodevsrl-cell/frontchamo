@@ -71,7 +71,8 @@ Front: reemplaza la lectura de `window.localStorage.getItem(CMS_KEY)` en
     "team": [{ "id": "…", "name": "…", "role": "…", "photo": "…", "hidden": false }],
     "offerBanner": [
       { "id": "…", "image": "…", "alt": "…", "label": "…", "productId": "sku-123", "url": "" }
-    ]
+    ],
+    "brands": [{ "id": "indeco", "name": "INDECO", "src": "…", "hidden": false }]
   }
 }
 ```
@@ -79,7 +80,9 @@ Front: reemplaza la lectura de `window.localStorage.getItem(CMS_KEY)` en
 Forma exacta = tipo `CmsState` en [`lib/cms.ts`](./lib/cms.ts). Si el backend
 no tiene fila guardada todavía, devolver `emptyCmsState` (mismo archivo) para
 que el front caiga en los valores de fábrica (`data/home.ts`, `data/media.ts`,
-`data/page-banners.ts`, `data/team.ts`). `pageBanners` incluye `"ofertas"` —
+`data/page-banners.ts`, `data/team.ts`). `brands` es la lista completa y
+ordenada del carrusel "Marcas distribuidoras" (el orden del array es el del
+carrusel; `hidden: true` la guarda sin mostrarla). `pageBanners` incluye `"ofertas"` —
 el banner ancho normal de `/ofertas` se edita igual que
 Nosotros/Contacto/Catálogo.
 
@@ -99,7 +102,7 @@ mergear igual (**parcial**, solo las claves presentes en el body).
 Requiere sesión de panel con permiso de la sección que corresponda (ver
 `AdminPermission` en `types/admin.ts`: `categorias` para `categories`/
 `customCategories`, `ajustes` para `footer`, `banners` para `slides`/
-`pageBanners`, `equipo` para `team`).
+`pageBanners`, `equipo` para `team`, `marcas` para `brands`).
 
 **Body:** `Partial<CmsState>` — cualquier subconjunto de las claves de arriba.
 

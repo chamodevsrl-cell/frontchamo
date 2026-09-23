@@ -3,6 +3,10 @@ export const MAX_PROFILE_IMAGE_BYTES = 2.5 * 1024 * 1024;
 export const MAX_BANNER_IMAGE_BYTES = 3.5 * 1024 * 1024;
 export const MAX_PRODUCT_IMAGE_BYTES = 60 * 1024 * 1024;
 
+/** Ayuda para el editor de marcas (usa MAX_CMS_IMAGE_BYTES vía CmsImageField). */
+export const MAX_LOGO_IMAGE_HINT =
+  "Mejor PNG o SVG con fondo transparente, horizontal y de hasta 1.5 MB.";
+
 export function isCmsInlineSrc(src: string) {
   return (
     src.startsWith("data:") ||
