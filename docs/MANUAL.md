@@ -704,7 +704,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 Hay un **panel de administración** en `/admin`. La sesión del panel es propia
 (cookie `chamo_admin_session`, login en “Mi cuenta”; mock
 `THE WINTER` / `Criper@11` o `admin@local.test` / `admin123`). El enlace
-**Administrar** solo aparece con sesión del panel, y únicamente dentro del menú del perfil (desktop) o en el drawer móvil — ya no hay botón suelto en la barra.
+**Administrar** solo aparece con sesión del panel **verificada por el servidor** (`verifyAdminSessionAction()` en `app/admin/actions.ts` → mock `verifyAdminSession()` de `GET /api/v1/auth/session`; mientras no responde `ok`, `hasPanelSession` es `false` y una sesión vieja en cookie/`localStorage` se borra), y únicamente dentro del menú del perfil (desktop) o en el drawer móvil — ya no hay botón suelto en la barra.
 El dashboard muestra KPIs del contrato. Productos y pedidos se gestionan contra
 el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). El CMS local
 (`chamo-cms-v1`) cubre:

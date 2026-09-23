@@ -124,7 +124,10 @@ Front: `logoutAdmin()`. Invalida el token y borra la cookie.
 
 ### `GET /api/v1/auth/session`
 
-Front: `getAdminSession()` (hoy lee cookie/localStorage, **sin** delay de 300 ms).
+Front: `getAdminSession()` (hoy lee cookie/localStorage, **sin** delay de 300 ms)
+y `verifyAdminSessionAction()` → `verifyAdminSession(token)` (mock en
+`services/adminApi.ts`): la tienda lo llama al cargar y solo muestra
+"Administrar" si responde `200`. Con `401` el front borra la sesión local.
 
 **Respuesta `200`:** mismo objeto `AuthSession` que el login.
 **Errores:** `401 UNAUTHORIZED`.

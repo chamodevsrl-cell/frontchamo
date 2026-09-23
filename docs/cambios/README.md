@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-23 | "Administrar" solo con sesión del panel verificada por el servidor | [2026-09-23-administrar-solo-con-sesion-verificada.md](./2026-09-23-administrar-solo-con-sesion-verificada.md) |
 | 2026-09-23 | Navbar: "Administrar" solo en el menú del perfil (fuera de la barra) | [2026-09-23-navbar-quitar-administrar-de-la-barra.md](./2026-09-23-navbar-quitar-administrar-de-la-barra.md) |
 | 2026-09-23 | Ofertas: carrusel de marcas en lugar de la línea divisoria | [2026-09-23-ofertas-carrusel-marcas-en-vez-de-linea.md](./2026-09-23-ofertas-carrusel-marcas-en-vez-de-linea.md) |
 | 2026-09-22 | Nueva sección "Unidades de medida" en el panel (`/admin/productos/unidades`) | [2026-09-22-unidades-de-medida.md](./2026-09-22-unidades-de-medida.md) |

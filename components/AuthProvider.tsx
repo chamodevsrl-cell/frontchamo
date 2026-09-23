@@ -1,6 +1,10 @@
 "use client";
 
-import { loginAdminAction, updateOwnProfileAction } from "@/app/admin/actions";
+import {
+  loginAdminAction,
+  updateOwnProfileAction,
+  verifyAdminSessionAction,
+} from "@/app/admin/actions";
 import {
   createContext,
   useCallback,
@@ -131,20 +135,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const loadedAccounts = parseAccounts(window.localStorage.getItem(ACCOUNTS_KEY));
     const loadedSession = parseSession(window.localStorage.getItem(SESSION_KEY));
     const loadedProfiles = parseProfiles(window.localStorage.getItem(PROFILES_KEY));
-    const nextPanel = readPanelSession();
-    const hydrated =
-      hydrateSessionUser(loadedSession, loadedAccounts) ??
-      (nextPanel ? panelUserFromSession(nextPanel) : null);
-    const withExtras = hydrated
-      ? applyProfileExtras(hydrated, loadedProfiles[hydrated.id])
+    // Solo una cuenta de la tienda se restaura directo. Un usuario del panel guardado
+    // en `chamo-session-v1` NO: espera a que el servidor confirme la sesión (abajo).
+    const storeSession =
+      loadedSession &&
+      loadedAccounts.some((account) => account.email === loadedSession.email)
+        ? hydrateSessionUser(loadedSession, loadedAccounts)
+        : null;
+    const storeUser = storeSession
+      ? applyProfileExtras(storeSession, loadedProfiles[storeSession.id])
       : null;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en el cliente
     setAccounts(loadedAccounts);
     setProfiles(loadedProfiles);
-    setPanelSession(nextPanel);
-    setHasPanelSession(Boolean(nextPanel));
-    setUser(withExtras);
+    setPanelSession(null);
+    setHasPanelSession(false);
+    setUser(storeUser);
     setReady(true);
+
+    // "Administrar" solo aparece si el servidor valida la sesión del panel
+    // (GET /api/v1/auth/session). Una copia vieja en cookie/localStorage no basta.
+    if (!readPanelSession()) return;
+    let cancelled = false;
+    void verifyAdminSessionAction().then((result) => {
+      if (cancelled) return;
+      if (!result.ok) {
+        clearAdminSessionClient();
+        return;
+      }
+      persistAdminSession(result.session);
+      setPanelSession(result.session);
+      setHasPanelSession(true);
+      if (!storeUser) {
+        setUser(
+          applyProfileExtras(
+            panelUserFromSession(result.session),
+            loadedProfiles[result.session.id],
+          ),
+        );
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {

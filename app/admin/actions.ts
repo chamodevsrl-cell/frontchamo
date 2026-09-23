@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import {
   ADMIN_SESSION_COOKIE,
   ADMIN_SESSION_MAX_AGE_SECONDS,
+  parseAdminSession,
   serializeAdminSession,
 } from "@/lib/auth";
 import {
@@ -22,6 +23,7 @@ import {
   updateProduct,
   updateUser,
   updateUserStatus,
+  verifyAdminSession,
 } from "@/services/adminApi";
 import type {
   AuthSession,
@@ -83,6 +85,25 @@ export async function loginAdminAction(
     const message =
       cause instanceof Error ? cause.message : "No se pudo iniciar sesión.";
     return { ok: false, message };
+  }
+}
+
+/**
+ * Comprueba en el servidor la sesión del panel (cookie). La tienda solo muestra
+ * "Administrar" si esto devuelve `ok`; una copia vieja en localStorage no basta.
+ */
+export async function verifyAdminSessionAction(): Promise<
+  { ok: true; session: AuthSession } | { ok: false }
+> {
+  const store = await cookies();
+  const current = parseAdminSession(store.get(ADMIN_SESSION_COOKIE)?.value);
+  if (!current) return { ok: false };
+  try {
+    const session = await verifyAdminSession(current.token);
+    return { ok: true, session };
+  } catch {
+    store.delete(ADMIN_SESSION_COOKIE);
+    return { ok: false };
   }
 }
 

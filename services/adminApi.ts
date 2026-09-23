@@ -415,6 +415,24 @@ export async function loginAdmin(
 }
 
 /**
+ * GET /api/v1/auth/session
+ * Revalida el token contra el servidor: el usuario debe existir, estar activo y
+ * tener rol. Devuelve la sesión actualizada (nombre/permisos al día).
+ */
+export async function verifyAdminSession(token: string): Promise<AuthSession> {
+  // TODO Backend: Reemplazar mock con fetch('/api/v1/auth/session') + Bearer token
+  const user = usersDb.find((item) => token === `mock.jwt.${item.id}`);
+  if (!user || user.status === "suspended") {
+    throw new AdminApiError("UNAUTHORIZED", "Sesión inválida o expirada");
+  }
+  const roles = rolesOf(user);
+  if (roles.length === 0) {
+    throw new AdminApiError("UNAUTHORIZED", "Sesión inválida o expirada");
+  }
+  return buildSession(user, roles);
+}
+
+/**
  * GET /api/v1/dashboard/kpis
  */
 export async function getDashboardKPIs(): Promise<DashboardKPIs> {

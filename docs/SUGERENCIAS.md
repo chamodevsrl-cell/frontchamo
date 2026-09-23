@@ -524,6 +524,8 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 - [x] 2026-09-10 — Collages de marcas/productos de cada línea en tarjetas y banners de categoría (`CategoryCollage`). Los JPEG de `public/images/categorias/` quedan de fallback.
 - [ ] Reemplazar wordmarks SVG de marcas por logos oficiales
 - [ ] Marcas editables desde `/admin/marcas` (hoy placeholder): subir/cambiar logos, nombre, orden y activo en el CMS local, para que el carrusel del home y el de `/ofertas` las lean de ahí en vez de `distributorBrands` (`data/home.ts`).
+- [x] 2026-09-23 — **Administrar** solo aparece si el servidor valida la sesión del panel (`verifyAdminSessionAction` → mock de `GET /api/v1/auth/session`); una sesión vieja en `localStorage` ya no basta.
+- [ ] Con backend real: cookie de panel `httpOnly` + `Secure` y quitar la copia `chamo-admin-session-v1` de `localStorage`.
 - [x] 2026-09-23 — Navbar: **Administrar** sale de la fila de íconos; queda solo en el menú del perfil (y drawer móvil) con sesión del panel.
 - [x] 2026-09-23 — `/ofertas`: el carrusel de marcas (`BrandsCarousel variant="inline"`) reemplaza a la línea divisoria entre el banner y las tarjetas.
 - [ ] Unificar la sesión del panel (`chamo_admin_session`) con `role: "admin"` de la tienda cuando exista un único backend de usuarios.
