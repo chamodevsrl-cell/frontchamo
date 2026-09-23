@@ -13,6 +13,7 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-09-23 | Ofertas: carrusel de marcas en lugar de la línea divisoria | [2026-09-23-ofertas-carrusel-marcas-en-vez-de-linea.md](./2026-09-23-ofertas-carrusel-marcas-en-vez-de-linea.md) |
 | 2026-09-22 | Nueva sección "Unidades de medida" en el panel (`/admin/productos/unidades`) | [2026-09-22-unidades-de-medida.md](./2026-09-22-unidades-de-medida.md) |
 | 2026-09-22 | Ofertas: título "¡Mega ofertas!" arriba de la grilla de 4 secciones | [2026-09-22-ofertas-titulo-mega-ofertas.md](./2026-09-22-ofertas-titulo-mega-ofertas.md) |
 | 2026-09-22 | Ofertas: separador entre la grilla y las tarjetas + bordes más gruesos | [2026-09-22-ofertas-separador-bordes-mas-gruesos.md](./2026-09-22-ofertas-separador-bordes-mas-gruesos.md) |

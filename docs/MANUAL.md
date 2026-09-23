@@ -359,9 +359,11 @@ imagen": son siempre 4). Cuando está activo, la página muestra un
 **`<h1>` "¡Mega ofertas!"** (con "ofertas" en `brand-gold`) y debajo la
 grilla de 4 fotos con bordes gruesos (`border-[3px]`/`border-4`) y líneas
 divisorias — sin panel de título oscuro ni banda de breadcrumb, ese modo
-**reemplaza el banner entero** por completo. Una línea divisoria del mismo
-grosor separa la grilla de la lista de productos en oferta que sigue
-debajo. CMS: `CmsOfferBannerTile[]` (`lib/cms.ts`, campo `offerBanner` de
+**reemplaza el banner entero** por completo. Entre el banner y la lista de
+productos en oferta va el **carrusel infinito de marcas distribuidoras**
+(`<BrandsCarousel variant="inline" />`, mismo componente y datos que el home,
+dibujado como tarjeta redondeada) — reemplazó a la línea divisoria que
+había antes. CMS: `CmsOfferBannerTile[]` (`lib/cms.ts`, campo `offerBanner` de
 `CmsState`) — `{ id, image, alt, label, productId, url }`; si `url` tiene
 contenido, gana sobre `productId` (el `<select>` de producto se deshabilita
 en el panel). Front público: `components/OffersBanner.tsx`, usado en

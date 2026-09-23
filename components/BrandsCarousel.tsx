@@ -57,16 +57,32 @@ function BrandCard({
   );
 }
 
-export default function BrandsCarousel() {
+export default function BrandsCarousel({
+  variant = "section",
+}: {
+  /** "section": franja a todo el ancho (home). "inline": tarjeta dentro de un `main` ya con padding (p. ej. /ofertas). */
+  variant?: "section" | "inline";
+}) {
   // Duplicado para loop continuo
   const loop = [...distributorBrands, ...distributorBrands];
+  const inline = variant === "inline";
 
   return (
     <section
-      className="overflow-hidden border-t border-brand-primary/25 bg-[#eef2f5]"
+      className={
+        inline
+          ? "overflow-hidden rounded-2xl border border-brand-primary/20 bg-[#eef2f5]"
+          : "overflow-hidden border-t border-brand-primary/25 bg-[#eef2f5]"
+      }
       aria-labelledby="marcas-heading"
     >
-      <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+      <div
+        className={
+          inline
+            ? "px-4 py-6 sm:px-6 sm:py-8"
+            : "mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 xl:px-10"
+        }
+      >
         <h2
           id="marcas-heading"
           className="mb-6 text-center font-display text-sm font-semibold tracking-[0.18em] uppercase sm:text-base"
