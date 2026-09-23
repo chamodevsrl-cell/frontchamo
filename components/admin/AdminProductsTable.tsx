@@ -26,7 +26,104 @@ export default function AdminProductsTable({ products }: { products: Product[] }
 
   return (
     <>
-      <div className="overflow-x-auto rounded-2xl border border-brand-dark/10 bg-white shadow-sm">
+      {/* Móvil / tablet: cards (la tabla no entra en pantallas angostas) */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+        {products.length === 0 ? (
+          <p className="rounded-2xl border border-brand-dark/10 bg-white px-4 py-8 text-center text-sm text-brand-dark/55 shadow-sm sm:col-span-2">
+            No hay productos con ese filtro.
+          </p>
+        ) : (
+          products.map((product) => {
+            const low = product.stock <= product.minStock;
+            return (
+              <article
+                key={product.id}
+                className="flex flex-col gap-3 rounded-2xl border border-brand-dark/10 border-l-4 border-l-brand-primary bg-white p-4 shadow-sm"
+              >
+                <div className="flex gap-3">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-brand-dark/10 bg-brand-gray">
+                    {product.images[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={product.images[0]}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center justify-between gap-2 text-[11px] text-brand-dark/50">
+                      <span className="truncate font-semibold uppercase">{product.brand}</span>
+                      <span className="shrink-0 font-mono">{product.sku}</span>
+                    </p>
+                    <p className="font-semibold leading-snug text-brand-dark">{product.name}</p>
+                    {product.isFeatured || product.isOnOffer ? (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {product.isFeatured ? (
+                          <span className="rounded-full bg-brand-gold/20 px-2 py-0.5 text-[10px] font-bold tracking-wide text-brand-dark uppercase">
+                            Destacado
+                          </span>
+                        ) : null}
+                        {product.isOnOffer ? (
+                          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-700 uppercase">
+                            Oferta
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="flex items-end justify-between gap-3">
+                  <p className="font-display text-lg font-bold text-brand-dark">
+                    {soles(product.price)}
+                    {product.isOnOffer && product.oldPrice ? (
+                      <span className="ml-1.5 text-xs font-normal text-brand-dark/40 line-through">
+                        {soles(product.oldPrice)}
+                      </span>
+                    ) : null}
+                  </p>
+                  <div className="text-right text-xs">
+                    <p className={low ? "font-bold text-red-700" : "text-brand-dark/70"}>
+                      Stock: {product.stock}
+                      {low ? " · bajo" : ""}
+                    </p>
+                    <p className="text-brand-dark/50">{STATUS_LABEL[product.status]}</p>
+                  </div>
+                </div>
+
+                <div className="mt-auto grid grid-cols-3 gap-2 border-t border-brand-dark/8 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setViewProduct(product)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-dark/12 py-2 text-xs font-semibold text-brand-dark hover:border-brand-primary hover:text-brand-primary"
+                  >
+                    <Eye className="h-4 w-4" strokeWidth={2} />
+                    Ver
+                  </button>
+                  <Link
+                    href={`/admin/productos/${product.id}/editar`}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-dark/12 py-2 text-xs font-semibold text-brand-dark hover:border-brand-primary hover:text-brand-primary"
+                  >
+                    <Pencil className="h-4 w-4" strokeWidth={2} />
+                    Editar
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(product)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" strokeWidth={2} />
+                    Eliminar
+                  </button>
+                </div>
+              </article>
+            );
+          })
+        )}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-brand-dark/10 bg-white shadow-sm lg:block">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[#0B3554] text-xs font-semibold tracking-wide text-white uppercase">
             <tr>

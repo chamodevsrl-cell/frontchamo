@@ -93,7 +93,59 @@ export default function AdminOrdersTable({
         </p>
       ) : null}
 
-      <div className="overflow-x-auto rounded-2xl border border-brand-dark/10 bg-white shadow-sm">
+      {/* Móvil / tablet: cards (la tabla no entra en pantallas angostas) */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+        {orders.length === 0 ? (
+          <p className="rounded-2xl border border-brand-dark/10 bg-white px-4 py-8 text-center text-sm text-brand-dark/55 shadow-sm sm:col-span-2">
+            No hay pedidos con ese filtro.
+          </p>
+        ) : (
+          orders.map((order) => (
+            <article
+              key={order.id}
+              className="flex flex-col gap-3 rounded-2xl border border-brand-dark/10 border-l-4 border-l-brand-primary bg-white p-4 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold text-brand-dark">{order.orderNumber}</p>
+                  <p className="text-xs text-brand-dark/50">
+                    {order.items.length} línea{order.items.length === 1 ? "" : "s"}
+                  </p>
+                </div>
+                <p className="shrink-0 font-display text-lg font-bold text-brand-dark">
+                  {soles(order.total)}
+                </p>
+              </div>
+              <div className="text-sm">
+                <p className="font-medium text-brand-dark">{order.clientName}</p>
+                <p className="text-xs text-brand-dark/50">{order.clientPhone}</p>
+              </div>
+              <p className="text-xs text-brand-dark/60 uppercase">
+                {order.paymentMethod} · {order.shippingMethod}
+              </p>
+              <label className="mt-auto flex items-center gap-2 border-t border-brand-dark/8 pt-3 text-xs font-semibold text-brand-dark/60 uppercase">
+                Estado
+                <select
+                  disabled={pendingId === order.id}
+                  value={order.status}
+                  onChange={(event) =>
+                    void changeStatus(order.id, event.target.value as OrderStatus)
+                  }
+                  className="min-w-0 flex-1 rounded-lg border border-brand-dark/15 px-2 py-2 text-sm font-normal text-brand-dark normal-case"
+                >
+                  {STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {STATUS_LABEL[status]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </article>
+          ))
+        )}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-brand-dark/10 bg-white shadow-sm lg:block">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[#0B3554] text-xs font-semibold tracking-wide text-white uppercase">
             <tr>
