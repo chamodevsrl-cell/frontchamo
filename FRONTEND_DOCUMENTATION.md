@@ -343,7 +343,7 @@ pieza más urgente de conectar si el cliente va a operar el sitio en producción
 2. Credenciales de prueba — **no oficiales, borrar cuando haya backend real**:
    usuario `THE WINTER` / contraseña `Criper@11` (también correo
    `thewinter@local.test`). Sigue existiendo `admin@local.test` / `admin123`.
-3. Tras entrar: en la barra aparece **Administrar** (casa). El sidebar del panel
+3. Tras entrar: **Administrar** aparece en el menú del perfil (clic en tu nombre en la barra). El sidebar del panel
    tiene Dashboard, Productos, Categorías, Marcas, Pedidos,
    Clientes, Inventario, Ofertas, Banners, Reportes, Usuarios, Roles, Configuración
    (las entradas visibles dependen del rol).

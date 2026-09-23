@@ -315,7 +315,7 @@ Piezas clave (v2):
    `app/admin/(panel)/layout.tsx`, que lee la cookie **en el servidor** con
    `getAdminSession()` — sin sesión válida, redirige a `/login`.
 4. Con sesión válida, se renderiza `AdminShell` (sidebar + header) alrededor de la
-   página pedida. En la barra de la tienda aparece **Administrar** (ícono de casa).
+   página pedida. En la tienda, **Administrar** aparece dentro del menú de la cuenta (al hacer clic en el perfil), no como botón suelto en la barra.
    **Mi perfil** (`/cuenta/perfil`) está en el menú de cuenta de la tienda y del panel:
    cualquier rol (cliente, admin de tienda, Administrador/Editor/Almacén del panel)
    edita nombre, foto, teléfono y datos de empresa. El banner de `/cuenta` (`AccountShell`)
@@ -704,7 +704,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 Hay un **panel de administración** en `/admin`. La sesión del panel es propia
 (cookie `chamo_admin_session`, login en “Mi cuenta”; mock
 `THE WINTER` / `Criper@11` o `admin@local.test` / `admin123`). El enlace
-**Administrar** (ícono de casa) del Navbar solo aparece con sesión del panel.
+**Administrar** solo aparece con sesión del panel, y únicamente dentro del menú del perfil (desktop) o en el drawer móvil — ya no hay botón suelto en la barra.
 El dashboard muestra KPIs del contrato. Productos y pedidos se gestionan contra
 el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). El CMS local
 (`chamo-cms-v1`) cubre:

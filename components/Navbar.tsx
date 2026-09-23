@@ -326,17 +326,6 @@ export default function Navbar() {
               </button>
             )}
 
-            {hasPanelSession ? (
-              <Link
-                href="/admin"
-                className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
-                aria-label="Administrar"
-              >
-                <House className="h-5 w-5" strokeWidth={2} />
-                <span className="text-[11px] font-semibold">Administrar</span>
-              </Link>
-            ) : null}
-
             <Link
               href="/favoritos"
               className="relative hidden flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:inline-flex"
@@ -368,15 +357,6 @@ export default function Navbar() {
             </Link>
 
             {/* Compact icons on very small screens */}
-            {hasPanelSession ? (
-              <Link
-                href="/admin"
-                className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"
-                aria-label="Administrar"
-              >
-                <House className="h-5 w-5" strokeWidth={2} />
-              </Link>
-            ) : null}
             <Link
               href="/favoritos"
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-dark transition hover:bg-brand-gray hover:text-brand-primary sm:hidden"

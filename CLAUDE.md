@@ -62,7 +62,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 
 - **Navbar de 3 niveles** (`components/Navbar.tsx`), estilo ferretería:
   1. Barra superior `brand-dark`: envíos, atención mayorista, enlaces Nosotros/Contacto, redes sociales.
-  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta (si hay sesión: menú con **Mi perfil**), Favoritos (badge), Carrito (badge con `CartProvider`). Si hay sesión del panel, aparece **Administrar** (ícono de casa) en esa fila. Comparar ya no está en la barra (sigue en tarjetas / `/comparar`).
+  2. Fila blanca: logo, buscador (navega a `/catalogo?q=`), lupa toggle en móvil, Mi cuenta (si hay sesión: menú con **Mi perfil**), Favoritos (badge), Carrito (badge con `CartProvider`). Si hay sesión del panel, **Administrar** aparece solo dentro del menú de Mi cuenta (y en el drawer móvil), no como botón en la fila. Comparar ya no está en la barra (sigue en tarjetas / `/comparar`).
   3. Barra `brand-primary`: botón **Categorías** (fondo `brand-dark`, dropdown desde `mainCategories` + "Ver todas") y menú principal uppercase (Inicio, Catálogo, Ofertas, Nosotros, Contacto). El ítem activo y el hover solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo además lleva una **barra dorada animada** debajo (`navIndicator`, calculada por `offsetLeft`/`offsetWidth` del link con `data-nav-active`).
   - Menú móvil tipo drawer lateral con categorías + navegación + botón "Mi cuenta".
   - Los badges **Oferta/Nuevo** (no el botón de categorías) son los que usan `brand-gold` — ver `FeaturedOffers.tsx` / `CategoriesGrid.tsx`.
