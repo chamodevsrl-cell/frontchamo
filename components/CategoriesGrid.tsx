@@ -5,80 +5,76 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { mainCategories, type MainCategory } from "@/data/home";
 import { useSiteContent } from "@/components/ContentProvider";
-import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 import Reveal from "@/components/Reveal";
 import CategoryIcon from "@/components/CategoryIcon";
-import CategoryCollage from "@/components/CategoryCollage";
+import Image from "next/image";
+import SkeletonImage from "@/components/ui/SkeletonImage";
 
-const shinyCard =
-  "border border-brand-primary/35 shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_18px_rgba(18,126,201,0.35)] hover:shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_28px_rgba(18,126,201,0.55)]";
+const shinyCard ="";
 
-function CategoryCard({ category }: { category: MainCategory }) {
-  const whatsappHref = useCmsWhatsappHref();
-  return (
-    <article
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl text-brand-dark transition duration-300 hover:-translate-y-0.5 dark:bg-[#102a40] dark:text-white ${shinyCard}`}
-      style={{ backgroundColor: category.tint }}
-    >
-      <div className="flex flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-4 lg:px-6 lg:pt-6 dark:bg-[#102a40]">
-        <p className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] text-brand-primary uppercase sm:text-[11px] lg:text-xs">
-          <CategoryIcon slug={category.slug} className="h-3.5 w-3.5" />
-          {category.eyebrow}
-        </p>
-        <h3 className="font-display mt-1.5 text-xl font-extrabold tracking-tight text-brand-dark uppercase sm:mt-2 sm:text-2xl lg:text-[1.65rem] dark:text-white">
-          {category.label}
-        </h3>
 
-        <ul className="mt-3 space-y-1.5 sm:mt-4 sm:space-y-2">
-          {category.bullets.map((bullet) => (
-            <li
-              key={bullet}
-              className="flex items-start gap-2 text-xs text-brand-dark/75 sm:gap-2.5 sm:text-sm dark:text-white/80"
+  function CategoryCard({ category }: { category: MainCategory }) {
+    return (
+      <article className="group relative h-[230px] sm:h-[260px] lg:h-[280px] overflow-hidden rounded-2xl bg-[#102a40] shadow-[0_8px_24px_rgba(11,53,84,0.12)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(11,53,84,0.25)] sm:h-[280px]">
+  
+
+{/* Imagen de fondo con Skeleton Loading */}
+<div className="absolute inset-0 overflow-hidden">
+  <SkeletonImage
+    src={category.image}
+    alt={category.imageAlt || category.label}
+    sizes="(max-width: 640px) 85vw, (max-width: 1024px) 48vw, 384px"
+    className="object-center transition-transform duration-700 group-hover:scale-110"
+  />
+</div>
+
+  
+        {/* Degradado oscuro */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#061b2d]/95 via-[#061b2d]/55 to-[#061b2d]/10 transition-all duration-500 group-hover:from-[#061b2d]"
+          aria-hidden="true"
+        />
+  
+        {/* Contenido */}
+        <div className="absolute inset-0 flex flex-col justify-end p-5 text-white sm:p-6">
+  
+          {/* Icono */}
+          <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-white/20 bg-brand-primary shadow-lg">
+            <CategoryIcon
+              slug={category.slug}
+              className="h-5 w-5 text-white"
+            />
+          </div>
+  
+          {/* Nombre */}
+          <h3 className="font-display text-xl font-extrabold uppercase tracking-tight sm:text-2xl">
+            {category.label}
+          </h3>
+  
+          {/* Descripción */}
+          <p className="mt-2 line-clamp-2 max-w-[85%] text-sm leading-relaxed text-white/85">
+            {category.bullets.slice(0, 2).join(" · ")}
+          </p>
+  
+          {/* Enlace */}
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-xs font-semibold text-white/90">
+              Explorar categoría
+            </span>
+  
+            <Link
+              href={category.href}
+              aria-label={`Explorar ${category.label}`}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/10 text-white backdrop-blur-sm transition-all duration-300 hover:border-brand-primary hover:bg-brand-primary hover:scale-110"
             >
-              <span
-                className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-primary"
-                aria-hidden
-              />
-              <span>{bullet}</span>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5">
-          <Link
-            href={category.href}
-            className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_0_14px_rgba(18,126,201,0.45)] transition hover:bg-brand-dark sm:px-4 sm:py-2 sm:text-sm"
-          >
-            Explorar
-            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
-          </Link>
-          <a
-            href={whatsappHref(
-              `Hola, quiero cotizar productos de la línea ${category.label} al por mayor.`,
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-fit items-center gap-1.5 rounded-full border border-brand-whatsapp/40 bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-dark transition hover:bg-brand-whatsapp hover:text-white sm:px-4 sm:py-2 sm:text-sm"
-          >
-            <MessageCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Cotizar línea
-          </a>
+              <ArrowRight className="h-5 w-5" strokeWidth={2.5} />
+            </Link>
+          </div>
         </div>
-      </div>
-
-      <div className="px-3 pb-3 sm:px-4 sm:pb-4 lg:px-5 lg:pb-5">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-brand-primary/15 bg-white/50">
-          <CategoryCollage
-            slug={category.slug}
-            fallback={category.image}
-            fallbackAlt={category.imageAlt}
-            className="transition duration-500 group-hover:scale-[1.03]"
-          />
-        </div>
-      </div>
-    </article>
-  );
-}
+      </article>
+    );
+  }
+  
 
 export default function CategoriesGrid() {
   const { categories } = useSiteContent();
@@ -118,56 +114,68 @@ export default function CategoriesGrid() {
 
   return (
     <section aria-labelledby="categorias-heading">
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
-        <div className="flex min-w-0 flex-1 flex-wrap items-end justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="h-8 w-1 rounded-full bg-brand-primary" aria-hidden />
-            <h2
-              id="categorias-heading"
-              className="font-display text-2xl font-bold text-brand-dark sm:text-3xl dark:text-white"
-            >
-              Categorías principales
-            </h2>
-          </div>
-          <Link
-            href="/categorias"
-            className="text-sm font-semibold text-brand-primary transition hover:text-brand-dark"
-          >
-            Ver todas
-          </Link>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => scrollByCard(-1)}
-            disabled={!canPrev}
-            aria-label="Categorías anteriores"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-[0_2px_10px_rgba(11,53,84,0.12)] transition hover:border-brand-primary/40 hover:text-brand-primary disabled:pointer-events-none disabled:opacity-35"
-          >
-            <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollByCard(1)}
-            disabled={!canNext}
-            aria-label="Categorías siguientes"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-[0_2px_10px_rgba(11,53,84,0.12)] transition hover:border-brand-primary/40 hover:text-brand-primary disabled:pointer-events-none disabled:opacity-35"
-          >
-            <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
-          </button>
-        </div>
-      </div>
+<div className="mb-5 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
 
-      <div className="-mx-4 sm:-mx-6 lg:mx-0">
-        <ul
-          ref={scrollerRef}
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 scrollbar-none sm:gap-4 sm:px-6 lg:gap-5 lg:px-0"
-        >
+{/* Título */}
+<div className="flex min-w-0 items-center gap-3">
+  <span
+    className="h-9 w-1 shrink-0 rounded-full bg-brand-primary"
+    aria-hidden
+  />
+
+  <h2
+    id="categorias-heading"
+    className="font-display text-xl font-bold leading-tight text-brand-dark sm:text-3xl dark:text-white"
+  >
+    Categorías principales
+  </h2>
+</div>
+
+{/* Acciones */}
+<div className="flex items-center justify-between gap-3 sm:justify-end">
+
+  <Link
+    href="/categorias"
+    className="text-sm font-semibold text-brand-primary transition hover:text-brand-dark"
+  >
+    Ver todas
+  </Link>
+
+  <div className="flex items-center gap-2">
+    <button
+      type="button"
+      onClick={() => scrollByCard(-1)}
+      disabled={!canPrev}
+      aria-label="Categorías anteriores"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35"
+    >
+      <ChevronLeft className="h-5 w-5" />
+    </button>
+
+    <button
+      type="button"
+      onClick={() => scrollByCard(1)}
+      disabled={!canNext}
+      aria-label="Categorías siguientes"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35"
+    >
+      <ChevronRight className="h-5 w-5" />
+    </button>
+  </div>
+</div>
+</div>
+
+
+<div className="w-full min-w-0 overflow-hidden">
+  <ul
+    ref={scrollerRef}
+    className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-3 scrollbar-none"
+  >
           {list.map((category, index) => (
             <li
               key={category.href}
-              className="w-[min(78vw,18rem)] shrink-0 snap-start sm:w-[min(48vw,20rem)] lg:w-[17.5rem] xl:w-[18.75rem]"
+              className="w-[min(85vw,22rem)] shrink-0 snap-start sm:w-[min(48vw,24rem)] lg:w-[22rem] xl:w-[24rem]"
             >
               <Reveal delayMs={Math.min(index, 6) * 70}>
                 <CategoryCard category={category} />

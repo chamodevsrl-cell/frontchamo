@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import { isCmsInlineSrc } from "@/lib/cms-image";
 
@@ -13,6 +14,9 @@ type CmsImageProps = {
   loading?: "eager" | "lazy";
   draggable?: boolean;
   objectFit?: "cover" | "contain";
+
+  // Nuevo: detectar cuando la imagen termina de cargar
+  onLoad?: () => void;
 };
 
 export default function CmsImage({
@@ -27,10 +31,10 @@ export default function CmsImage({
   loading,
   draggable,
   objectFit = "cover",
+  onLoad,
 }: CmsImageProps) {
   if (isCmsInlineSrc(src)) {
     return (
-      // next/image no acepta data:/https arbitrarios del CMS local
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={src}
@@ -40,6 +44,7 @@ export default function CmsImage({
         className={className}
         draggable={draggable}
         loading={loading}
+        onLoad={onLoad}
         style={
           fill
             ? {
@@ -67,6 +72,7 @@ export default function CmsImage({
       preload={preload}
       loading={loading}
       draggable={draggable}
+      onLoad={onLoad}
     />
   );
 }
