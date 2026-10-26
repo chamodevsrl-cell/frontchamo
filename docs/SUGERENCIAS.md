@@ -2,6 +2,19 @@
 
 Última actualización: **2026-10-26**
 
+## 📄 Catálogo PDF flotante (2026-10-26)
+
+- [x] 2026-10-26 — Botón azul encima de WhatsApp para descargar el catálogo.
+  Ruta vacía (`CATALOG_PDF_SRC`). Detalle:
+  [`cambios/2026-10-26-boton-flotante-catalogo-pdf.md`](./cambios/2026-10-26-boton-flotante-catalogo-pdf.md).
+- [ ] Cuando el cliente envíe el PDF, subirlo a `public/` y apuntar `CATALOG_PDF_SRC`.
+
+## 🧭 Navbar barra 3D (2026-10-26)
+
+- [x] 2026-10-26 — Barra azul de navegación redonda, centrada y con sombra 3D.
+  Detalle: [`cambios/2026-10-26-navbar-barra-3d-redonda.md`](./cambios/2026-10-26-navbar-barra-3d-redonda.md).
+- [x] 2026-10-26 — Se quitó el 3D y los links del nav van a la izquierda.
+
 ## 📱 WhatsApp 936 + icono de categoría (2026-10-26)
 
 - [x] 2026-10-26 — Destino de WhatsApp: **+51 936 608 583** (`wa.me/51936608583`).
@@ -31,6 +44,9 @@
   [`cambios/2026-10-26-ficha-mock-galeria-thumbs-qty.md`](./cambios/2026-10-26-ficha-mock-galeria-thumbs-qty.md).
 - [x] 2026-10-26 — Brillo de borde (`.card-glow`) en cards de la tienda.
   Detalle: [`cambios/2026-10-26-brillo-bordes-cards.md`](./cambios/2026-10-26-brillo-bordes-cards.md).
+- [x] 2026-10-26 — Presentación Unidad / Docena / Caja cambia el precio;
+  notas “Mayorista c/u” y contenido del pack más grandes. Detalle:
+  [`cambios/2026-10-26-ficha-presentacion-unidad-docena-caja.md`](./cambios/2026-10-26-ficha-presentacion-unidad-docena-caja.md).
 - [ ] Cuando el backend esté listo, esta ruta debe dejar de leer
   `getProductById` / `getRelatedProducts` del array estático y usar
   `GET /api/v1/catalog/:id` + `related`.
@@ -538,7 +554,10 @@ código con `main`). Falta resolver a mano los 5 conflictos de documentación al
 
 - [x] 2026-09-09 — Teléfono oficial `+51 959 723 602` en `WhatsAppFloat.tsx`, `Footer.tsx`, `app/cotizar/page.tsx` y `app/contacto/page.tsx`
 - [ ] Confirmar correo de contacto oficial (footer y `/contacto` usan `ventas@chamoimport.com` como provisional)
-- [ ] Reemplazar textos placeholder de `/nosotros` (`data/company.ts`: año 2016, misión/visión de ejemplo) por ficha oficial del cliente
+- [x] 2026-10-26 — Ficha comercial oficial cargada: RUC, 2013, sedes, horario y
+  franja **Solidez en Cifras** bajo testimonios. Misión/visión de catálogo
+  siguen. Detalle:
+  [`cambios/2026-10-26-solidez-en-cifras-ficha-oficial.md`](./cambios/2026-10-26-solidez-en-cifras-ficha-oficial.md).
 - [x] 2026-09-09 — Políticas (términos, privacidad) enlazadas desde el footer
 - [ ] Sustituir testimonios de ejemplo (`data/testimonials.ts`) por casos reales de distribuidores
 

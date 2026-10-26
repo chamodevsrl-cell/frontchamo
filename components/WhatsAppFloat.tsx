@@ -16,7 +16,7 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="group fixed right-4 bottom-4 z-[70] flex h-14 w-14 items-center justify-center rounded-full bg-brand-whatsapp text-white shadow-[0_8px_24px_rgba(37,211,102,0.45)] transition duration-200 hover:scale-105 hover:bg-[#1ebe57] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-whatsapp sm:right-6 sm:bottom-6 sm:h-16 sm:w-16"
+      className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-brand-whatsapp text-white shadow-[0_8px_24px_rgba(37,211,102,0.45)] transition duration-200 hover:scale-105 hover:bg-[#1ebe57] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-whatsapp sm:h-16 sm:w-16"
     >
       <span className="absolute inset-0 animate-ping rounded-full bg-brand-whatsapp/40 [animation-duration:2.4s]" />
       <WhatsAppIcon className="relative h-7 w-7 sm:h-8 sm:w-8" />

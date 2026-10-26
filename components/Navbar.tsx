@@ -430,13 +430,13 @@ export default function Navbar() {
       </div>
 
       {/* Nav azul */}
-      <div className="bg-brand-primary text-white">
-        <div className="mx-auto flex max-w-[1600px] items-stretch gap-1 px-2 sm:px-4 lg:px-8 xl:px-10">
+      <div className="hidden bg-white px-4 pb-2 pt-1 sm:px-6 lg:block lg:px-8 xl:px-10">
+        <div className="mx-auto flex max-w-[1600px] items-stretch rounded-2xl bg-brand-primary text-white">
           <div className="relative hidden lg:block" ref={categoriesRef}>
             <button
               type="button"
               onClick={() => setCategoriesOpen((open) => !open)}
-              className="inline-flex h-full items-center gap-2 bg-brand-dark px-4 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition hover:bg-[#082a43]"
+              className="inline-flex h-full items-center gap-2 rounded-l-2xl bg-brand-dark px-5 py-3.5 font-display text-sm font-bold tracking-wide uppercase transition hover:bg-[#082a43]"
               aria-expanded={categoriesOpen}
             >
               <LayoutGrid className="h-4 w-4" strokeWidth={2.5} />
@@ -448,7 +448,7 @@ export default function Navbar() {
             </button>
 
             {categoriesOpen && (
-              <div className="absolute top-full left-0 z-50 mt-0 min-w-[240px] overflow-hidden rounded-b-lg border border-brand-dark/10 bg-white shadow-xl">
+              <div className="absolute top-full left-0 z-50 mt-2 min-w-[240px] overflow-hidden rounded-xl border border-brand-dark/10 bg-white shadow-xl">
                 <ul className="py-2">
                   {navCategories.map((category) => (
                     <li key={category.slug}>
@@ -482,7 +482,7 @@ export default function Navbar() {
 
           <nav
             ref={mainNavRef}
-            className="relative hidden flex-1 items-center gap-0.5 lg:flex"
+            className="relative hidden flex-1 items-center justify-start gap-1 lg:flex"
             aria-label="Principal"
           >
             {mainLinks.map((link) => {

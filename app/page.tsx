@@ -5,6 +5,7 @@ import CategoriesGrid from "@/components/CategoriesGrid";
 import FeaturedOffers from "@/components/FeaturedOffers";
 import BrandsCarousel from "@/components/BrandsCarousel";
 import Testimonials from "@/components/Testimonials";
+import CompanyStats from "@/components/CompanyStats";
 import Reveal from "@/components/Reveal";
 
 export default function Home() {
@@ -31,6 +32,9 @@ export default function Home() {
           <Testimonials />
         </Reveal>
       </main>
+      <Reveal>
+        <CompanyStats />
+      </Reveal>
     </div>
   );
 }

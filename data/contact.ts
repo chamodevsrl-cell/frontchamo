@@ -10,11 +10,11 @@ export const WHATSAPP_NUMBER = "51936608583";
 /** Provisional: confirmar con el cliente antes de darlo por oficial. */
 export const EMAIL = "ventas@chamoimport.com";
 
-export const ADDRESS_DISPLAY = "Lima, Perú";
+export const ADDRESS_DISPLAY = "Jr. Andahuaylas N° 955 Int. 60, Lima";
 export const ADDRESS_HINT =
-  "Coordinamos visita y despacho. Abre el mapa para la ubicación.";
-export const HOURS_DISPLAY = "Lun - Sáb 8:00am a 6:00pm";
-export const HOURS_HINT = "Atención mayorista y distribuidores";
+  "Retiro en tienda. Anexos: Jr. Cusco 716 Int. 301 · Jr. Andahuaylas 929 Int. 301";
+export const HOURS_DISPLAY = "Lun - Sáb 9:00am a 7:00pm";
+export const HOURS_HINT = "Domingos y feriados 11:00am a 6:00pm";
 
 export const MAP_URL = "https://maps.app.goo.gl/mrh3WueTJErXS2sg6";
 export const MAP_EMBED_URL =

@@ -7,6 +7,7 @@ import { ContentProvider } from "@/components/ContentProvider";
 import { FavoritesProvider } from "@/components/FavoritesProvider";
 import AuthModal from "@/components/AuthModal";
 import Footer from "@/components/Footer";
+import CatalogPdfFloat from "@/components/CatalogPdfFloat";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import WrenchCursor from "@/components/WrenchCursor";
 import IntroSplash from "@/components/IntroSplash";
@@ -57,7 +58,10 @@ export default function RootLayout({
                   <IntroSplash />
                   <div className="flex min-h-full flex-1 flex-col">{children}</div>
                   <Footer />
-                  <WhatsAppFloat />
+                  <div className="fixed right-4 bottom-4 z-[70] flex flex-col items-end gap-3 sm:right-6 sm:bottom-6">
+                    <CatalogPdfFloat />
+                    <WhatsAppFloat />
+                  </div>
                   <AuthModal />
                 </CompareProvider>
               </FavoritesProvider>

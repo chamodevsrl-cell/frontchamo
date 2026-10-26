@@ -903,6 +903,34 @@ export function productPath(id: string) {
   return `/producto/${id}`;
 }
 
+export type PackKind = "unidad" | "docena" | "caja";
+
+export const PACK_OPTIONS: { id: PackKind; label: string }[] = [
+  { id: "unidad", label: "Unidad" },
+  { id: "docena", label: "Docena" },
+  { id: "caja", label: "Caja" },
+];
+
+function firstNumber(text: string, fallback: number) {
+  const match = text.match(/\d+/);
+  const value = match ? Number(match[0]) : fallback;
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+/** Unidades físicas que trae cada presentación. */
+export function packQuantity(product: FeaturedProduct, kind: PackKind) {
+  if (kind === "unidad") return 1;
+  if (kind === "docena") return firstNumber(product.packaging.docena, 12);
+  return firstNumber(product.packaging.caja, 24);
+}
+
+/** Precio de la presentación: unidad = lista; docena/caja = mayorista × unidades. */
+export function packPrice(product: FeaturedProduct, kind: PackKind) {
+  const units = packQuantity(product, kind);
+  const raw = kind === "unidad" ? product.price : product.wholesalePrice * units;
+  return Math.round(raw * 100) / 100;
+}
+
 // TODO Backend: reemplazar con fetch(`/api/v1/catalog/${id}`) — ver API_CONTRACT_TIENDA.md §2.
 // Llamado en varios lugares del cliente (CartProvider, FavoritesProvider, CompareProvider,
 // ProductDetail) para resolver un productId guardado al FeaturedProduct completo.

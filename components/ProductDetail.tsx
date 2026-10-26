@@ -25,7 +25,14 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
-import { productPath, type FeaturedProduct } from "@/data/products";
+import {
+  PACK_OPTIONS,
+  packPrice,
+  packQuantity,
+  productPath,
+  type FeaturedProduct,
+  type PackKind,
+} from "@/data/products";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/components/CartProvider";
 import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
@@ -84,12 +91,6 @@ function firstSentence(text: string) {
   return match?.[0] ?? text;
 }
 
-function wholesaleMinQty(packaging: FeaturedProduct["packaging"]) {
-  const match = packaging.docena.match(/\d+/);
-  const qty = match ? Number(match[0]) : 12;
-  return Number.isFinite(qty) && qty > 0 ? qty : 12;
-}
-
 function AccordionCard({
   id,
   title,
@@ -97,6 +98,7 @@ function AccordionCard({
   open,
   onToggle,
   actions,
+  tint = "plain",
   children,
 }: {
   id: string;
@@ -105,11 +107,17 @@ function AccordionCard({
   open: boolean;
   onToggle: () => void;
   actions?: ReactNode;
+  tint?: "plain" | "primary";
   children: ReactNode;
 }) {
+  const branded = tint === "primary";
   return (
     <div className={CARD}>
-      <div className="flex items-center justify-between gap-3 px-4 py-3.5 lg:px-6">
+      <div
+        className={`flex items-center justify-between gap-3 px-4 py-3.5 lg:px-6 ${
+          branded ? "bg-brand-primary text-white" : ""
+        }`}
+      >
         <button
           type="button"
           className="inline-flex min-w-0 flex-1 items-center justify-between gap-3 text-left lg:pointer-events-none lg:cursor-default"
@@ -117,14 +125,21 @@ function AccordionCard({
           aria-expanded={open}
           aria-controls={id}
         >
-          <span className="inline-flex items-center gap-2 font-display text-base font-bold text-brand-dark sm:text-lg">
-            <Icon className="h-5 w-5 shrink-0 text-brand-primary" strokeWidth={2} />
+          <span
+            className={`inline-flex items-center gap-2 font-display text-base font-bold sm:text-lg ${
+              branded ? "text-white" : "text-brand-dark"
+            }`}
+          >
+            <Icon
+              className={`h-5 w-5 shrink-0 ${branded ? "text-brand-gold" : "text-brand-primary"}`}
+              strokeWidth={2}
+            />
             {title}
           </span>
           <ChevronDown
-            className={`h-5 w-5 shrink-0 text-brand-dark/45 transition lg:hidden ${
-              open ? "rotate-180" : ""
-            }`}
+            className={`h-5 w-5 shrink-0 transition lg:hidden ${
+              branded ? "text-white/80" : "text-brand-dark/45"
+            } ${open ? "rotate-180" : ""}`}
             strokeWidth={2.25}
           />
         </button>
@@ -149,6 +164,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
   const categoryIcon = categories.find((item) => item.slug === product.category)?.icon;
   const [activeImage, setActiveImage] = useState(0);
   const [qty, setQty] = useState(1);
+  const [pack, setPack] = useState<PackKind>("unidad");
   const [added, setAdded] = useState(false);
   const [openSpecs, setOpenSpecs] = useState(false);
   const [openDescription, setOpenDescription] = useState(false);
@@ -166,7 +182,10 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
     { label: "Tipo", value: product.categoryLabel },
     ...product.specs,
   ];
-  const minWholesale = wholesaleMinQty(product.packaging);
+  const unitsPerPack = packQuantity(product, pack);
+  const selectedPrice = packPrice(product, pack);
+  const packLabel = PACK_OPTIONS.find((item) => item.id === pack)?.label ?? "Unidad";
+  const packHint = product.packaging[pack];
 
   const updateRelatedArrows = useCallback(() => {
     const el = relatedRef.current;
@@ -204,7 +223,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
   }
 
   const whatsappHref = whatsappHrefFor(
-    `Hola, quiero cotizar este producto: ${product.name} (${product.sku}) x${qty}`,
+    `Hola, quiero cotizar este producto: ${product.name} (${product.sku}) · ${qty} ${packLabel.toLowerCase()} (${unitsPerPack * qty} unids)`,
   );
 
   return (
@@ -339,18 +358,46 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <p className="font-display text-[2.35rem] font-extrabold tracking-tight text-brand-dark sm:text-5xl">
-              {formatPrice(product.price)}
-            </p>
-            <div className="text-right">
-              <p className="text-[11px] font-semibold tracking-wide text-brand-dark/45">
-                Precio mayorista
+            <div>
+              <p className="font-display text-[2.35rem] font-extrabold tracking-tight text-brand-dark sm:text-5xl">
+                {formatPrice(selectedPrice)}
               </p>
-              <p className="font-display text-lg font-bold text-brand-primary sm:text-xl">
-                {formatPrice(product.wholesalePrice)}
+              {pack !== "unidad" ? (
+                <p className="mt-1 text-sm font-medium text-brand-dark/70 sm:text-base">
+                  {formatPrice(product.wholesalePrice)} c/u · {unitsPerPack} unidades
+                </p>
+              ) : (
+                <p className="mt-1 text-sm font-medium text-brand-dark/70 sm:text-base">
+                  Mayorista {formatPrice(product.wholesalePrice)} c/u
+                </p>
+              )}
+            </div>
+            <div className="min-w-[13rem] text-right">
+              <p className="mb-1.5 text-sm font-semibold tracking-wide text-brand-dark/60">
+                Presentación
               </p>
-              <p className="text-[11px] text-brand-dark/45">
-                desde {minWholesale} unidades
+              <div className="inline-flex overflow-hidden rounded-xl border border-[#d7e4ef] bg-white">
+                {PACK_OPTIONS.map((option) => {
+                  const selected = pack === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setPack(option.id)}
+                      aria-pressed={selected}
+                      className={`px-3 py-2 text-sm font-bold uppercase transition ${
+                        selected
+                          ? "bg-brand-primary text-white"
+                          : "text-brand-dark/70 hover:bg-brand-gray"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 max-w-[18rem] text-sm leading-snug font-medium text-brand-dark/70 sm:text-base">
+                {packHint}
               </p>
             </div>
           </div>
@@ -387,7 +434,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
             <button
               type="button"
               onClick={() => {
-                addItem(product.id, qty);
+                addItem(product.id, qty * unitsPerPack);
                 setAdded(true);
                 window.setTimeout(() => setAdded(false), 1400);
               }}
@@ -431,14 +478,17 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
           icon={ClipboardList}
           open={openSpecs}
           onToggle={() => setOpenSpecs((value) => !value)}
+          tint="primary"
         >
-          <dl className="grid grid-cols-1 border-t border-[#e6eef5] sm:grid-cols-2">
+          <dl className="grid grid-cols-1 sm:grid-cols-2">
             {specs.map((spec, index) => (
               <div
                 key={`${spec.label}-${index}`}
-                className="flex items-baseline justify-between gap-4 border-b border-[#e6eef5] px-4 py-3 sm:px-6"
+                className={`flex items-baseline justify-between gap-4 border-b border-brand-primary/15 px-4 py-3 sm:px-6 ${
+                  index % 2 === 0 ? "bg-[#e8f4fc]" : "bg-white"
+                }`}
               >
-                <dt className="text-sm text-brand-dark/55">{spec.label}</dt>
+                <dt className="text-sm font-semibold text-brand-primary">{spec.label}</dt>
                 <dd className="text-right text-sm font-semibold text-brand-dark">
                   {spec.value}
                 </dd>

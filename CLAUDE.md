@@ -67,9 +67,9 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
   3. Barra `brand-primary`: botón **Categorías** (fondo `brand-dark`, dropdown desde `mainCategories` + "Ver todas") y menú principal uppercase (Inicio, Catálogo, Ofertas, Nosotros, Contacto). El ítem activo y el hover solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo además lleva una **barra dorada animada** debajo (`navIndicator`, calculada por `offsetLeft`/`offsetWidth` del link con `data-nav-active`).
   - Menú móvil tipo drawer lateral con categorías + navegación + botón "Mi cuenta".
   - Los badges **Oferta/Nuevo** (no el botón de categorías) son los que usan `brand-gold` — ver `FeaturedOffers.tsx` / `CategoriesGrid.tsx`.
-- **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) con el número oficial; `/cotizar` arma el mensaje con formulario + carrito.
+- **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) con el número oficial; `/cotizar` arma el mensaje con formulario + carrito. Encima, botón azul `CatalogPdfFloat` para descargar el catálogo PDF (`CATALOG_PDF_SRC` en `data/media.ts`; hoy vacío).
 - **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
-- **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials).
+- **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials) → CompanyStats.
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
 - Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Área cliente `/cuenta` (Mi perfil / Mi empresa) para **cualquier rol**. Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `THE WINTER` / `Criper@11`, también `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS local (`chamo-cms-v1`): banners en `/admin/banners`, categorías en `/admin/categorias`, footer en `/admin/ajustes/footer`, canales (WhatsApp/teléfono/correo/redes) en `/admin/ajustes/canales`, equipo en `/admin/equipo`, marcas del carrusel en `/admin/marcas`.
 - **Ficha de producto** en `/producto/[id]` (pantalla completa, sin modal) + catálogo de ejemplo (~22 SKUs, mín. 3 por categoría): galería, ficha técnica, relacionados, agregar a cotización y WhatsApp.
@@ -83,6 +83,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | --- | --- |
 | `Navbar.tsx` | Header de 3 niveles (ver §5) |
 | `WhatsAppFloat.tsx` | Burbuja flotante WhatsApp (verde `#25D366`, fija inferior derecha) |
+| `CatalogPdfFloat.tsx` | Burbuja flotante azul encima de WhatsApp: descarga el catálogo PDF (ruta vacía por ahora) |
 | `HeroSlider.tsx` | Slider de anuncios: solo banners reales (sin placeholder), swipe táctil |
 | `BrandsCarousel.tsx` | Carrusel de marcas distribuidoras (marquee CSS), debajo del slider |
 | `CategoriesGrid.tsx` | Categorías en carrusel horizontal con flechas circulares + borde brillante de marca |
@@ -93,6 +94,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `FavoritesProvider.tsx` | Favoritos en `localStorage` (`chamo-favorites-v1`) |
 | `FavoriteButton.tsx` | Corazón con persistencia + confirmación “Guardado” |
 | `Testimonials.tsx` | Prueba social B2B de ejemplo en la home |
+| `CompanyStats.tsx` | Franja “Solidez en Cifras” (años, clientes/día, despachos, RUC) |
 | `Breadcrumbs.tsx` | Miga de pan en páginas internas |
 | `ProductCard.tsx` | Tarjeta de producto reutilizable (home, catálogo, ofertas) |
 | `ProductCatalog.tsx` | Grilla + modal |
@@ -151,7 +153,7 @@ API_CONTRACT.md        # Handover HTTP para backend
 components/            # UI reutilizable (ver §6)
 data/
   contact.ts            # Teléfono / WhatsApp / correo / Maps
-  company.ts            # Historia / misión / visión de /nosotros (placeholder)
+  company.ts            # Ficha oficial (RUC, sedes, cifras) + misión/visión
   media.ts              # Rutas de slider, logo e icono (LOGO_SRC, ICON_SRC, slides)
   home.ts                # Datos de secciones del home (marcas, categorías, trust bar…)
   products.ts            # Catálogo de productos de ejemplo
@@ -215,7 +217,7 @@ Productos del panel en cards en móvil. Resumen para el backend:
 - `FavoritesProvider` sigue en `ids: string[]` (sin `addedAt`) — cambiar a `{productId, addedAt}[]` si se necesita ordenar u sincronizar con cuenta real.
 - `categoryLabel` sigue denormalizado en cada producto (documentado, no corregido).
 - Confirmar correo de contacto oficial (footer y `/contacto`).
-- Reemplazar textos placeholder de `/nosotros` (`data/company.ts`) por ficha oficial.
+- Completar misión/visión oficiales de `/nosotros` si el cliente envía redacción distinta a la ficha SUNAT.
 - Revisar si el modo oscuro debe reactivarse (`Navbar.tsx` lo fuerza a apagado en cada carga).
 - Fotos reales de tienda/almacén y logos oficiales de marca (hoy JPEG localizados y wordmarks SVG).
 - Specs técnicas oficiales por SKU cuando el cliente envíe fichas.

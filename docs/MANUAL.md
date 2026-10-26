@@ -76,14 +76,15 @@ components/
   Preloader.tsx           # Carga inicial → BrandLoader
   BrandLoader.tsx         # Logo + engranaje + CARGANDO... (entrada y nav interna)
   ProductCard.tsx / ProductCatalog.tsx / ProductDetail.tsx
-  FavoriteButton.tsx / Testimonials.tsx / Breadcrumbs.tsx
+  FavoriteButton.tsx / Testimonials.tsx / CompanyStats.tsx / Breadcrumbs.tsx
   QuoteForm.tsx
   ContactForm.tsx           # /contacto → WhatsApp
+  CatalogPdfFloat.tsx       # Botón flotante catálogo PDF (encima de WhatsApp)
   WrenchCursor.tsx          # Cursor a medida (desktop, hover: hover): negro puro,
                             # blanco sobre cualquier <img> (target.closest("img"))
 data/
   contact.ts               # Teléfono, WhatsApp, correo, horario, Maps
-  company.ts               # Historia / misión / visión (placeholder)
+  company.ts               # Ficha oficial (RUC, sedes, cifras) + misión/visión
   testimonials.ts          # Prueba social B2B de ejemplo
   media.ts                 # Slides / logo / icon
   home.ts                   # trustItems, mainCategories, distributorBrands
@@ -120,9 +121,9 @@ Detalle `/categorias/[slug]`: banner ancho (`PageBanner` vía `CategoryBanner`) 
 línea, título centrado en mayúsculas (`bannerTitle`, p. ej. **ELÉCTRICOS**) y
 chips de marcas de esa categoría. Los productos van debajo, a todo el ancho.
 
-`/nosotros` reutiliza el mismo `PageBanner` con el encabezado sticker **SOBRE NOSOTROS**. Textos de
-empresa (historia, misión, visión, valores) viven en `data/company.ts` y son
-placeholder hasta ficha oficial del cliente.
+`/nosotros` reutiliza el mismo `PageBanner` con el encabezado sticker **SOBRE NOSOTROS**. Identidad
+oficial (RUC `20552044895`, inicio 18 mar 2013, sedes) vive en `data/company.ts`.
+Misión/visión siguen redacción de catálogo hasta que el cliente envíe otra.
 
 ### A.5b Animaciones de entrada
 
@@ -198,7 +199,7 @@ ficha persiste, muestra el aviso fijo **Guardado en favoritos** y el Navbar llev
 
 Ficha (`ProductDetail.tsx`):
 1. Miga de pan + bloque comercial (marca, título, blurb, chips, precios, cantidad, CTAs) junto a la galería ancha con miniaturas.
-2. En móvil el orden es título → galería/thumbs → precio/qty/CTAs; specs, descripción y relacionados van en acordeón. En escritorio: dos columnas + specs en pares + descripción con checklist. “Desde N unidades” sale de `packaging.docena`. Las cards de la tienda usan `.card-glow` (borde azul + halo dorado).
+2. En móvil el orden es título → galería/thumbs → precio/qty/CTAs; specs, descripción y relacionados van en acordeón. En escritorio: dos columnas + specs en pares (cabecera `brand-primary` y filas azul/blanco) + descripción con checklist. La presentación (Unidad / Docena / Caja) cambia el precio: lista en unidad, mayorista × unidades en docena/caja. Las notas de mayorista y del pack van en texto `sm`/`base`. Las cards de la tienda usan `.card-glow`.
 3. **Productos relacionados** de la misma categoría (carrusel; clic abre esa ficha).
 
 WhatsApp unificado: `data/contact.ts` → `wa.me/51936608583` (`+51 936 608 583`). Los formularios de
@@ -219,16 +220,16 @@ Fuente: `data/contact.ts`.
 
 - Razón social: Chamo Import S.R.L.
 - Teléfono de llamadas: **+51 959 723 602**. WhatsApp de cotización: **+51 936 608 583** (`wa.me/51936608583`) — float, footer, cotizar, contacto y ficha de producto.
-- Ubicación: Lima, Perú — https://maps.app.goo.gl/mrh3WueTJErXS2sg6
-- Correo `ventas@chamoimport.com` sigue provisional
+- Ubicación fiscal: Jr. Andahuaylas N° 955 Int. 60, Lima — https://maps.app.goo.gl/mrh3WueTJErXS2sg6
+- Horario: Lun–Sáb 9:00am a 7:00pm; domingos y feriados 11:00am a 6:00pm
+- RUC **20552044895** (Activo / Habido). Correo `ventas@chamoimport.com` sigue provisional
 
 ### A.9 Navbar — interacción del menú principal
 
-`components/Navbar.tsx`, barra `brand-primary` (nivel 3): el link activo y el hover
-solo cambian el **color del texto a `brand-gold`** (sin bloque de fondo); el activo
-además lleva una barra dorada animada debajo, calculada con `offsetLeft`/`offsetWidth`
-del link marcado `data-nav-active="true"` (estado `navIndicator`, se recalcula al
-cambiar `pathname`). Si se agregan ítems a `mainLinks`, el indicador los sigue solo.
+`components/Navbar.tsx`, barra `brand-primary` (nivel 3): en desktop es una cápsula
+`rounded-2xl` plana (sin sombra 3D). Los links van a la **izquierda** (junto a
+Categorías). El activo y el hover solo cambian el **color del texto a `brand-gold`**;
+el activo además lleva una barra dorada animada debajo (`navIndicator`).
 
 ### A.10 Auditoría UX 2026-09-10 (origen y cierre)
 
@@ -662,10 +663,14 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 **WhatsApp**
 - Botón flotante verde para cotizar / contactar (`+51 936 608 583`)
+- Encima: botón azul para descargar el catálogo PDF (aún sin archivo; `CATALOG_PDF_SRC`)
 - En cada categoría: **Cotizar línea** abre WhatsApp con el nombre de esa línea
 
 **Testimonios**
 - Tres referencias de mayoristas de ejemplo (se reemplazan con casos reales del cliente)
+
+**Solidez en Cifras**
+- Franja `brand-dark` bajo testimonios (separada del footer): +13 años, +100 clientes/día, 20–30 despachos a provincia, 100% facturación legal (RUC)
 
 **Pie de página**
 - Enlaces, contacto, mapa, medios de pago, boletín, términos y privacidad
@@ -722,7 +727,7 @@ el mock documentado en [`API_CONTRACT.md`](../API_CONTRACT.md). El CMS local
 - Logos de marcas → `public/images/marcas/`
 - Productos → `data/products.ts` (la UI de `/catalogo` los pide a `/api/productos`)
 - Testimonios del home → `data/testimonials.ts` (hoy ejemplo)
-- Historia, misión y visión de `/nosotros` → `data/company.ts` (hoy placeholder)
+- Historia, RUC, sedes y cifras → `data/company.ts` (ficha oficial 2026-10-26); misión/visión aún de catálogo
 
 > ⚠️ Todo lo del CMS local se guarda en el navegador (`localStorage`), que
 > tiene un límite de espacio (unos 5-10 MB según el navegador). Si al subir

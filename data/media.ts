@@ -35,3 +35,9 @@ export const LOGO_SRC = "/images/logo/logo-chamo-import.png";
 
 /** Icono del sitio (favicon) */
 export const ICON_SRC = "/images/icon/logo-chamo-import.png";
+
+/**
+ * Catálogo PDF de productos (botón flotante). Vacío hasta que el cliente
+ * entregue el archivo — p. ej. `/catalogo/chamo-import.pdf`.
+ */
+export const CATALOG_PDF_SRC = "";
