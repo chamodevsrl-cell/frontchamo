@@ -113,15 +113,15 @@ type FeaturedProduct = {
 
 | Componente | Props relevantes | Fuente |
 | --- | --- | --- |
-| `ProductCard.tsx` | `product: FeaturedProduct`, `onOpen(): void`, `onAddToCart?(): void` | lista pasada por el padre |
-| `ProductModal.tsx` | `product: FeaturedProduct`, `onClose(): void`, `onSelectProduct?(p: FeaturedProduct): void` | igual |
+| `ProductCard.tsx` | `product: FeaturedProduct`, `onAddToCart?(): void` — clic navega a `/producto/[id]` | lista pasada por el padre |
+| `ProductDetail.tsx` | `product: FeaturedProduct`, `related: FeaturedProduct[]` | `app/producto/[id]/page.tsx` |
 | `ProductCatalog.tsx` | `products: FeaturedProduct[]`, `emptyMessage?: string` | `getProducts()`/`searchCatalog()` en `data/products.ts` |
 | `CatalogFilters.tsx` | `q: string`, `category: string`, `brand: string` (controla `?q=&category=&brand=` de `/catalogo`) | `useSearchParams()` |
 | `CategoryCollage.tsx` | `slug: string`, `fallback: string`, `fallbackAlt: string` | `getCategoryCollage(slug)` en `data/products.ts` |
 | `CategoryBanner.tsx` | `category: MainCategory`, `brands?: readonly string[]` | `data/home.ts` + `useSiteContent()` (overlay CMS) |
 | `FeaturedOffers.tsx` / `app/catalogo/page.tsx` / `app/ofertas/page.tsx` | consumen `featuredProducts`/`searchCatalog()` y arman los `FeaturedProduct[]` de arriba | `data/products.ts` |
 
-Helpers relevantes en `data/products.ts`: `searchCatalog(filters)`, `getProductById(id)`,
+Helpers relevantes en `data/products.ts`: `productPath(id)`, `searchCatalog(filters)`, `getProductById(id)`,
 `getRelatedProducts(product, limit)`, `getProductsByCategory(category)`,
 `getCategoryCollage(slug, limit)`, `getCatalogBrands()`.
 
@@ -144,7 +144,7 @@ type CartResolvedLine = CartLine & {
 ```
 
 Usado por: `app/carrito/page.tsx` (totales, WhatsApp del pedido), `Navbar.tsx` (badge
-del carrito), `ProductCard.tsx`/`ProductModal.tsx` (`addItem`), `QuoteForm.tsx` (arma
+del carrito), `ProductCard.tsx`/`ProductDetail.tsx` (`addItem`), `QuoteForm.tsx` (arma
 el mensaje de cotización con `lines`).
 
 ### 4.3 Favoritos y Comparar (`FavoritesProvider.tsx` / `CompareProvider.tsx`)
@@ -251,7 +251,7 @@ detalle por id y los relacionados (hoy sin ruta HTTP —
 [`API_CONTRACT_TIENDA.md` §2](./API_CONTRACT_TIENDA.md#2-catálogo-público).
 Para un backend real: reemplazar `searchCatalog()`/`featuredProducts` por una
 consulta a base de datos con la misma forma `FeaturedProduct[]` — el resto de
-la tienda (`ProductCatalog`, `ProductCard`, `ProductModal`, etc.) no necesita
+la tienda (`ProductCatalog`, `ProductCard`, `ProductDetail`, etc.) no necesita
 cambios si el shape se mantiene.
 
 ### 5.3 Tienda pública — carrito, favoritos, comparar, cuentas
@@ -321,10 +321,10 @@ pieza más urgente de conectar si el cliente va a operar el sitio en producción
    con flechas), productos destacados, testimonios.
 2. **Buscar**: el buscador del Navbar navega a `/catalogo?q=...`. `/catalogo` tiene
    filtros por categoría y marca (`CatalogFilters.tsx`, vía query string).
-3. **Ver un producto**: clic en una tarjeta abre el modal (`ProductModal.tsx`) con
-   galería, precio unitario/mayorista, ficha técnica y productos relacionados de la
-   misma categoría (clic en uno cambia el producto dentro del mismo modal).
-4. **Carrito**: "Añadir al carrito" desde la tarjeta o el modal. `/carrito` muestra
+3. **Ver un producto**: clic en una tarjeta abre la ficha `/producto/[id]`
+   (`ProductDetail.tsx`) con galería, precio unitario/mayorista, ficha técnica y
+   productos relacionados de la misma categoría.
+4. **Carrito**: "Añadir al carrito" desde la tarjeta o la ficha. `/carrito` muestra
    cantidades, totales (precio guardado al agregar, con aviso si cambió), y arma un
    mensaje de WhatsApp con el pedido o lleva a `/cotizar` (formulario completo).
 5. **Favoritos / Comparar**: corazón y ícono de comparar en cada tarjeta; páginas

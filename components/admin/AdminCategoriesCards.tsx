@@ -19,6 +19,7 @@ type Draft = {
   name: string;
   description: string;
   image: string;
+  icon: string;
 };
 
 export default function AdminCategoriesCards({
@@ -53,7 +54,13 @@ function AdminCategoriesCardsForm({
   products: Product[];
   cmsCategories: CmsCategoryOverride[];
   customCategories: CmsCustomCategory[];
-  categories: { slug: string; label: string; eyebrow: string; image: string }[];
+  categories: {
+    slug: string;
+    label: string;
+    eyebrow: string;
+    image: string;
+    icon?: string;
+  }[];
   saveCms: (patch: Partial<CmsState>) => string | null;
 }) {
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -64,7 +71,7 @@ function AdminCategoriesCardsForm({
   useEffect(() => {
     function openFromHash() {
       if (window.location.hash === "#nueva-categoria") {
-        setDraft({ slug: null, name: "", description: "", image: "" });
+        setDraft({ slug: null, name: "", description: "", image: "", icon: "" });
       }
     }
     openFromHash();
@@ -86,7 +93,7 @@ function AdminCategoriesCardsForm({
 
   function openAdd() {
     setError("");
-    setDraft({ slug: null, name: "", description: "", image: "" });
+    setDraft({ slug: null, name: "", description: "", image: "", icon: "" });
   }
 
   async function persist() {
@@ -98,6 +105,7 @@ function AdminCategoriesCardsForm({
     }
     const description = draft.description.trim() || name;
     const image = draft.image.trim() || DEFAULT_IMAGE;
+    const icon = draft.icon.trim();
     setSaving(true);
     setError("");
 
@@ -123,6 +131,7 @@ function AdminCategoriesCardsForm({
             imageAlt: name,
             bannerTitle: name.toLocaleUpperCase("es"),
             bullets: previous?.bullets,
+            icon,
           },
         ],
       });
@@ -140,6 +149,7 @@ function AdminCategoriesCardsForm({
             bannerTitle: name.toLocaleUpperCase("es"),
             bullets: previous?.bullets,
             tint: previous?.tint,
+            icon,
           },
         ],
       });
@@ -152,8 +162,8 @@ function AdminCategoriesCardsForm({
     }
 
     const result = isNew
-      ? await createCategoryAction({ id: slug, name, description, image })
-      : await updateCategoryAction(slug, { name, description, image });
+      ? await createCategoryAction({ id: slug, name, description, image, icon })
+      : await updateCategoryAction(slug, { name, description, image, icon });
 
     setSaving(false);
     if (!result.ok) {
@@ -169,8 +179,8 @@ function AdminCategoriesCardsForm({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="max-w-2xl text-sm text-brand-dark/70">
           Cada tarjeta es una línea del catálogo. El recuento sale de los SKUs del
-          mock asignados a esa categoría. Editar abre un modal; la imagen se pega
-          por URL o se elige desde galería o carpetas.
+          mock asignados a esa categoría. Editar abre un modal; la portada y el
+          icono (opcional) se pegan por URL o se eligen desde galería o carpetas.
         </p>
         <button
           type="button"
@@ -222,6 +232,7 @@ function AdminCategoriesCardsForm({
                       name: category.label,
                       description: category.eyebrow,
                       image: category.image,
+                      icon: category.icon ?? "",
                     })
                   }
                   className="mt-1 inline-flex items-center justify-center gap-2 rounded-lg border border-brand-primary/30 bg-white px-3 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/10"
@@ -301,6 +312,14 @@ function AdminCategoriesCardsForm({
                 onChange={(image) => setDraft({ ...draft, image })}
                 label="Imagen de portada"
                 previewClassName="h-36 w-full"
+              />
+              <CmsImageField
+                value={draft.icon}
+                onChange={(icon) => setDraft({ ...draft, icon })}
+                label="Icono de la categoría"
+                previewClassName="h-20 w-20"
+                objectFit="contain"
+                optional
               />
               {error ? (
                 <p className="text-sm font-medium text-red-600">{error}</p>

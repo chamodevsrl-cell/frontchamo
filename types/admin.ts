@@ -196,6 +196,8 @@ export type CreateCategoryInput = {
   description: string;
   image: string;
   id?: string;
+  /** Icono opcional (URL, ruta o data URL). */
+  icon?: string;
 };
 
 export type UpdateCategoryInput = {
@@ -203,6 +205,7 @@ export type UpdateCategoryInput = {
   description?: string;
   image?: string;
   status?: CategoryStatus;
+  icon?: string;
 };
 
 /**
@@ -222,6 +225,8 @@ export interface Category {
   image: string;
   /** Texto corto de la línea (tarjeta del panel y antetítulo en la tienda). */
   description: string;
+  /** Icono opcional de la línea (URL, ruta o data URL). */
+  icon?: string;
 }
 
 /** Línea de un pedido. */

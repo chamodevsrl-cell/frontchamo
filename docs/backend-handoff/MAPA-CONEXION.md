@@ -58,8 +58,8 @@ venir como data URL base64 → ver §5).
 | Pieza | Vive hoy en (código) | Endpoint(s) | Contrato |
 | --- | --- | --- | --- |
 | Listado + búsqueda/filtros | `data/products.ts` → `searchCatalog()`, servido por `app/api/productos/route.ts` | `GET /api/v1/catalog?q=&category=&brand=` | [`API_CONTRACT_TIENDA.md` §2](../../API_CONTRACT_TIENDA.md#2-catálogo-público) |
-| Detalle por id | `data/products.ts` → `getProductById()` | `GET /api/v1/catalog/:id` | ídem |
-| Relacionados | `data/products.ts` → `getRelatedProducts()` | `GET /api/v1/catalog/:id/related` | ídem |
+| Detalle por id | `app/producto/[id]/page.tsx` + `getProductById()` | `GET /api/v1/catalog/:id` | ídem |
+| Relacionados | `ProductDetail.tsx` + `getRelatedProducts()` | `GET /api/v1/catalog/:id/related` | ídem |
 
 > ⚠️ Namespace **`catalog`**, no `products` — `/api/v1/products` ya es del
 > panel (fila 0, tipo `Product`, requiere sesión). Mismo path para las dos

@@ -8,8 +8,12 @@ import Reveal from "@/components/Reveal";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useCompare } from "@/components/CompareProvider";
 import { formatPrice } from "@/lib/format";
+import {
+  productPath,
+  type FeaturedProduct,
+  type ProductSpec,
+} from "@/data/products";
 import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
-import type { FeaturedProduct, ProductSpec } from "@/data/products";
 
 function specMap(product: FeaturedProduct) {
   return new Map(product.specs.map((spec) => [spec.label, spec.value]));
@@ -137,7 +141,12 @@ export default function CompararPage() {
                             />
                           </div>
                           <p className="font-display text-sm font-bold">
-                            {product.name}
+                            <Link
+                              href={productPath(product.id)}
+                              className="hover:text-brand-gold"
+                            >
+                              {product.name}
+                            </Link>
                           </p>
                           <button
                             type="button"

@@ -13,6 +13,11 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-10-26 | WhatsApp 936 608 583 + icono opcional en categorías | [2026-10-26-whatsapp-936-icono-categoria.md](./2026-10-26-whatsapp-936-icono-categoria.md) |
+| 2026-10-26 | Ficha móvil: orden de bloques + acordeón specs/descripción | [2026-10-26-ficha-layout-mobile-acordeon.md](./2026-10-26-ficha-layout-mobile-acordeon.md) |
+| 2026-10-26 | Ficha: tabla specs fluid + bordes azules de cards | [2026-10-26-ficha-tabla-responsive-bordes-cards.md](./2026-10-26-ficha-tabla-responsive-bordes-cards.md) |
+| 2026-10-26 | Ficha: specs en tabla y descripción debajo | [2026-10-26-ficha-tabla-specs-descripcion-abajo.md](./2026-10-26-ficha-tabla-specs-descripcion-abajo.md) |
+| 2026-10-26 | Ficha de producto a pantalla completa (se quita el modal) | [2026-10-26-ficha-producto-pantalla-completa.md](./2026-10-26-ficha-producto-pantalla-completa.md) |
 | 2026-09-23 | Panel: Marcas editables (nueva marca, logo, orden, ocultar) para el carrusel | [2026-09-23-admin-marcas-editables.md](./2026-09-23-admin-marcas-editables.md) |
 | 2026-09-23 | Panel: Pedidos y Productos en cards en móvil/tablet (tabla solo en escritorio) | [2026-09-23-admin-tablas-a-cards-en-movil.md](./2026-09-23-admin-tablas-a-cards-en-movil.md) |
 | 2026-09-23 | "Administrar" solo con sesión del panel verificada por el servidor | [2026-09-23-administrar-solo-con-sesion-verificada.md](./2026-09-23-administrar-solo-con-sesion-verificada.md) |

@@ -4,7 +4,8 @@ export const COMPANY_NAME = "Chamo Import S.R.L.";
 
 export const PHONE_DISPLAY = "+51 959 723 602";
 export const PHONE_TEL = "+51959723602";
-export const WHATSAPP_NUMBER = "51959723602";
+export const WHATSAPP_DISPLAY = "+51 936 608 583";
+export const WHATSAPP_NUMBER = "51936608583";
 
 /** Provisional: confirmar con el cliente antes de darlo por oficial. */
 export const EMAIL = "ventas@chamoimport.com";

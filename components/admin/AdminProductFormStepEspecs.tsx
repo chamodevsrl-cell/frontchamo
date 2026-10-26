@@ -38,7 +38,7 @@ export default function AdminProductFormStepEspecs({
         Fase 4 — Ficha técnica (Especs)
       </h2>
       <p className="text-sm text-brand-dark/60">
-        Pares atributo / valor para la tabla de ficha técnica del modal de
+        Pares atributo / valor para la tabla de ficha técnica de la página de
         producto. Opcional.
       </p>
       <div className="space-y-2">

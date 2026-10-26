@@ -11,8 +11,8 @@ Tailwind CSS v4.
 - **Slider de anuncios** en el home con animación de entrada, puntos y swipe táctil.
 - **Carrusel de marcas** distribuidoras y **carrusel de categorías** ("Explorar") con
   flechas circulares y swipe, en PC y móvil.
-- **Modal de producto** con galería, precio unitario/mayorista, ficha técnica
-  (tabla de especificaciones) y productos relacionados de la misma categoría.
+- **Ficha de producto** a pantalla completa (`/producto/[id]`) con galería, precio
+  unitario/mayorista, ficha técnica y productos relacionados de la misma categoría.
 - **CTA de WhatsApp** flotante para cotizaciones mayoristas.
 - **Autenticación** (login / registro) con contexto global y modal.
 - **Modo oscuro** vía clase `.dark` y preferencia persistida en `localStorage`.

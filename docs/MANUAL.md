@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-09-23**
+Última actualización: **2026-10-26**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -31,6 +31,7 @@ cambio visible o estructural — ver el flujo en [`docs/README.md`](./README.md)
 
 ```
 app/page.tsx              # Home: orden de secciones
+app/producto/[id]/        # Ficha pública de producto (pantalla completa)
 app/categorias/           # Listado + detalle [slug]
 app/catalogo/             # Búsqueda y filtros (API)
 app/carrito/              # Cotización local
@@ -74,7 +75,7 @@ components/
   IntroSplash.tsx         # BrandLoader solo al cruzar admin/perfil (sin recargar)
   Preloader.tsx           # Carga inicial → BrandLoader
   BrandLoader.tsx         # Logo + engranaje + CARGANDO... (entrada y nav interna)
-  ProductCard.tsx / ProductCatalog.tsx / ProductModal.tsx
+  ProductCard.tsx / ProductCatalog.tsx / ProductDetail.tsx
   FavoriteButton.tsx / Testimonials.tsx / Breadcrumbs.tsx
   QuoteForm.tsx
   ContactForm.tsx           # /contacto → WhatsApp
@@ -180,28 +181,27 @@ en oferta (ver A.12 más abajo). El resto del menú es placeholder.
 Navegar **dentro** de `/admin` no dispara el BrandLoader (solo al entrar o salir
 del panel — ver A.5b).
 
-### A.6 Productos y modal (`data/products.ts` → `ProductModal.tsx`)
+### A.6 Productos y ficha (`data/products.ts` → `ProductDetail.tsx`)
 
 Cada producto incluye `category` / `categoryLabel`, `specs[]` (ficha técnica) y
-`packaging`. Helpers: `getRelatedProducts`, `searchCatalog`, `getProductsByCategory`.
-Hay **al menos 3 productos por categoría** (22 SKUs de ejemplo).
+`packaging`. Helpers: `productPath`, `getRelatedProducts`, `searchCatalog`,
+`getProductsByCategory`. Hay **al menos 3 productos por categoría** (22 SKUs de ejemplo).
 
 El listado público pasa por `GET /api/productos?q=&category=&brand=`.
-`CartProvider` guarda líneas `{ productId, quantity, unitPrice, wholesaleUnitPrice }`
+Clic en una tarjeta navega a **`/producto/[id]`** (ficha a pantalla completa, ya no hay
+modal). `CartProvider` guarda líneas `{ productId, quantity, unitPrice, wholesaleUnitPrice }`
 en `localStorage` (`chamo-cart-v1`) — el precio se guarda al agregar, no se recalcula
 solo si el catálogo cambia de precio después; `/carrito` avisa si detecta que cambió.
 Líneas del formato viejo (`{productId, qty}`, sin precio) se migran solas al leer.
-`FavoritesProvider` guarda IDs en `chamo-favorites-v1`; el corazón de la tarjeta y del
-modal persiste, muestra el aviso fijo **Guardado en favoritos** y el Navbar lleva el contador.
+`FavoritesProvider` guarda IDs en `chamo-favorites-v1`; el corazón de la tarjeta y de la
+ficha persiste, muestra el aviso fijo **Guardado en favoritos** y el Navbar lleva el contador.
 
-Modal (diseño ficha):
-1. Galería + thumbs  
-2. Marca / SKU / OFF, descripción, caja de precios, stock, cantidad, CTAs  
-3. Tabla **Especificaciones técnicas**: cabecera `brand-dark` con columnas
-   “Especificación / Detalle”, filas blancas / `#eef6fc`, esquinas redondeadas + borde brillante  
-4. **Productos relacionados de la misma categoría** (clic cambia el producto del modal)
+Ficha (`ProductDetail.tsx`):
+1. Miga de pan + bloque comercial (marca, título, descripción, chips, precios, CTAs) junto a la galería ancha
+2. En móvil el orden es título → chips → galería → precio/CTAs; specs y descripción van en acordeón. En escritorio: ficha a dos columnas + tabla de specs + descripción. Cards con borde azul `brand-primary`.
+3. **Productos relacionados** de la misma categoría (carrusel; clic abre esa ficha)
 
-WhatsApp unificado: `data/contact.ts` → `wa.me/51959723602`. Los formularios de
+WhatsApp unificado: `data/contact.ts` → `wa.me/51936608583` (`+51 936 608 583`). Los formularios de
 `/contacto` y `/cotizar` abren el chat con `openWhatsApp()` (enlace `<a>`, no
 `window.open`, para no perder el envío por el bloqueador de popups).
 `FavoritesProvider` sincroniza el toast con un `idsRef` para que clics rápidos
@@ -218,7 +218,7 @@ no desfasen “Guardado” / “Quitado”.
 Fuente: `data/contact.ts`.
 
 - Razón social: Chamo Import S.R.L.
-- Teléfono / WhatsApp oficial: **+51 959 723 602** (`wa.me/51959723602`) — ya sincronizado en float, footer, cotizar, contacto y modal
+- Teléfono de llamadas: **+51 959 723 602**. WhatsApp de cotización: **+51 936 608 583** (`wa.me/51936608583`) — float, footer, cotizar, contacto y ficha de producto.
 - Ubicación: Lima, Perú — https://maps.app.goo.gl/mrh3WueTJErXS2sg6
 - Correo `ventas@chamoimport.com` sigue provisional
 
@@ -518,10 +518,10 @@ Contrato exacto: [`API_CONTRACT_TIENDA.md` §2](../API_CONTRACT_TIENDA.md#2-cat�
 Resumen: `app/api/productos/route.ts` usa `searchCatalog()` sobre
 `data/products.ts` (array estático) — se reemplaza por una consulta real
 manteniendo la forma `FeaturedProduct[]`; el resto de la tienda
-(`ProductCatalog.tsx`, `CatalogFilters.tsx`, `ProductModal.tsx`, etc.) no
+(`ProductCatalog.tsx`, `CatalogFilters.tsx`, `ProductDetail.tsx`, etc.) no
 cambia si esa forma se mantiene. El detalle por id y los relacionados
-(`getProductById`, `getRelatedProducts`) hoy **no** pasan por ninguna ruta
-HTTP — el contrato agrega `GET /api/v1/catalog/:id` y
+(`getProductById`, `getRelatedProducts`) hoy los usa `app/producto/[id]/page.tsx`
+sin pasar por HTTP — el contrato agrega `GET /api/v1/catalog/:id` y
 `GET /api/v1/catalog/:id/related` para eso (namespace `catalog`, no
 `products`, para no pisar la ruta del panel — ver la nota al inicio de
 `API_CONTRACT_TIENDA.md` §2).
@@ -655,13 +655,13 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 **Productos destacados / ofertas**
 - **Carrusel de una sola fila** (igual que categorías): flechas circulares ← →
   arriba a la derecha en PC y móvil; también se puede deslizar
-- Tarjetas con icono Lucide (oferta / destacado), precio, stock y "Añadir al carrito"; clic abre el detalle (modal)
-- En el modal: precios unitario/mayorista, cantidad, cotización / WhatsApp,
-  **ficha técnica** (tabla) y **productos relacionados** de la misma categoría
-  (al tocar uno se abre ese producto en el mismo modal)
+- Tarjetas con icono Lucide (oferta / destacado), precio, stock y "Añadir al carrito"; clic abre la ficha `/producto/[id]`
+- En la ficha: precios unitario/mayorista, cotización / WhatsApp,
+  **ficha técnica**, **descripción** y **productos relacionados** de la misma categoría
+  (al tocar uno se abre esa ficha)
 
 **WhatsApp**
-- Botón flotante verde para cotizar / contactar (`+51 959 723 602`)
+- Botón flotante verde para cotizar / contactar (`+51 936 608 583`)
 - En cada categoría: **Cotizar línea** abre WhatsApp con el nombre de esa línea
 
 **Testimonios**
@@ -674,6 +674,7 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 
 | Ruta | Uso |
 | --- | --- |
+| `/producto/[id]` | Ficha de producto a pantalla completa (galería, specs, relacionados) |
 | `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
 | `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |

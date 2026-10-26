@@ -17,7 +17,6 @@ const shinyCard ="";
     return (
       <article className="group relative h-[230px] sm:h-[260px] lg:h-[280px] overflow-hidden rounded-2xl bg-[#102a40] shadow-[0_8px_24px_rgba(11,53,84,0.12)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(11,53,84,0.25)] sm:h-[280px]">
   
-
 {/* Imagen de fondo con Skeleton Loading */}
 <div className="absolute inset-0 overflow-hidden">
   <SkeletonImage
@@ -42,6 +41,7 @@ const shinyCard ="";
           <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-white/20 bg-brand-primary shadow-lg">
             <CategoryIcon
               slug={category.slug}
+              icon={category.icon}
               className="h-5 w-5 text-white"
             />
           </div>
@@ -74,7 +74,6 @@ const shinyCard ="";
       </article>
     );
   }
-  
 
 export default function CategoriesGrid() {
   const { categories } = useSiteContent();

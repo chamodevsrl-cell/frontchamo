@@ -42,6 +42,8 @@ export type MainCategory = {
   bannerImage?: string;
   /** Fondo pastel suave de la tarjeta */
   tint: string;
+  /** Icono opcional (URL, ruta o data URL). Si falta, `CategoryIcon` usa Lucide. */
+  icon?: string;
 };
 
 /** Categorías destacadas del home (layout tipo “Explorar”) — fuente única del Navbar */

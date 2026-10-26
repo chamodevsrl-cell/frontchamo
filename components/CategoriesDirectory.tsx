@@ -30,7 +30,11 @@ export default function CategoriesDirectory() {
               </Link>
               <div className="flex flex-1 flex-col p-4">
                 <p className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-brand-primary uppercase">
-                  <CategoryIcon slug={category.slug} className="h-3.5 w-3.5" />
+                  <CategoryIcon
+                    slug={category.slug}
+                    icon={category.icon}
+                    className="h-3.5 w-3.5"
+                  />
                   {category.eyebrow}
                 </p>
                 <h2 className="mt-1 font-display text-xl font-bold text-brand-dark dark:text-white">

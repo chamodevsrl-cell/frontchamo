@@ -4,7 +4,9 @@ import { mainCategories } from "@/data/home";
 import {
   featuredProducts,
   getCategoryCollage,
+  getProductById,
   getRelatedProducts,
+  productPath,
   searchCatalog,
 } from "@/data/products";
 import {
@@ -59,6 +61,11 @@ describe("smoke de catálogo y home", () => {
     }
   });
 
+  it("productPath arma la ficha pública por id", () => {
+    expect(productPath("1")).toBe("/producto/1");
+    expect(getProductById("1")?.id).toBe("1");
+  });
+
   it("searchCatalog filtra por texto y categoría", () => {
     const bySku = searchCatalog({ q: "TRU-7821" });
     expect(bySku).toHaveLength(1);
@@ -79,7 +86,7 @@ describe("smoke de catálogo y home", () => {
 
   it("WhatsApp por categoría lleva el nombre de la línea", () => {
     const href = categoryWhatsappUrl("Ferretería");
-    expect(href).toContain("wa.me/51959723602");
+    expect(href).toContain("wa.me/51936608583");
     expect(href).toContain(encodeURIComponent("Ferretería"));
   });
 
@@ -111,6 +118,12 @@ describe("smoke de catálogo y home", () => {
     expect(
       categories.find((category) => category.slug === "ferreteria")?.label,
     ).toBe("Ferretería VIP");
+    const withIcon = mergeCategories(undefined, [
+      { slug: "ferreteria", icon: "/images/icon/logo-chamo-import.png" },
+    ]);
+    expect(
+      withIcon.find((category) => category.slug === "ferreteria")?.icon,
+    ).toBe("/images/icon/logo-chamo-import.png");
     const withExtra = mergeCategories(undefined, [], [
       {
         slug: "pintura",
@@ -249,13 +262,13 @@ describe("smoke de catálogo y home", () => {
   it("contacto oficial tiene teléfono, horario y WhatsApp", () => {
     expect(PHONE_DISPLAY).toContain("959 723 602");
     expect(HOURS_DISPLAY.toLowerCase()).toContain("lun");
-    expect(categoryWhatsappUrl("Ferretería")).toContain("wa.me/51959723602");
+    expect(categoryWhatsappUrl("Ferretería")).toContain("wa.me/51936608583");
   });
 
   it("whatsappUrl arma el enlace con el mensaje encodeado", () => {
     const href = whatsappUrl("Hola, soy Chamo");
     expect(href).toBe(
-      `https://wa.me/51959723602?text=${encodeURIComponent("Hola, soy Chamo")}`,
+      `https://wa.me/51936608583?text=${encodeURIComponent("Hola, soy Chamo")}`,
     );
   });
 
@@ -536,6 +549,7 @@ describe("CMS local (footer, banners de página, equipo)", () => {
     const { defaultTeam } = await import("@/data/team");
     const cms = parseCms(JSON.stringify({ slides: [], categories: [] }));
     expect(cms.footer.phone).toContain("959 723 602");
+    expect(cms.footer.whatsapp).toContain("936 608 583");
     expect(cms.footer.paymentMethods.length).toBeGreaterThanOrEqual(4);
     expect(cms.team.map((member) => member.role)).toEqual(
       defaultTeam.map((member) => member.role),

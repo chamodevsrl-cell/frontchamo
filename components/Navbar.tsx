@@ -459,6 +459,7 @@ export default function Navbar() {
                       >
                         <CategoryIcon
                           slug={category.slug}
+                          icon={category.icon}
                           className="h-4 w-4 text-brand-primary"
                         />
                         {category.label}
@@ -551,6 +552,7 @@ export default function Navbar() {
                 >
                   <CategoryIcon
                     slug={category.slug}
+                    icon={category.icon}
                     className="h-4 w-4 text-brand-primary"
                   />
                   {category.label}

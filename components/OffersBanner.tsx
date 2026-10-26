@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useSiteContent } from "@/components/ContentProvider";
 import SitePageBanner from "@/components/SitePageBanner";
 import type { PageBannerCrumb } from "@/components/PageBanner";
-import ProductModal from "@/components/ProductModal";
 import CmsImage from "@/components/CmsImage";
 import Reveal from "@/components/Reveal";
 import { formatPrice } from "@/lib/format";
-import { getProductById, type FeaturedProduct } from "@/data/products";
+import { getProductById, productPath, type FeaturedProduct } from "@/data/products";
 import type { CmsOfferBannerTile } from "@/lib/cms";
 
 /** El banner de 4 secciones solo reemplaza al normal cuando las 4 tienen foto + destino. */
@@ -63,7 +61,6 @@ export default function OffersBanner({
   crumbs?: PageBannerCrumb[];
 }) {
   const { cms, ready } = useSiteContent();
-  const [selected, setSelected] = useState<FeaturedProduct | null>(null);
 
   if (!ready) return null;
 
@@ -116,14 +113,14 @@ export default function OffersBanner({
                       <TileContent tile={tile} product={product} />
                     </Link>
                   )
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => product && setSelected(product)}
-                    className={tileClassName}
-                  >
+                ) : product ? (
+                  <Link href={productPath(product.id)} className={tileClassName}>
                     <TileContent tile={tile} product={product} />
-                  </button>
+                  </Link>
+                ) : (
+                  <div className={tileClassName}>
+                    <TileContent tile={tile} product={product} />
+                  </div>
                 )}
               </li>
             );
@@ -131,14 +128,6 @@ export default function OffersBanner({
         </ul>
       </Reveal>
 
-      {selected ? (
-        <ProductModal
-          key={selected.id}
-          product={selected}
-          onClose={() => setSelected(null)}
-          onSelectProduct={(product) => setSelected(product)}
-        />
-      ) : null}
     </>
   );
 }

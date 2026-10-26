@@ -153,12 +153,12 @@ auth.
 
 Forma exacta = tipo `FeaturedProduct` en [`data/products.ts`](./data/products.ts)
 (incluye `images[]`, `specs[]`, `packaging`, `badge`, etc. — mismo shape que
-ya consumen `ProductCard.tsx` y `ProductModal.tsx`, no cambia nada de UI si
+ya consumen `ProductCard.tsx` y `ProductDetail.tsx`, no cambia nada de UI si
 se mantiene).
 
 ### `GET /api/v1/catalog/:id`
 
-Front: reemplaza `getProductById(id)`. Usado por `ProductModal.tsx`,
+Front: reemplaza `getProductById(id)`. Usado por `ProductDetail.tsx`,
 `CartProvider.tsx`, `FavoritesProvider.tsx` y `CompareProvider.tsx` para
 resolver un id guardado (carrito/favoritos/comparar solo guardan `productId`,
 no el producto completo) al objeto `FeaturedProduct` completo. Público.
@@ -171,8 +171,8 @@ en vez de romper — mantener ese comportamiento con un 404 silencioso).
 
 ### `GET /api/v1/catalog/:id/related`
 
-Front: reemplaza `getRelatedProducts(product, limit)`, usado en el modal de
-producto ("También te puede interesar"). Query opcional `?limit=4` (default
+Front: reemplaza `getRelatedProducts(product, limit)`, usado en la ficha
+`/producto/[id]` ("Productos relacionados"). Query opcional `?limit=4` (default
 4). Misma categoría, excluyendo el propio id. Público.
 
 **Respuesta `200`:** `{ "ok": true, "data": [ /* FeaturedProduct[] */ ] }`

@@ -631,6 +631,7 @@ export async function createCategory(
     name,
     description: input.description.trim(),
     image: input.image.trim() || "/images/categorias/herramientas.jpg",
+    icon: input.icon?.trim() || undefined,
     subcategoriesCount: 0,
     status: "active",
   };
@@ -665,6 +666,9 @@ export async function updateCategory(
   }
   if (input.status !== undefined) {
     category.status = input.status;
+  }
+  if (input.icon !== undefined) {
+    category.icon = input.icon.trim() || undefined;
   }
   return { ...category };
 }

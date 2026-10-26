@@ -22,7 +22,7 @@ export type FeaturedProduct = {
   images: string[];
   description: string;
   features: string[];
-  /** Ficha técnica (tabla del modal) */
+  /** Ficha técnica (tabla de la ficha de producto) */
   specs: ProductSpec[];
   packaging: {
     unidad: string;
@@ -899,9 +899,13 @@ export const featuredProducts: FeaturedProduct[] = [
 
 export const homeFeaturedProducts = featuredProducts.slice(0, 8);
 
+export function productPath(id: string) {
+  return `/producto/${id}`;
+}
+
 // TODO Backend: reemplazar con fetch(`/api/v1/catalog/${id}`) — ver API_CONTRACT_TIENDA.md §2.
 // Llamado en varios lugares del cliente (CartProvider, FavoritesProvider, CompareProvider,
-// ProductModal) para resolver un productId guardado al FeaturedProduct completo.
+// ProductDetail) para resolver un productId guardado al FeaturedProduct completo.
 export function getProductById(id: string) {
   return featuredProducts.find((product) => product.id === id);
 }

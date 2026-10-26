@@ -1,6 +1,33 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-09-23**
+Última actualización: **2026-10-26**
+
+## 📱 WhatsApp 936 + icono de categoría (2026-10-26)
+
+- [x] 2026-10-26 — Destino de WhatsApp: **+51 936 608 583** (`wa.me/51936608583`).
+  El teléfono de llamadas no se tocó. En `/admin/categorias` el icono es
+  **opcional** (archivo o URL). Detalle:
+  [`cambios/2026-10-26-whatsapp-936-icono-categoria.md`](./cambios/2026-10-26-whatsapp-936-icono-categoria.md).
+
+## 🛒 Ficha de producto a pantalla completa (2026-10-26)
+
+- [x] 2026-10-26 — El clic en un producto ya no abre modal: navega a
+  `/producto/[id]` (`ProductDetail.tsx`) con galería ancha, precios, specs,
+  descripción y relacionados. Detalle:
+  [`cambios/2026-10-26-ficha-producto-pantalla-completa.md`](./cambios/2026-10-26-ficha-producto-pantalla-completa.md).
+- [x] 2026-10-26 — Specs en tabla (Especificación / Detalle) a todo el ancho;
+  la descripción queda **debajo**, no al lado. Detalle:
+  [`cambios/2026-10-26-ficha-tabla-specs-descripcion-abajo.md`](./cambios/2026-10-26-ficha-tabla-specs-descripcion-abajo.md).
+- [x] 2026-10-26 — La tabla encaja en cualquier ancho (`table-fixed` +
+  `break-words`, sin `min-w`) y las cards blancas de la ficha llevan borde
+  azul `brand-primary` visible. Detalle:
+  [`cambios/2026-10-26-ficha-tabla-responsive-bordes-cards.md`](./cambios/2026-10-26-ficha-tabla-responsive-bordes-cards.md).
+- [x] 2026-10-26 — Layout móvil de la ficha: chips → galería → precio/CTAs;
+  specs y descripción en acordeón. Detalle:
+  [`cambios/2026-10-26-ficha-layout-mobile-acordeon.md`](./cambios/2026-10-26-ficha-layout-mobile-acordeon.md).
+- [ ] Cuando el backend esté listo, esta ruta debe dejar de leer
+  `getProductById` / `getRelatedProducts` del array estático y usar
+  `GET /api/v1/catalog/:id` + `related`.
 
 ## 📏 Nueva sección "Unidades de medida" en el panel (2026-09-22)
 

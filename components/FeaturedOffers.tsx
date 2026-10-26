@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { homeFeaturedProducts, type FeaturedProduct } from "@/data/products";
+import { homeFeaturedProducts } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
-import ProductModal from "@/components/ProductModal";
 import Reveal from "@/components/Reveal";
 import { useCart } from "@/components/CartProvider";
 
 export default function FeaturedOffers() {
-  const [selected, setSelected] = useState<FeaturedProduct | null>(null);
   const { addItem } = useCart();
   const scrollerRef = useRef<HTMLUListElement>(null);
   const [canPrev, setCanPrev] = useState(false);
@@ -109,7 +107,6 @@ export default function FeaturedOffers() {
               <Reveal delayMs={Math.min(index, 6) * 70}>
                 <ProductCard
                   product={product}
-                  onOpen={() => setSelected(product)}
                   onAddToCart={() => addItem(product.id, 1)}
                 />
               </Reveal>
@@ -124,14 +121,6 @@ export default function FeaturedOffers() {
         <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
       </p>
 
-      {selected ? (
-        <ProductModal
-          key={selected.id}
-          product={selected}
-          onClose={() => setSelected(null)}
-          onSelectProduct={(product) => setSelected(product)}
-        />
-      ) : null}
     </section>
   );
 }

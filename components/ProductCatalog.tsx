@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import ProductModal from "@/components/ProductModal";
 import Reveal from "@/components/Reveal";
 import { useCart } from "@/components/CartProvider";
 import type { FeaturedProduct } from "@/data/products";
@@ -16,7 +14,6 @@ export default function ProductCatalog({
   products,
   emptyMessage = "No hay productos para estos filtros.",
 }: ProductCatalogProps) {
-  const [selected, setSelected] = useState<FeaturedProduct | null>(null);
   const { addItem } = useCart();
 
   if (products.length === 0) {
@@ -28,28 +25,17 @@ export default function ProductCatalog({
   }
 
   return (
-    <>
-      <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product, index) => (
-          <li key={product.id}>
-            <Reveal delayMs={Math.min(index, 8) * 55}>
-              <ProductCard
-                product={product}
-                onOpen={() => setSelected(product)}
-                onAddToCart={() => addItem(product.id, 1)}
-              />
-            </Reveal>
-          </li>
-        ))}
-      </ul>
-      {selected ? (
-        <ProductModal
-          key={selected.id}
-          product={selected}
-          onClose={() => setSelected(null)}
-          onSelectProduct={(product) => setSelected(product)}
-        />
-      ) : null}
-    </>
+    <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+      {products.map((product, index) => (
+        <li key={product.id}>
+          <Reveal delayMs={Math.min(index, 8) * 55}>
+            <ProductCard
+              product={product}
+              onAddToCart={() => addItem(product.id, 1)}
+            />
+          </Reveal>
+        </li>
+      ))}
+    </ul>
   );
 }

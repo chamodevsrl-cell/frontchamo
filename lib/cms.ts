@@ -8,6 +8,7 @@ import {
   MAP_URL,
   PHONE_DISPLAY,
   SOCIAL_LINKS,
+  WHATSAPP_DISPLAY,
 } from "@/data/contact";
 import {
   distributorBrands,
@@ -40,6 +41,8 @@ export type CmsCategoryOverride = {
   image?: string;
   imageAlt?: string;
   bannerTitle?: string;
+  /** Icono opcional (URL, ruta o data URL). Cadena vacía lo quita. */
+  icon?: string;
 };
 
 export type CmsCustomCategory = {
@@ -51,6 +54,8 @@ export type CmsCustomCategory = {
   bannerTitle?: string;
   bullets?: [string, string, string];
   tint?: string;
+  /** Icono opcional (URL, ruta o data URL). */
+  icon?: string;
 };
 
 export type CmsPaymentMethod = {
@@ -144,7 +149,7 @@ export function defaultFooter(): CmsFooter {
     address: ADDRESS_DISPLAY,
     addressHint: ADDRESS_HINT,
     phone: PHONE_DISPLAY,
-    whatsapp: PHONE_DISPLAY,
+    whatsapp: WHATSAPP_DISPLAY,
     email: EMAIL,
     hours: HOURS_DISPLAY,
     hoursHint: HOURS_HINT,
@@ -312,7 +317,10 @@ export function mergeFooter(
     address: pickText(override.address, defaults.address),
     addressHint: pickText(override.addressHint, defaults.addressHint),
     phone: pickText(override.phone, defaults.phone),
-    whatsapp: typeof override.whatsapp === "string" ? override.whatsapp : "",
+    whatsapp: migrateWhatsapp(
+      typeof override.whatsapp === "string" ? override.whatsapp : defaults.whatsapp,
+      defaults.whatsapp,
+    ),
     email: pickText(override.email, defaults.email),
     hours: pickText(override.hours, defaults.hours),
     hoursHint: pickText(override.hoursHint, defaults.hoursHint),
@@ -328,6 +336,14 @@ export function mergeFooter(
 
 function pickText(value: string | undefined, fallback: string) {
   return typeof value === "string" ? value : fallback;
+}
+
+const LEGACY_WHATSAPP_DIGITS = new Set(["51959723602", "959723602"]);
+
+function migrateWhatsapp(value: string, fallback: string) {
+  const digits = phoneDigits(value);
+  if (LEGACY_WHATSAPP_DIGITS.has(digits)) return fallback;
+  return value;
 }
 
 export function mergeSlides(
@@ -365,6 +381,7 @@ export function customCategoryToMain(item: CmsCustomCategory): MainCategory {
     image: item.image,
     imageAlt: item.imageAlt?.trim() || item.label,
     tint: item.tint || "#e8f3fb",
+    icon: item.icon?.trim() || undefined,
   };
 }
 
@@ -389,6 +406,10 @@ export function mergeCategories(
       imageAlt: over.imageAlt?.trim() || category.imageAlt,
       bannerTitle:
         over.bannerTitle?.trim().toLocaleUpperCase("es") || category.bannerTitle,
+      icon:
+        over.icon !== undefined
+          ? over.icon.trim() || undefined
+          : category.icon,
     };
   });
   const known = new Set(mapped.map((item) => item.slug));

@@ -107,7 +107,7 @@ function AdminChannelsSettingsForm({
               className={`${fieldClass} mt-1`}
               value={footer.whatsapp}
               onChange={(event) => update("whatsapp", event.target.value)}
-              placeholder={footer.phone || "+51 959 723 602"}
+              placeholder="+51 936 608 583"
             />
             <span className="mt-1 block text-[11px] font-medium normal-case tracking-normal text-brand-dark/50">
               Si lo dejas vacío, se usa el teléfono de llamadas.

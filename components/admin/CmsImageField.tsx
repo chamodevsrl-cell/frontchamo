@@ -14,12 +14,14 @@ export default function CmsImageField({
   label = "Imagen",
   previewClassName = "h-28 w-full",
   objectFit = "cover",
+  optional = false,
 }: {
   value: string;
   onChange: (src: string) => void;
   label?: string;
   previewClassName?: string;
   objectFit?: "cover" | "contain";
+  optional?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
@@ -39,6 +41,11 @@ export default function CmsImageField({
       {label ? (
         <p className="text-xs font-bold tracking-wide text-brand-dark/60 uppercase">
           {label}
+          {optional ? (
+            <span className="ml-1 font-medium normal-case tracking-normal text-brand-dark/45">
+              (opcional)
+            </span>
+          ) : null}
         </p>
       ) : null}
       <div
@@ -82,6 +89,15 @@ export default function CmsImageField({
             <FolderOpen className="h-3.5 w-3.5" />
             Galería o carpetas
           </button>
+          {optional && value ? (
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="inline-flex items-center rounded-lg border border-brand-dark/15 px-3 py-1.5 text-xs font-semibold text-brand-dark/70 hover:border-brand-primary hover:text-brand-primary"
+            >
+              Quitar
+            </button>
+          ) : null}
         </div>
       </div>
       <input

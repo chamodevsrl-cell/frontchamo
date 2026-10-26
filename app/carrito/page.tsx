@@ -8,6 +8,7 @@ import Reveal from "@/components/Reveal";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/format";
+import { productPath } from "@/data/products";
 import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 
 export default function CarritoPage() {
@@ -97,7 +98,12 @@ export default function CarritoPage() {
                       {line.product.brand}
                     </p>
                     <p className="font-display text-sm font-bold text-brand-dark sm:text-base dark:text-white">
-                      {line.product.name}
+                      <Link
+                        href={productPath(line.product.id)}
+                        className="hover:text-brand-primary"
+                      >
+                        {line.product.name}
+                      </Link>
                     </p>
                     <p className="text-xs text-brand-dark/50 dark:text-white/50">
                       SKU {line.product.sku}
