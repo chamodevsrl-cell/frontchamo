@@ -45,7 +45,7 @@ export default function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-brand-primary/25 bg-white p-5 shadow-[0_0_18px_rgba(18,126,201,0.12)] sm:p-6 dark:bg-[#102a40]"
+      className="card-glow rounded-2xl bg-white p-5 sm:p-6 dark:bg-[#102a40]"
     >
       <p className="text-sm font-bold tracking-wide text-brand-primary uppercase">
         Escríbenos

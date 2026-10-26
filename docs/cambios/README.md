@@ -13,6 +13,8 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-10-26 | Brillo azul/dorado en bordes de cards de la tienda | [2026-10-26-brillo-bordes-cards.md](./2026-10-26-brillo-bordes-cards.md) |
+| 2026-10-26 | Ficha: mock galería + qty + specs 2 columnas (local, sin push) | [2026-10-26-ficha-mock-galeria-thumbs-qty.md](./2026-10-26-ficha-mock-galeria-thumbs-qty.md) |
 | 2026-10-26 | WhatsApp 936 608 583 + icono opcional en categorías | [2026-10-26-whatsapp-936-icono-categoria.md](./2026-10-26-whatsapp-936-icono-categoria.md) |
 | 2026-10-26 | Ficha móvil: orden de bloques + acordeón specs/descripción | [2026-10-26-ficha-layout-mobile-acordeon.md](./2026-10-26-ficha-layout-mobile-acordeon.md) |
 | 2026-10-26 | Ficha: tabla specs fluid + bordes azules de cards | [2026-10-26-ficha-tabla-responsive-bordes-cards.md](./2026-10-26-ficha-tabla-responsive-bordes-cards.md) |

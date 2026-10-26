@@ -54,7 +54,7 @@ export default function AccountSummary() {
           <Link
             key={card.href}
             href={card.href}
-            className="flex items-start gap-3 rounded-2xl border border-brand-dark/10 bg-white p-5 shadow-sm transition hover:border-brand-primary/40 hover:shadow-md"
+            className="card-glow flex items-start gap-3 rounded-2xl bg-white p-5 transition"
           >
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
               <Icon className="h-5 w-5" strokeWidth={2.25} />

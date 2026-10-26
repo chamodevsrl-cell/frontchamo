@@ -19,7 +19,7 @@ export default function CategoriesDirectory() {
       {list.map((category, index) => (
         <li key={category.slug}>
           <Reveal delayMs={Math.min(index, 6) * 70}>
-            <article className="group flex h-full overflow-hidden rounded-2xl border border-brand-primary/30 bg-white shadow-[0_0_18px_rgba(18,126,201,0.2)] transition hover:-translate-y-0.5 dark:bg-[#102a40]">
+            <article className="card-glow group flex h-full overflow-hidden rounded-2xl bg-white transition hover:-translate-y-0.5 dark:bg-[#102a40]">
               <Link href={category.href} className="relative w-32 shrink-0 sm:w-40">
                 <CategoryCollage
                   slug={category.slug}

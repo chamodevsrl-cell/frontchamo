@@ -5,14 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  Award,
+  Box,
   Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
   FileText,
+  Hand,
+  Home,
+  Layers,
   Lock,
+  Minus,
+  Plus,
   ShieldCheck,
   ShoppingCart,
   Store,
@@ -20,21 +25,16 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
-import {
-  productPath,
-  type FeaturedProduct,
-} from "@/data/products";
+import { productPath, type FeaturedProduct } from "@/data/products";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/components/CartProvider";
 import { useCmsWhatsappHref } from "@/components/useCmsWhatsappHref";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FavoriteButton from "@/components/FavoriteButton";
-import CompareButton from "@/components/CompareButton";
 import CategoryIcon from "@/components/CategoryIcon";
 import { useSiteContent } from "@/components/ContentProvider";
 
-const CARD =
-  "overflow-hidden rounded-2xl border-2 border-brand-primary/50 bg-white shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_22px_rgba(18,126,201,0.28)]";
+const CARD = "card-glow overflow-hidden rounded-2xl bg-white";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -49,7 +49,24 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-const FEATURE_ICONS = [ShieldCheck, Lock, Wrench, Award] as const;
+const FEATURE_ICONS = [Layers, Lock, Hand, Home, Box, Wrench] as const;
+
+function featureIcon(feature: string, index: number): LucideIcon {
+  const text = feature.toLowerCase();
+  if (text.includes("cierre") || text.includes("seguridad") || text.includes("metálic")) {
+    return Lock;
+  }
+  if (text.includes("asa") || text.includes("ergon") || text.includes("mango")) {
+    return Hand;
+  }
+  if (text.includes("hogar") || text.includes("taller") || text.includes("uso")) {
+    return Home;
+  }
+  if (text.includes("bandeja") || text.includes("compart") || text.includes("extraíb")) {
+    return Layers;
+  }
+  return FEATURE_ICONS[index % FEATURE_ICONS.length];
+}
 
 function splitTitle(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -62,12 +79,24 @@ function splitTitle(name: string) {
   };
 }
 
+function firstSentence(text: string) {
+  const match = text.trim().match(/^[^.!?]+[.!?]?/);
+  return match?.[0] ?? text;
+}
+
+function wholesaleMinQty(packaging: FeaturedProduct["packaging"]) {
+  const match = packaging.docena.match(/\d+/);
+  const qty = match ? Number(match[0]) : 12;
+  return Number.isFinite(qty) && qty > 0 ? qty : 12;
+}
+
 function AccordionCard({
   id,
   title,
   icon: Icon,
   open,
   onToggle,
+  actions,
   children,
 }: {
   id: string;
@@ -75,28 +104,32 @@ function AccordionCard({
   icon: LucideIcon;
   open: boolean;
   onToggle: () => void;
+  actions?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div className={CARD}>
-      <button
-        type="button"
-        className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left lg:pointer-events-none lg:cursor-default"
-        onClick={onToggle}
-        aria-expanded={open}
-        aria-controls={id}
-      >
-        <span className="inline-flex items-center gap-2 font-display text-base font-bold text-brand-dark sm:text-lg">
-          <Icon className="h-5 w-5 shrink-0 text-brand-primary" strokeWidth={2} />
-          {title}
-        </span>
-        <ChevronDown
-          className={`h-5 w-5 shrink-0 text-brand-dark/45 transition lg:hidden ${
-            open ? "rotate-180" : ""
-          }`}
-          strokeWidth={2.25}
-        />
-      </button>
+      <div className="flex items-center justify-between gap-3 px-4 py-3.5 lg:px-6">
+        <button
+          type="button"
+          className="inline-flex min-w-0 flex-1 items-center justify-between gap-3 text-left lg:pointer-events-none lg:cursor-default"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={id}
+        >
+          <span className="inline-flex items-center gap-2 font-display text-base font-bold text-brand-dark sm:text-lg">
+            <Icon className="h-5 w-5 shrink-0 text-brand-primary" strokeWidth={2} />
+            {title}
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-brand-dark/45 transition lg:hidden ${
+              open ? "rotate-180" : ""
+            }`}
+            strokeWidth={2.25}
+          />
+        </button>
+        {actions ? <div className="hidden shrink-0 lg:block">{actions}</div> : null}
+      </div>
       <div id={id} className={open ? "block" : "hidden lg:block"}>
         {children}
       </div>
@@ -115,9 +148,11 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
   const whatsappHrefFor = useCmsWhatsappHref();
   const categoryIcon = categories.find((item) => item.slug === product.category)?.icon;
   const [activeImage, setActiveImage] = useState(0);
+  const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [openSpecs, setOpenSpecs] = useState(false);
   const [openDescription, setOpenDescription] = useState(false);
+  const [openRelated, setOpenRelated] = useState(false);
   const relatedRef = useRef<HTMLUListElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -131,6 +166,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
     { label: "Tipo", value: product.categoryLabel },
     ...product.specs,
   ];
+  const minWholesale = wholesaleMinQty(product.packaging);
 
   const updateRelatedArrows = useCallback(() => {
     const el = relatedRef.current;
@@ -150,7 +186,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
       el.removeEventListener("scroll", updateRelatedArrows);
       window.removeEventListener("resize", updateRelatedArrows);
     };
-  }, [updateRelatedArrows, related.length]);
+  }, [updateRelatedArrows, related.length, openRelated]);
 
   function scrollRelated(direction: -1 | 1) {
     const el = relatedRef.current;
@@ -168,11 +204,11 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
   }
 
   const whatsappHref = whatsappHrefFor(
-    `Hola, quiero cotizar este producto: ${product.name} (${product.sku})`,
+    `Hola, quiero cotizar este producto: ${product.name} (${product.sku}) x${qty}`,
   );
 
   return (
-    <div className="space-y-6 lg:space-y-10">
+    <div className="space-y-5 lg:space-y-8">
       <Breadcrumbs
         items={[
           { href: "/", label: "Inicio" },
@@ -183,9 +219,9 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
       />
 
       <section className="grid items-start gap-5 lg:grid-cols-2 lg:gap-10 xl:gap-12">
-        <div className="min-w-0">
+        <header className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-2 rounded-lg bg-brand-gold px-2.5 py-1 font-display text-sm font-extrabold tracking-wide text-brand-dark uppercase">
+            <span className="inline-flex items-center rounded-md bg-brand-gold px-2.5 py-1 font-display text-sm font-extrabold tracking-wide text-brand-dark uppercase">
               {product.brand}
             </span>
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.18em] text-brand-dark/45 uppercase">
@@ -198,7 +234,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
             </span>
           </div>
 
-          <h1 className="mt-3 font-display text-[1.65rem] leading-tight font-extrabold text-brand-dark sm:text-4xl xl:text-[2.65rem]">
+          <h1 className="mt-3 font-display text-[1.7rem] leading-[1.12] font-extrabold text-brand-dark sm:text-4xl xl:text-[2.7rem]">
             {title.lead}
             {title.rest ? (
               <>
@@ -208,21 +244,24 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
             ) : null}
           </h1>
 
-          <p className="mt-3 text-sm leading-relaxed text-brand-dark/70 sm:text-[15px] lg:max-w-xl">
-            {product.description}
+          <p className="mt-3 hidden text-sm leading-relaxed text-brand-dark/70 sm:text-[15px] lg:block lg:max-w-xl">
+            {firstSentence(product.description)}
           </p>
 
           {chips.length > 0 ? (
-            <ul className="mt-4 grid grid-cols-4 gap-2 lg:flex lg:flex-wrap lg:gap-2">
+            <ul className="mt-4 hidden gap-x-5 gap-y-3 lg:flex lg:flex-wrap">
               {chips.map((feature, index) => {
-                const Icon = FEATURE_ICONS[index % FEATURE_ICONS.length];
+                const Icon = featureIcon(feature, index);
                 return (
                   <li
                     key={feature}
-                    className="flex flex-col items-center gap-1.5 px-1 py-1 text-center lg:inline-flex lg:flex-row lg:rounded-full lg:border lg:border-brand-dark/10 lg:bg-white lg:px-3 lg:py-1.5 lg:text-left lg:shadow-[0_1px_4px_rgba(11,53,84,0.06)]"
+                    className="inline-flex max-w-[11rem] items-start gap-2 text-left"
                   >
-                    <Icon className="h-5 w-5 text-brand-primary lg:h-3.5 lg:w-3.5" strokeWidth={2.25} />
-                    <span className="text-[10px] leading-tight font-semibold text-brand-dark sm:text-xs">
+                    <Icon
+                      className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary"
+                      strokeWidth={2.25}
+                    />
+                    <span className="text-xs font-semibold leading-snug text-brand-dark/80">
                       {feature}
                     </span>
                   </li>
@@ -230,80 +269,116 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
               })}
             </ul>
           ) : null}
-        </div>
+        </header>
 
-        <div
-          className={`${CARD} relative aspect-[4/3] w-full lg:row-span-2 lg:aspect-auto lg:min-h-[520px]`}
-        >
-          {images[activeImage] ? (
-            <Image
-              src={images[activeImage]}
-              alt={`${product.name} — imagen ${activeImage + 1}`}
-              fill
-              className="object-contain p-3 sm:p-6"
-              sizes="(max-width: 1024px) 100vw, 55vw"
-              preload
-            />
-          ) : null}
+        <div className="flex min-w-0 flex-col gap-3 lg:row-span-2">
+          <div className={`${CARD} relative aspect-[4/3] w-full`}>
+            {images[activeImage] ? (
+              <Image
+                src={images[activeImage]}
+                alt={`${product.name} — imagen ${activeImage + 1}`}
+                fill
+                className="object-contain p-4 sm:p-6"
+                sizes="(max-width: 1024px) 100vw, 52vw"
+                preload
+              />
+            ) : null}
+
+            <div className="absolute top-3 right-3 z-10">
+              <FavoriteButton productId={product.id} />
+            </div>
+
+            {images.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => goImage(-1)}
+                  aria-label="Imagen anterior"
+                  className="absolute top-1/2 left-2 z-10 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white/95 text-brand-dark shadow-md transition hover:text-brand-primary sm:left-3 sm:h-10 sm:w-10"
+                >
+                  <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goImage(1)}
+                  aria-label="Imagen siguiente"
+                  className="absolute top-1/2 right-2 z-10 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white/95 text-brand-dark shadow-md transition hover:text-brand-primary sm:right-3 sm:h-10 sm:w-10"
+                >
+                  <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
+                </button>
+              </>
+            ) : null}
+          </div>
 
           {images.length > 1 ? (
-            <>
-              <button
-                type="button"
-                onClick={() => goImage(-1)}
-                aria-label="Imagen anterior"
-                className="absolute top-1/2 left-2 z-10 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white/90 text-brand-dark shadow-md transition hover:text-brand-primary sm:left-3 sm:h-10 sm:w-10"
-              >
-                <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
-              </button>
-              <button
-                type="button"
-                onClick={() => goImage(1)}
-                aria-label="Imagen siguiente"
-                className="absolute top-1/2 right-2 z-10 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white/90 text-brand-dark shadow-md transition hover:text-brand-primary sm:right-3 sm:h-10 sm:w-10"
-              >
-                <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
-              </button>
-              <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
-                {images.map((src, index) => (
+            <ul className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+              {images.slice(0, 5).map((src, index) => (
+                <li key={`${src}-${index}`}>
                   <button
-                    key={`${src}-${index}`}
                     type="button"
                     aria-label={`Ver imagen ${index + 1}`}
                     aria-current={activeImage === index}
                     onClick={() => setActiveImage(index)}
-                    className={`h-2 rounded-full transition-all ${
-                      activeImage === index
-                        ? "w-6 bg-brand-primary"
-                        : "w-2 bg-brand-dark/20 hover:bg-brand-dark/40"
+                    className={`card-glow relative aspect-square w-full overflow-hidden rounded-xl bg-white transition ${
+                      activeImage === index ? "ring-2 ring-brand-primary/40" : ""
                     }`}
-                  />
-                ))}
-              </div>
-            </>
+                  >
+                    <Image
+                      src={src}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="120px"
+                    />
+                  </button>
+                </li>
+              ))}
+            </ul>
           ) : null}
         </div>
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <p className="font-display text-4xl font-extrabold tracking-tight text-brand-dark sm:text-5xl">
+            <p className="font-display text-[2.35rem] font-extrabold tracking-tight text-brand-dark sm:text-5xl">
               {formatPrice(product.price)}
             </p>
-            <div className="rounded-xl border border-brand-primary/25 bg-[#eef6fc] px-3.5 py-2">
-              <p className="text-[11px] font-semibold tracking-wide text-brand-dark/50 uppercase">
+            <div className="text-right">
+              <p className="text-[11px] font-semibold tracking-wide text-brand-dark/45">
                 Precio mayorista
               </p>
-              <p className="font-display text-lg font-bold text-brand-primary">
+              <p className="font-display text-lg font-bold text-brand-primary sm:text-xl">
                 {formatPrice(product.wholesalePrice)}
               </p>
-              <p className="text-[11px] text-brand-dark/45">por volumen</p>
+              <p className="text-[11px] text-brand-dark/45">
+                desde {minWholesale} unidades
+              </p>
             </div>
           </div>
 
-          <div className="mt-3 hidden flex-wrap items-center gap-2 lg:flex">
-            <FavoriteButton productId={product.id} variant="box" />
-            <CompareButton productId={product.id} variant="box" />
-            <p className="text-sm font-medium text-emerald-600">
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center overflow-hidden rounded-xl border border-[#d7e4ef] bg-white">
+              <button
+                type="button"
+                onClick={() => setQty((value) => Math.max(1, value - 1))}
+                aria-label="Disminuir cantidad"
+                className="inline-flex h-11 w-11 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
+              >
+                <Minus className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+              <span className="min-w-8 text-center font-display text-base font-bold text-brand-dark">
+                {qty}
+              </span>
+              <button
+                type="button"
+                onClick={() => setQty((value) => value + 1)}
+                aria-label="Aumentar cantidad"
+                className="inline-flex h-11 w-11 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            </div>
+            <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
+              <Check className="h-4 w-4" strokeWidth={2.5} />
               En stock ({product.stock} unidades)
             </p>
           </div>
@@ -312,13 +387,12 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
             <button
               type="button"
               onClick={() => {
-                addItem(product.id, 1);
+                addItem(product.id, qty);
                 setAdded(true);
                 window.setTimeout(() => setAdded(false), 1400);
               }}
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-5 py-3.5 text-sm font-bold text-white shadow-[0_8px_20px_rgba(18,126,201,0.28)] transition hover:bg-brand-dark"
             >
-              <ShoppingCart className="h-4 w-4 lg:hidden" strokeWidth={2.25} />
               {added ? "Agregado a cotización" : "Agregar a cotización"}
               <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
             </button>
@@ -333,24 +407,24 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
             </a>
           </div>
 
-          <ul className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-brand-dark/60 sm:text-xs lg:justify-start lg:gap-x-6">
-            <li className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-brand-primary" strokeWidth={2} />
+          <ul className="mt-5 grid grid-cols-3 gap-2 text-center text-[10px] font-medium text-brand-dark/60 sm:text-xs lg:flex lg:flex-wrap lg:justify-start lg:gap-x-6 lg:text-left">
+            <li className="inline-flex flex-col items-center gap-1.5 lg:flex-row">
+              <ShieldCheck className="h-5 w-5 text-brand-primary lg:h-4 lg:w-4" strokeWidth={2} />
               Garantía oficial
             </li>
-            <li className="inline-flex items-center gap-1.5">
-              <Truck className="h-4 w-4 text-brand-primary" strokeWidth={2} />
+            <li className="inline-flex flex-col items-center gap-1.5 lg:flex-row">
+              <Truck className="h-5 w-5 text-brand-primary lg:h-4 lg:w-4" strokeWidth={2} />
               Envíos a todo el Perú
             </li>
-            <li className="inline-flex items-center gap-1.5">
-              <Store className="h-4 w-4 text-brand-primary" strokeWidth={2} />
+            <li className="inline-flex flex-col items-center gap-1.5 lg:flex-row">
+              <Store className="h-5 w-5 text-brand-primary lg:h-4 lg:w-4" strokeWidth={2} />
               Retiro en tienda
             </li>
           </ul>
         </div>
       </section>
 
-      <section className="flex flex-col gap-3 lg:gap-6">
+      <section className="flex flex-col gap-3 lg:gap-5">
         <AccordionCard
           id="product-specs"
           title="Especificaciones técnicas"
@@ -358,39 +432,19 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
           open={openSpecs}
           onToggle={() => setOpenSpecs((value) => !value)}
         >
-          <table className="w-full table-fixed border-collapse text-left text-xs sm:text-sm">
-            <thead>
-              <tr className="bg-brand-dark text-white">
-                <th
-                  scope="col"
-                  className="w-[42%] px-3 py-2.5 font-semibold sm:w-[38%] sm:px-6 sm:py-3"
-                >
-                  Especificación
-                </th>
-                <th scope="col" className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">
-                  Detalle
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {specs.map((spec, index) => (
-                <tr
-                  key={`${spec.label}-${index}`}
-                  className={index % 2 === 0 ? "bg-white" : "bg-[#eef6fc]"}
-                >
-                  <th
-                    scope="row"
-                    className="border-t border-brand-primary/15 px-3 py-2.5 align-top font-semibold break-words text-brand-dark sm:px-6 sm:py-3"
-                  >
-                    {spec.label}
-                  </th>
-                  <td className="border-t border-brand-primary/15 px-3 py-2.5 align-top break-words text-brand-dark/80 sm:px-6 sm:py-3">
-                    {spec.value}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <dl className="grid grid-cols-1 border-t border-[#e6eef5] sm:grid-cols-2">
+            {specs.map((spec, index) => (
+              <div
+                key={`${spec.label}-${index}`}
+                className="flex items-baseline justify-between gap-4 border-b border-[#e6eef5] px-4 py-3 sm:px-6"
+              >
+                <dt className="text-sm text-brand-dark/55">{spec.label}</dt>
+                <dd className="text-right text-sm font-semibold text-brand-dark">
+                  {spec.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </AccordionCard>
 
         <AccordionCard
@@ -400,12 +454,12 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
           open={openDescription}
           onToggle={() => setOpenDescription((value) => !value)}
         >
-          <div className="px-4 pb-4 sm:px-6 sm:pb-5">
+          <div className="grid gap-5 border-t border-[#e6eef5] px-4 py-4 sm:px-6 sm:py-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(16rem,0.9fr)] lg:gap-10">
             <p className="text-sm leading-relaxed text-brand-dark/70">
               {product.description}
             </p>
             {product.features.length > 0 ? (
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+              <ul className="grid gap-2.5 content-start">
                 {product.features.map((feature) => (
                   <li
                     key={feature}
@@ -425,90 +479,89 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
       </section>
 
       {related.length > 0 ? (
-        <section aria-labelledby="related-heading">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3 lg:mb-4">
-            <h2
-              id="related-heading"
-              className="inline-flex items-center gap-2 font-display text-base font-bold text-brand-dark sm:text-lg"
+        <AccordionCard
+          id="product-related"
+          title="Productos relacionados"
+          icon={ShoppingCart}
+          open={openRelated}
+          onToggle={() => setOpenRelated((value) => !value)}
+          actions={
+            <Link
+              href={`/categorias/${product.category}`}
+              className="text-sm font-semibold text-brand-primary transition hover:text-brand-dark"
             >
-              <ShoppingCart className="h-5 w-5 text-brand-primary" strokeWidth={2} />
-              Productos relacionados
-            </h2>
-            <div className="flex items-center gap-3">
-              <Link
-                href={`/categorias/${product.category}`}
-                className="hidden text-sm font-semibold text-brand-primary transition hover:text-brand-dark sm:inline"
-              >
-                Ver más productos →
-              </Link>
-              <div className="hidden items-center gap-2 sm:flex">
-                <button
-                  type="button"
-                  onClick={() => scrollRelated(-1)}
-                  disabled={!canPrev}
-                  aria-label="Productos anteriores"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark transition hover:text-brand-primary disabled:opacity-35"
-                >
-                  <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollRelated(1)}
-                  disabled={!canNext}
-                  aria-label="Productos siguientes"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark transition hover:text-brand-primary disabled:opacity-35"
-                >
-                  <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
-                </button>
-              </div>
-            </div>
-          </div>
+              Ver más productos →
+            </Link>
+          }
+        >
+          <div className="relative border-t border-[#e6eef5] px-3 pt-3 pb-4 sm:px-4">
+            <button
+              type="button"
+              onClick={() => scrollRelated(-1)}
+              disabled={!canPrev}
+              aria-label="Productos anteriores"
+              className="absolute top-1/2 left-1 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35 lg:inline-flex"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollRelated(1)}
+              disabled={!canNext}
+              aria-label="Productos siguientes"
+              className="absolute top-1/2 right-1 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35 lg:inline-flex"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
+            </button>
 
-          <ul
-            ref={relatedRef}
-            className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-2 scrollbar-none sm:gap-4"
-          >
-            {related.map((item) => (
-              <li
-                key={item.id}
-                className="w-[38%] min-w-[7.25rem] shrink-0 snap-start sm:w-[14.5rem] sm:min-w-0"
-              >
-                <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-brand-primary/50 bg-white shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_16px_rgba(18,126,201,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(18,126,201,0.22),0_0_24px_rgba(18,126,201,0.4)]">
-                  <Link href={productPath(item.id)} className="flex flex-1 flex-col">
-                    <div className="relative aspect-square overflow-hidden bg-brand-gray">
-                      <Image
-                        src={item.images[0]}
-                        alt={item.name}
-                        fill
-                        className="object-cover transition duration-300 group-hover:scale-[1.03]"
-                        sizes="160px"
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col gap-1 p-2 sm:p-3">
-                      <p className="text-[10px] font-bold tracking-wide text-brand-primary uppercase">
-                        {item.brand}
-                      </p>
-                      <p className="line-clamp-2 font-display text-xs font-bold text-brand-dark sm:text-sm">
-                        {item.name}
-                      </p>
-                      <p className="mt-auto font-display text-sm font-bold text-brand-primary sm:text-base">
+            <ul
+              ref={relatedRef}
+              className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 scrollbar-none sm:gap-4 lg:px-8"
+            >
+              {related.map((item) => (
+                <li
+                  key={item.id}
+                  className="w-[46%] min-w-[9.5rem] shrink-0 snap-start sm:w-[14.5rem] sm:min-w-0"
+                >
+                  <article className="card-glow group flex h-full flex-col overflow-hidden rounded-xl bg-white transition hover:-translate-y-0.5">
+                    <Link href={productPath(item.id)} className="flex flex-1 flex-col">
+                      <div className="relative aspect-square overflow-hidden bg-brand-gray">
+                        <Image
+                          src={item.images[0]}
+                          alt={item.name}
+                          fill
+                          className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                          sizes="180px"
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col gap-1 p-2.5 pb-0 sm:p-3 sm:pb-0">
+                        <p className="text-[10px] font-bold tracking-wide text-brand-primary uppercase">
+                          {item.brand}
+                        </p>
+                        <p className="line-clamp-2 font-display text-xs font-bold text-brand-dark sm:text-sm">
+                          {item.name}
+                        </p>
+                      </div>
+                    </Link>
+                    <div className="mt-auto flex items-center justify-between gap-2 p-2.5 pt-2 sm:p-3 sm:pt-2">
+                      <p className="font-display text-sm font-bold text-brand-primary sm:text-base">
                         {formatPrice(item.price)}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => addItem(item.id, 1)}
+                        aria-label={`Agregar ${item.name} a cotización`}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary text-white transition hover:bg-brand-dark"
+                      >
+                        <ShoppingCart className="h-4 w-4" strokeWidth={2} />
+                      </button>
                     </div>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => addItem(item.id, 1)}
-                    aria-label={`Agregar ${item.name} a cotización`}
-                    className="absolute top-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-brand-dark shadow-sm transition hover:bg-brand-primary hover:text-white sm:h-9 sm:w-9"
-                  >
-                    <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                  </button>
-                </article>
-              </li>
-            ))}
-          </ul>
-        </section>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </AccordionCard>
       ) : null}
     </div>
   );

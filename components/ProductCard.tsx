@@ -31,7 +31,7 @@ export default function ProductCard({
   }
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-brand-primary/35 bg-white shadow-[0_0_0_1px_rgba(18,126,201,0.12),0_0_18px_rgba(18,126,201,0.35)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(18,126,201,0.25),0_0_28px_rgba(18,126,201,0.55)] lg:rounded-2xl dark:bg-[#102a40] dark:text-white">
+    <article className="card-glow group relative flex h-full flex-col overflow-hidden rounded-xl bg-white transition duration-300 hover:-translate-y-0.5 lg:rounded-2xl dark:bg-[#102a40] dark:text-white">
       <div className="absolute top-2 right-2 z-10 flex flex-col gap-2 sm:top-3 sm:right-3">
         <FavoriteButton productId={product.id} />
         <CompareButton productId={product.id} />

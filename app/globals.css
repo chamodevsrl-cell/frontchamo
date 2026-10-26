@@ -122,6 +122,25 @@ html.admin-shell footer {
   scrollbar-width: none;
 }
 
+/* Brillo de borde corporativo (azul + halo dorado) en cards de la tienda */
+.card-glow {
+  border-width: 2px;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--brand-primary) 55%, transparent);
+  box-shadow:
+    0 0 0 1px rgba(18, 126, 201, 0.16),
+    0 0 18px rgba(18, 126, 201, 0.38),
+    0 0 34px rgba(228, 183, 20, 0.16);
+}
+
+.card-glow:hover {
+  border-color: color-mix(in srgb, var(--brand-primary) 75%, transparent);
+  box-shadow:
+    0 0 0 1px rgba(18, 126, 201, 0.28),
+    0 0 26px rgba(18, 126, 201, 0.5),
+    0 0 42px rgba(228, 183, 20, 0.22);
+}
+
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }

@@ -25,6 +25,12 @@
 - [x] 2026-10-26 — Layout móvil de la ficha: chips → galería → precio/CTAs;
   specs y descripción en acordeón. Detalle:
   [`cambios/2026-10-26-ficha-layout-mobile-acordeon.md`](./cambios/2026-10-26-ficha-layout-mobile-acordeon.md).
+- [x] 2026-10-26 — Prueba del mock: miniaturas bajo la galería, selector de
+  cantidad, specs en 2 columnas, relacionados en acordeón móvil. **Sin push**.
+  Detalle:
+  [`cambios/2026-10-26-ficha-mock-galeria-thumbs-qty.md`](./cambios/2026-10-26-ficha-mock-galeria-thumbs-qty.md).
+- [x] 2026-10-26 — Brillo de borde (`.card-glow`) en cards de la tienda.
+  Detalle: [`cambios/2026-10-26-brillo-bordes-cards.md`](./cambios/2026-10-26-brillo-bordes-cards.md).
 - [ ] Cuando el backend esté listo, esta ruta debe dejar de leer
   `getProductById` / `getRelatedProducts` del array estático y usar
   `GET /api/v1/catalog/:id` + `related`.

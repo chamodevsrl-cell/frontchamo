@@ -22,7 +22,7 @@ export default function Testimonials() {
         {testimonials.map((item, index) => (
           <li key={item.id}>
             <Reveal delayMs={Math.min(index, 2) * 80}>
-              <blockquote className="flex h-full flex-col rounded-2xl border border-brand-primary/25 bg-white p-5 shadow-[0_0_18px_rgba(18,126,201,0.12)] dark:bg-[#102a40]">
+              <blockquote className="card-glow flex h-full flex-col rounded-2xl bg-white p-5 dark:bg-[#102a40]">
                 <Quote
                   className="h-6 w-6 text-brand-primary"
                   strokeWidth={2}

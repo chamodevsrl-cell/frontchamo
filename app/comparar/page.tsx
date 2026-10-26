@@ -122,7 +122,7 @@ export default function CompararPage() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto rounded-2xl border border-brand-dark/10 bg-white dark:bg-[#102a40]">
+              <div className="card-glow overflow-x-auto rounded-2xl bg-white dark:bg-[#102a40]">
                 <table className="min-w-[640px] w-full border-collapse text-left">
                   <thead>
                     <tr className="bg-brand-dark text-white">

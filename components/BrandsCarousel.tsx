@@ -75,7 +75,7 @@ export default function BrandsCarousel({
     <section
       className={
         inline
-          ? "overflow-hidden rounded-2xl border border-brand-primary/20 bg-[#eef2f5]"
+          ? "card-glow overflow-hidden rounded-2xl bg-[#eef2f5]"
           : "overflow-hidden border-t border-brand-primary/25 bg-[#eef2f5]"
       }
       aria-labelledby="marcas-heading"

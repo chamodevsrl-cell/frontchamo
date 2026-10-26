@@ -10,12 +10,9 @@ import CategoryIcon from "@/components/CategoryIcon";
 import Image from "next/image";
 import SkeletonImage from "@/components/ui/SkeletonImage";
 
-const shinyCard ="";
-
-
-  function CategoryCard({ category }: { category: MainCategory }) {
+function CategoryCard({ category }: { category: MainCategory }) {
     return (
-      <article className="group relative h-[230px] sm:h-[260px] lg:h-[280px] overflow-hidden rounded-2xl bg-[#102a40] shadow-[0_8px_24px_rgba(11,53,84,0.12)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(11,53,84,0.25)] sm:h-[280px]">
+      <article className="card-glow group relative h-[230px] overflow-hidden rounded-2xl bg-[#102a40] transition-all duration-500 hover:-translate-y-1 sm:h-[280px] lg:h-[280px]">
   
 {/* Imagen de fondo con Skeleton Loading */}
 <div className="absolute inset-0 overflow-hidden">
@@ -183,6 +180,7 @@ export default function CategoriesGrid() {
           ))}
         </ul>
       </div>
+      
 
       <p className="mt-1 flex items-center justify-center gap-2 text-xs text-brand-dark/45 lg:hidden">
         <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />

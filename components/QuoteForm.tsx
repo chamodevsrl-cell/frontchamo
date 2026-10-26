@@ -76,7 +76,7 @@ export default function QuoteForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-8 max-w-2xl space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-5 sm:p-6 dark:bg-[#102a40]"
+      className="card-glow mt-8 max-w-2xl space-y-4 rounded-2xl bg-white p-5 sm:p-6 dark:bg-[#102a40]"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm">

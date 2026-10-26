@@ -197,9 +197,9 @@ Líneas del formato viejo (`{productId, qty}`, sin precio) se migran solas al le
 ficha persiste, muestra el aviso fijo **Guardado en favoritos** y el Navbar lleva el contador.
 
 Ficha (`ProductDetail.tsx`):
-1. Miga de pan + bloque comercial (marca, título, descripción, chips, precios, CTAs) junto a la galería ancha
-2. En móvil el orden es título → chips → galería → precio/CTAs; specs y descripción van en acordeón. En escritorio: ficha a dos columnas + tabla de specs + descripción. Cards con borde azul `brand-primary`.
-3. **Productos relacionados** de la misma categoría (carrusel; clic abre esa ficha)
+1. Miga de pan + bloque comercial (marca, título, blurb, chips, precios, cantidad, CTAs) junto a la galería ancha con miniaturas.
+2. En móvil el orden es título → galería/thumbs → precio/qty/CTAs; specs, descripción y relacionados van en acordeón. En escritorio: dos columnas + specs en pares + descripción con checklist. “Desde N unidades” sale de `packaging.docena`. Las cards de la tienda usan `.card-glow` (borde azul + halo dorado).
+3. **Productos relacionados** de la misma categoría (carrusel; clic abre esa ficha).
 
 WhatsApp unificado: `data/contact.ts` → `wa.me/51936608583` (`+51 936 608 583`). Los formularios de
 `/contacto` y `/cotizar` abren el chat con `openWhatsApp()` (enlace `<a>`, no

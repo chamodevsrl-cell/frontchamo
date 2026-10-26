@@ -82,7 +82,7 @@ export default function CarritoPage() {
               {lines.map((line) => (
                 <li
                   key={line.productId}
-                  className="flex gap-3 rounded-2xl border border-brand-dark/10 bg-white p-3 sm:p-4 dark:bg-[#102a40]"
+                  className="card-glow flex gap-3 rounded-2xl bg-white p-3 sm:p-4 dark:bg-[#102a40]"
                 >
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-brand-gray sm:h-24 sm:w-24">
                     <Image
@@ -157,7 +157,7 @@ export default function CarritoPage() {
               ))}
             </ul>
 
-            <aside className="h-fit rounded-2xl border border-brand-primary/25 bg-white p-5 dark:bg-[#102a40]">
+            <aside className="card-glow h-fit rounded-2xl bg-white p-5 dark:bg-[#102a40]">
               <p className="text-sm text-brand-dark/60 dark:text-white/60">
                 {count} unidad{count === 1 ? "" : "es"}
               </p>

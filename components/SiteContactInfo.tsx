@@ -104,7 +104,7 @@ export function SiteContactChannels() {
             </>
           );
           const className =
-            "flex h-full flex-col rounded-2xl border border-brand-primary/20 bg-white p-5 shadow-[0_0_16px_rgba(18,126,201,0.1)] transition hover:-translate-y-0.5 dark:bg-[#102a40]";
+            "card-glow flex h-full flex-col rounded-2xl bg-white p-5 transition hover:-translate-y-0.5 dark:bg-[#102a40]";
           return (
             <li key={channel.id}>
               {channel.external ? (
@@ -134,7 +134,7 @@ export function SiteContactVisit() {
   const socials = footerSocialLinks(footer);
 
   return (
-    <aside className="space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-5 sm:p-6 dark:bg-[#102a40]">
+    <aside className="card-glow space-y-4 rounded-2xl bg-white p-5 sm:p-6 dark:bg-[#102a40]">
       <p className="text-sm font-bold tracking-wide text-brand-primary uppercase">
         Visítanos
       </p>
@@ -197,7 +197,7 @@ export function SiteContactMap() {
     <section
       id="mapa"
       aria-labelledby="mapa-heading"
-      className="overflow-hidden rounded-2xl border border-brand-dark/10 bg-white dark:bg-[#102a40]"
+      className="card-glow overflow-hidden rounded-2xl bg-white dark:bg-[#102a40]"
     >
       <div className="flex flex-wrap items-end justify-between gap-3 px-5 py-4 sm:px-6">
         <div>
