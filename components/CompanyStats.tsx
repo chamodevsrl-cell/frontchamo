@@ -4,9 +4,9 @@ export default function CompanyStats() {
   return (
     <section
       aria-labelledby="solidez-heading"
-      className="mb-12 bg-brand-dark text-white sm:mb-16 lg:mb-20"
+      className="bg-brand-dark text-white"
     >
-      <div className="mx-auto max-w-[1100px] px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
+      <div className="mx-auto max-w-[1100px] px-4 pt-16 pb-12 text-center sm:px-6 sm:pt-20 sm:pb-14 lg:px-8">
         <p className="font-display text-[11px] font-bold tracking-[0.28em] text-brand-gold uppercase">
           Respaldo comercial
         </p>
@@ -48,6 +48,9 @@ export default function CompanyStats() {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="px-4 pb-8 sm:px-6 sm:pb-10 lg:px-8 xl:px-10" aria-hidden>
+        <span className="mx-auto block h-px w-full max-w-[1600px] bg-brand-gold" />
       </div>
     </section>
   );

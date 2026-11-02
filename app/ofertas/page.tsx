@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
 import BrandsCarousel from "@/components/BrandsCarousel";
+import CatalogPagination from "@/components/CatalogPagination";
 import Navbar from "@/components/Navbar";
 import OffersBanner from "@/components/OffersBanner";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
-import { featuredProducts } from "@/data/products";
+import { featuredProducts, paginateItems, parsePageParam } from "@/data/products";
 
 export const metadata: Metadata = {
   title: "Ofertas | Chamo Import",
   description: "Ofertas y promociones de Chamo Import",
 };
 
-export default function OfertasPage() {
+export default async function OfertasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
   const offers = featuredProducts.filter((product) => product.badge === "oferta");
+  const {
+    items: products,
+    page,
+    pageSize,
+    total,
+    totalPages,
+  } = paginateItems(offers, parsePageParam(params.page));
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
@@ -31,8 +44,15 @@ export default function OfertasPage() {
           <BrandsCarousel variant="inline" />
         </div>
         <Reveal delayMs={80}>
-          <div>
-            <ProductCatalog products={offers} />
+          <div className="space-y-6">
+            <ProductCatalog products={products} />
+            <CatalogPagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              pageSize={pageSize}
+              basePath="/ofertas"
+            />
           </div>
         </Reveal>
       </main>

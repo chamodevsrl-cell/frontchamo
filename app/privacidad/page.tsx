@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Reveal from "@/components/Reveal";
-import { COMPANY_NAME, EMAIL } from "@/data/contact";
+import LegalCopy from "@/components/LegalCopy";
 
 export const metadata: Metadata = {
   title: "Política de privacidad | Chamo Import",
@@ -18,28 +18,16 @@ export default function PrivacidadPage() {
         <h1 className="font-display text-3xl font-bold text-brand-dark dark:text-white">
           Política de privacidad
         </h1>
-        <p className="mt-2 text-sm text-brand-dark/55 dark:text-white/55">
-          Última actualización: 9 de septiembre de 2026
-        </p>
-        <div className="mt-6 space-y-4 text-sm leading-relaxed text-brand-dark/80 dark:text-white/80">
-          <p>
-            {COMPANY_NAME} recolecta los datos que usted envía en el formulario
-            de cotización o por WhatsApp (nombre, empresa, RUC, teléfono, correo
-            y detalle del pedido) solo para atender la solicitud comercial.
-          </p>
-          <p>
-            No vendemos esas listas. El mensaje se abre en WhatsApp bajo su
-            control; el boletín del pie de página es una suscripción voluntaria
-            y aún no está conectado a un proveedor de correo.
-          </p>
-          <p>
-            Para acceder, corregir o retirar sus datos, escriba a {EMAIL}. Los{" "}
-            <Link href="/terminos" className="font-semibold text-brand-primary">
-              términos y condiciones
-            </Link>{" "}
-            describen el uso del catálogo.
-          </p>
+        <div className="mt-6">
+          <LegalCopy doc="privacidad" />
         </div>
+        <p className="mt-6 text-sm text-brand-dark/80">
+          Los{" "}
+          <Link href="/terminos" className="font-semibold text-brand-primary">
+            términos y condiciones
+          </Link>{" "}
+          describen el uso del catálogo.
+        </p>
         </Reveal>
       </main>
     </div>

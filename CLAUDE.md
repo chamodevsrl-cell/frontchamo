@@ -68,7 +68,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
   - Menú móvil tipo drawer lateral con categorías + navegación + botón "Mi cuenta".
   - Los badges **Oferta/Nuevo** (no el botón de categorías) son los que usan `brand-gold` — ver `FeaturedOffers.tsx` / `CategoriesGrid.tsx`.
 - **CTA WhatsApp**: burbuja flotante verde (`WhatsAppFloat.tsx`, esquina inferior derecha, animación ping) con el número oficial; `/cotizar` arma el mensaje con formulario + carrito. Encima, botón azul `CatalogPdfFloat` para descargar el catálogo PDF (`CATALOG_PDF_SRC` en `data/media.ts`; hoy vacío).
-- **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín + términos/privacidad.
+- **Footer** (`components/Footer.tsx`): marca + enlaces rápidos + contacto + pagos + mapa + boletín. Bajo el tagline, **Términos, condiciones y privacidad** abre un modal (`LegalModal`) con pestañas; `/terminos` y `/privacidad` siguen como páginas.
 - **Home** (`app/page.tsx`): Navbar → HeroSlider → BrandsCarousel → TrustInfoBar → `main` (CategoriesGrid + FeaturedOffers + Testimonials) → CompanyStats.
 - **Categorías** (`CategoriesGrid.tsx`): carrusel horizontal con flechas; collage de productos/marcas de la línea (JPEG local de fallback). Listado `/categorias`. Detalle `/categorias/[slug]` con banner ancho (`CategoryBanner`) y título centrado (`bannerTitle`, p. ej. ELÉCTRICOS).
 - Autenticación tienda: `AuthProvider` + `AuthModal` + `AuthForm` (cuentas en este navegador, `role: "customer" | "admin"`). Área cliente `/cuenta` (Mi perfil / Mi empresa) para **cualquier rol**. Panel `/admin`: sesión propia (`lib/auth.ts`, cookie `chamo_admin_session`); login en `/admin/login` (mock `THE WINTER` / `Criper@11`, también `admin@local.test` / `admin123`). Contrato: `API_CONTRACT.md` + `types/admin.ts` + `services/adminApi.ts`. CMS local (`chamo-cms-v1`): banners en `/admin/banners`, categorías en `/admin/categorias`, footer en `/admin/ajustes/footer`, canales (WhatsApp/teléfono/correo/redes) en `/admin/ajustes/canales`, equipo en `/admin/equipo`, marcas del carrusel en `/admin/marcas`.
@@ -88,7 +88,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `BrandsCarousel.tsx` | Carrusel de marcas distribuidoras (marquee CSS), debajo del slider |
 | `CategoriesGrid.tsx` | Categorías en carrusel horizontal con flechas circulares + borde brillante de marca |
 | `FeaturedOffers.tsx` | Ofertas destacadas: carrusel de una fila (igual que categorías); clic abre `/producto/[id]` |
-| `ProductDetail.tsx` | Ficha de producto a pantalla completa: galería, precios, specs, descripción y relacionados |
+| `ProductDetail.tsx` | Ficha a pantalla completa: galería, card de tipo de compra (Unidad/Docena/Caja), specs, relacionados |
 | `TrustInfoBar.tsx` | Barra de confianza (envíos, garantía, atención, etc.) |
 | `CartProvider.tsx` | Carrito / cotización en `localStorage` |
 | `FavoritesProvider.tsx` | Favoritos en `localStorage` (`chamo-favorites-v1`) |
@@ -99,6 +99,7 @@ Carga en `app/layout.tsx` vía `next/font/google` (pesos 400–700).
 | `ProductCard.tsx` | Tarjeta de producto reutilizable (home, catálogo, ofertas) |
 | `ProductCatalog.tsx` | Grilla + modal |
 | `CatalogFilters.tsx` | Filtros de `/catalogo` (query string) |
+| `CatalogPagination.tsx` | Numerador (16 por página, `?page=`) en catálogo, ofertas y categoría |
 | `CategoryBanner.tsx` | Detalle de categoría: reutiliza `PageBanner` (imagen + título centrado) |
 | `PageBanner.tsx` | Banner ancho compartido (categorías y `/nosotros`) |
 | `StampHeading.tsx` | Encabezado sticker (Catálogo, Nosotros, Ofertas, Contacto) |

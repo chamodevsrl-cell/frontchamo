@@ -1,15 +1,17 @@
 "use client";
 
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import CategoryBanner from "@/components/CategoryBanner";
+import CatalogPagination from "@/components/CatalogPagination";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
 import { useSiteContent } from "@/components/ContentProvider";
-import { getProductsByCategory } from "@/data/products";
+import { getProductsByCategory, paginateItems, parsePageParam } from "@/data/products";
 
 export default function CategoryDetailLive({ slug }: { slug: string }) {
   const { categories, ready } = useSiteContent();
+  const searchParams = useSearchParams();
 
   if (!ready) {
     return (
@@ -23,8 +25,15 @@ export default function CategoryDetailLive({ slug }: { slug: string }) {
   const category = categories.find((item) => item.slug === slug);
   if (!category) notFound();
 
-  const products = getProductsByCategory(category.slug);
-  const brands = [...new Set(products.map((product) => product.brand))];
+  const matches = getProductsByCategory(category.slug);
+  const {
+    items: products,
+    page,
+    pageSize,
+    total,
+    totalPages,
+  } = paginateItems(matches, parsePageParam(searchParams.get("page") ?? undefined));
+  const brands = [...new Set(matches.map((product) => product.brand))];
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
@@ -37,12 +46,21 @@ export default function CategoryDetailLive({ slug }: { slug: string }) {
               id="productos-categoria-heading"
               className="mb-4 font-display text-xl font-bold text-brand-dark dark:text-white"
             >
-              {products.length} producto{products.length === 1 ? "" : "s"} en {category.label}
+              {total} producto{total === 1 ? "" : "s"} en {category.label}
             </h2>
-            <ProductCatalog
-              products={products}
-              emptyMessage="Aún no hay productos de ejemplo en esta categoría. Cotiza por WhatsApp y te armamos la lista."
-            />
+            <div className="space-y-6">
+              <ProductCatalog
+                products={products}
+                emptyMessage="Aún no hay productos de ejemplo en esta categoría. Cotiza por WhatsApp y te armamos la lista."
+              />
+              <CatalogPagination
+                page={page}
+                totalPages={totalPages}
+                total={total}
+                pageSize={pageSize}
+                basePath={`/categorias/${category.slug}`}
+              />
+            </div>
           </section>
         </Reveal>
       </main>

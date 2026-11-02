@@ -911,6 +911,33 @@ export const PACK_OPTIONS: { id: PackKind; label: string }[] = [
   { id: "caja", label: "Caja" },
 ];
 
+export function packTitle(kind: PackKind, units: number) {
+  if (kind === "unidad") return `Unidad x ${units} und`;
+  if (kind === "docena") return `Docena x ${units} unds`;
+  return `Caja x ${units} unds`;
+}
+
+/** Precio de lista / retail de esa presentación (unidad × precio de lista). */
+export function packRetail(product: FeaturedProduct, kind: PackKind) {
+  const units = packQuantity(product, kind);
+  if (kind === "unidad") {
+    const retail = product.oldPrice > product.price ? product.oldPrice : product.price;
+    return Math.round(retail * 100) / 100;
+  }
+  return Math.round(product.price * units * 100) / 100;
+}
+
+export function packSavingsPercent(product: FeaturedProduct, kind: PackKind) {
+  const retail = packRetail(product, kind);
+  const price = packPrice(product, kind);
+  if (retail <= price) return 0;
+  return Math.round(((retail - price) / retail) * 100);
+}
+
+export function packAvailable(product: FeaturedProduct, kind: PackKind) {
+  return Math.max(0, Math.floor(product.stock / packQuantity(product, kind)));
+}
+
 function firstNumber(text: string, fallback: number) {
   const match = text.match(/\d+/);
   const value = match ? Number(match[0]) : fallback;
@@ -957,6 +984,35 @@ export function getCatalogBrands() {
   return [...new Set(featuredProducts.map((product) => product.brand))].sort(
     (a, b) => a.localeCompare(b, "es"),
   );
+}
+
+export const CATALOG_PAGE_SIZE = 16;
+
+export function parsePageParam(raw: string | string[] | undefined) {
+  const value = Array.isArray(raw) ? (raw[0] ?? "") : (raw ?? "");
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) && n > 0 ? n : 1;
+}
+
+export function paginateItems<T>(
+  items: T[],
+  page: number,
+  pageSize = CATALOG_PAGE_SIZE,
+) {
+  const total = items.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize) || 1);
+  if (total === 0) {
+    return { items: [] as T[], page: 1, pageSize, total: 0, totalPages: 1 };
+  }
+  const current = Math.min(Math.max(1, page), totalPages);
+  const start = (current - 1) * pageSize;
+  return {
+    items: items.slice(start, start + pageSize),
+    page: current,
+    pageSize,
+    total,
+    totalPages,
+  };
 }
 
 export function searchCatalog({

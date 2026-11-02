@@ -1,6 +1,28 @@
 # Sugerencias para el proyecto
 
-Última actualización: **2026-10-26**
+Última actualización: **2026-11-02**
+
+## 🟦 Home: Solidez + footer (2026-11-02)
+
+- [x] 2026-11-02 — Juntar Solidez en Cifras con el footer y separarlas
+  con una raya `brand-gold` fina casi a todo el ancho. Detalle:
+  [`cambios/2026-11-02-solidez-unida-footer.md`](./cambios/2026-11-02-solidez-unida-footer.md).
+
+## 📄 Catálogo paginado (2026-11-02)
+
+- [x] 2026-11-02 — `/catalogo`, `/ofertas` y `/categorias/[slug]` muestran
+  16 productos por página y un numerador debajo. Detalle:
+  [`cambios/2026-11-02-catalogo-paginacion-18.md`](./cambios/2026-11-02-catalogo-paginacion-18.md).
+- [ ] Cuando el backend liste el catálogo, paginar en el servidor
+  (`page` / `pageSize`) en vez de recortar el array en el front.
+
+## 📜 Modal de términos y privacidad (2026-11-02)
+
+- [x] 2026-11-02 — Enlace bajo el tagline del footer abre un modal con
+  términos y política de privacidad. Detalle:
+  [`cambios/2026-11-02-footer-modal-terminos-privacidad.md`](./cambios/2026-11-02-footer-modal-terminos-privacidad.md).
+- [ ] Sustituir el texto de `data/legal.ts` cuando el cliente envíe la
+  redacción oficial.
 
 ## 📄 Catálogo PDF flotante (2026-10-26)
 
@@ -40,6 +62,9 @@
   [`cambios/2026-10-26-ficha-layout-mobile-acordeon.md`](./cambios/2026-10-26-ficha-layout-mobile-acordeon.md).
 - [x] 2026-10-26 — Prueba del mock: miniaturas bajo la galería, selector de
   cantidad, specs en 2 columnas, relacionados en acordeón móvil. **Sin push**.
+- [x] 2026-11-02 — Relacionados ya no van en acordeón: carrusel siempre
+  visible (como desktop). Detalle:
+  [`cambios/2026-11-02-relacionados-carrusel-siempre.md`](./cambios/2026-11-02-relacionados-carrusel-siempre.md).
   Detalle:
   [`cambios/2026-10-26-ficha-mock-galeria-thumbs-qty.md`](./cambios/2026-10-26-ficha-mock-galeria-thumbs-qty.md).
 - [x] 2026-10-26 — Brillo de borde (`.card-glow`) en cards de la tienda.
@@ -47,6 +72,9 @@
 - [x] 2026-10-26 — Presentación Unidad / Docena / Caja cambia el precio;
   notas “Mayorista c/u” y contenido del pack más grandes. Detalle:
   [`cambios/2026-10-26-ficha-presentacion-unidad-docena-caja.md`](./cambios/2026-10-26-ficha-presentacion-unidad-docena-caja.md).
+- [x] 2026-11-02 — El bloque de precio pasó a card de tipo de compra
+  (radios, ahorro, equivalencia por unidad). Detalle:
+  [`cambios/2026-11-02-ficha-tipo-compra-empaque.md`](./cambios/2026-11-02-ficha-tipo-compra-empaque.md).
 - [ ] Cuando el backend esté listo, esta ruta debe dejar de leer
   `getProductById` / `getRelatedProducts` del array estático y usar
   `GET /api/v1/catalog/:id` + `related`.

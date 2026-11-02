@@ -13,6 +13,12 @@ Esta carpeta documenta **cada solicitud de cambio** del proyecto: qué había an
 
 | Fecha | Cambio | Archivo |
 | --- | --- | --- |
+| 2026-11-02 | Solidez en Cifras unida al footer con raya dorada | [2026-11-02-solidez-unida-footer.md](./2026-11-02-solidez-unida-footer.md) |
+| 2026-11-02 | Relacionados: carrusel siempre visible (sin acordeón) | [2026-11-02-relacionados-carrusel-siempre.md](./2026-11-02-relacionados-carrusel-siempre.md) |
+| 2026-11-02 | Ficha: card de tipo de compra (Unidad/Docena/Caja) | [2026-11-02-ficha-tipo-compra-empaque.md](./2026-11-02-ficha-tipo-compra-empaque.md) |
+| 2026-11-02 | Paginación de 16 también en ofertas y categorías | [2026-11-02-paginacion-ofertas-categorias.md](./2026-11-02-paginacion-ofertas-categorias.md) |
+| 2026-11-02 | Catálogo: máximo 16 productos por página + numerador | [2026-11-02-catalogo-paginacion-18.md](./2026-11-02-catalogo-paginacion-18.md) |
+| 2026-11-02 | Footer: modal de términos y privacidad bajo el tagline | [2026-11-02-footer-modal-terminos-privacidad.md](./2026-11-02-footer-modal-terminos-privacidad.md) |
 | 2026-10-26 | Ficha: Unidad/Docena/Caja + notas de precio más grandes | [2026-10-26-ficha-presentacion-unidad-docena-caja.md](./2026-10-26-ficha-presentacion-unidad-docena-caja.md) |
 | 2026-10-26 | Botón flotante catálogo PDF (vacío) encima de WhatsApp | [2026-10-26-boton-flotante-catalogo-pdf.md](./2026-10-26-boton-flotante-catalogo-pdf.md) |
 | 2026-10-26 | Home: Solidez en Cifras + ficha oficial (RUC, sedes, horario) | [2026-10-26-solidez-en-cifras-ficha-oficial.md](./2026-10-26-solidez-en-cifras-ficha-oficial.md) |

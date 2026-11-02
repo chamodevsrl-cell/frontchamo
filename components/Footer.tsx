@@ -19,6 +19,8 @@ import {
 import { LOGO_SRC } from "@/data/media";
 import Reveal from "@/components/Reveal";
 import CmsImage from "@/components/CmsImage";
+import LegalModal from "@/components/LegalModal";
+import { type LegalDoc } from "@/components/LegalCopy";
 import { useSiteContent } from "@/components/ContentProvider";
 import { COMPANY_NAME } from "@/data/contact";
 import {
@@ -99,6 +101,13 @@ export default function Footer() {
   const [logoFailed, setLogoFailed] = useState(false);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(false);
+  const [legalTab, setLegalTab] = useState<LegalDoc>("terminos");
+
+  function openLegal(tab: LegalDoc = "terminos") {
+    setLegalTab(tab);
+    setLegalOpen(true);
+  }
   const year = new Date().getFullYear();
   const phoneTel = phoneToTel(footer.phone);
   const socials = footerSocialLinks(footer);
@@ -133,6 +142,13 @@ export default function Footer() {
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
             {footer.tagline}
           </p>
+          <button
+            type="button"
+            onClick={() => openLegal("terminos")}
+            className="mt-4 inline-block text-left text-sm font-semibold text-brand-gold underline-offset-4 transition hover:text-white hover:underline"
+          >
+            Términos, condiciones y privacidad
+          </button>
         </div>
 
         <div className="lg:col-span-2">
@@ -298,6 +314,12 @@ export default function Footer() {
         </div>
       </div>
       </Reveal>
+      <LegalModal
+        open={legalOpen}
+        tab={legalTab}
+        onClose={() => setLegalOpen(false)}
+        onTabChange={setLegalTab}
+      />
     </footer>
   );
 }

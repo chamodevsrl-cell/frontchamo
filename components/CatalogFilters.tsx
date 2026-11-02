@@ -27,6 +27,7 @@ export default function CatalogFilters({
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value);
     else params.delete(key);
+    params.delete("page");
     const next = params.toString();
     router.push(next ? `${pathname}?${next}` : pathname);
   }

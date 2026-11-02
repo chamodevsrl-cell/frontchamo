@@ -27,8 +27,12 @@ import {
 } from "lucide-react";
 import {
   PACK_OPTIONS,
+  packAvailable,
   packPrice,
   packQuantity,
+  packRetail,
+  packSavingsPercent,
+  packTitle,
   productPath,
   type FeaturedProduct,
   type PackKind,
@@ -168,7 +172,6 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
   const [added, setAdded] = useState(false);
   const [openSpecs, setOpenSpecs] = useState(false);
   const [openDescription, setOpenDescription] = useState(false);
-  const [openRelated, setOpenRelated] = useState(false);
   const relatedRef = useRef<HTMLUListElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -184,8 +187,13 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
   ];
   const unitsPerPack = packQuantity(product, pack);
   const selectedPrice = packPrice(product, pack);
+  const selectedRetail = packRetail(product, pack);
+  const selectedSavings = packSavingsPercent(product, pack);
+  const selectedAvailable = packAvailable(product, pack);
   const packLabel = PACK_OPTIONS.find((item) => item.id === pack)?.label ?? "Unidad";
-  const packHint = product.packaging[pack];
+  const selectedTitle = packTitle(pack, unitsPerPack);
+  const unitEquivalent = Math.round((selectedPrice / unitsPerPack) * 100) / 100;
+  const subtotal = Math.round(selectedPrice * qty * 100) / 100;
 
   const updateRelatedArrows = useCallback(() => {
     const el = relatedRef.current;
@@ -205,7 +213,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
       el.removeEventListener("scroll", updateRelatedArrows);
       window.removeEventListener("resize", updateRelatedArrows);
     };
-  }, [updateRelatedArrows, related.length, openRelated]);
+  }, [updateRelatedArrows, related.length]);
 
   function scrollRelated(direction: -1 | 1) {
     const el = relatedRef.current;
@@ -354,83 +362,8 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
               ))}
             </ul>
           ) : null}
-        </div>
 
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="font-display text-[2.35rem] font-extrabold tracking-tight text-brand-dark sm:text-5xl">
-                {formatPrice(selectedPrice)}
-              </p>
-              {pack !== "unidad" ? (
-                <p className="mt-1 text-sm font-medium text-brand-dark/70 sm:text-base">
-                  {formatPrice(product.wholesalePrice)} c/u · {unitsPerPack} unidades
-                </p>
-              ) : (
-                <p className="mt-1 text-sm font-medium text-brand-dark/70 sm:text-base">
-                  Mayorista {formatPrice(product.wholesalePrice)} c/u
-                </p>
-              )}
-            </div>
-            <div className="min-w-[13rem] text-right">
-              <p className="mb-1.5 text-sm font-semibold tracking-wide text-brand-dark/60">
-                Presentación
-              </p>
-              <div className="inline-flex overflow-hidden rounded-xl border border-[#d7e4ef] bg-white">
-                {PACK_OPTIONS.map((option) => {
-                  const selected = pack === option.id;
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => setPack(option.id)}
-                      aria-pressed={selected}
-                      className={`px-3 py-2 text-sm font-bold uppercase transition ${
-                        selected
-                          ? "bg-brand-primary text-white"
-                          : "text-brand-dark/70 hover:bg-brand-gray"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mt-1.5 max-w-[18rem] text-sm leading-snug font-medium text-brand-dark/70 sm:text-base">
-                {packHint}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center overflow-hidden rounded-xl border border-[#d7e4ef] bg-white">
-              <button
-                type="button"
-                onClick={() => setQty((value) => Math.max(1, value - 1))}
-                aria-label="Disminuir cantidad"
-                className="inline-flex h-11 w-11 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
-              >
-                <Minus className="h-4 w-4" strokeWidth={2.5} />
-              </button>
-              <span className="min-w-8 text-center font-display text-base font-bold text-brand-dark">
-                {qty}
-              </span>
-              <button
-                type="button"
-                onClick={() => setQty((value) => value + 1)}
-                aria-label="Aumentar cantidad"
-                className="inline-flex h-11 w-11 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.5} />
-              </button>
-            </div>
-            <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
-              <Check className="h-4 w-4" strokeWidth={2.5} />
-              En stock ({product.stock} unidades)
-            </p>
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             <button
               type="button"
               onClick={() => {
@@ -452,6 +385,206 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
               <WhatsAppIcon className="h-4 w-4" />
               Cotizar por WhatsApp
             </a>
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <div className="rounded-[1.35rem] border border-[#d7e4ef] bg-white p-4 shadow-[0_8px_28px_rgba(11,53,84,0.06)] sm:p-5">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.12em] text-brand-dark uppercase">
+                <Box className="h-4 w-4 text-brand-primary" strokeWidth={2.25} />
+                Precio por {selectedTitle}
+              </p>
+              {selectedSavings > 0 ? (
+                <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-emerald-700 uppercase">
+                  -{selectedSavings}% ahorro
+                </span>
+              ) : null}
+            </div>
+
+            <div className="mt-2 flex flex-wrap items-end gap-x-2 gap-y-1">
+              <p className="font-display text-[2.15rem] leading-none font-extrabold tracking-tight text-brand-dark sm:text-[2.6rem]">
+                {formatPrice(selectedPrice)}
+              </p>
+              <p className="mb-1 text-sm text-brand-dark/45">/ {selectedTitle.toLowerCase()}</p>
+            </div>
+            {selectedRetail > selectedPrice ? (
+              <p className="mt-1.5 text-sm text-brand-dark/50">
+                Retail sugerido:{" "}
+                <span className="line-through">{formatPrice(selectedRetail)}</span>{" "}
+                {selectedSavings > 0 ? (
+                  <span className="font-semibold text-emerald-600">
+                    (-{selectedSavings}%)
+                  </span>
+                ) : null}
+              </p>
+            ) : null}
+
+            <p className="mt-3 inline-flex flex-wrap items-center gap-x-1.5 rounded-xl bg-[#eef7f2] px-3 py-2 text-sm text-brand-dark/80">
+              <Box className="h-4 w-4 text-emerald-700" strokeWidth={2.25} />
+              Contiene{" "}
+              <span className="font-bold text-brand-dark">
+                {unitsPerPack} {unitsPerPack === 1 ? "unidad" : "unidades"}
+              </span>
+              <span className="text-brand-dark/35">•</span>
+              Equivale a{" "}
+              <span className="font-bold text-brand-dark">
+                {formatPrice(unitEquivalent)}
+              </span>{" "}
+              por unidad individual.
+            </p>
+
+            <div className="mt-3 flex items-center justify-between gap-3 border-b border-[#e6edf3] pb-3 text-sm">
+              <p className="text-brand-dark/55">
+                Subtotal ({qty} {packLabel.toLowerCase()}
+                {qty === 1 ? "" : "s"} x {unitsPerPack} unds. • {qty * unitsPerPack} unid.):
+              </p>
+              <p className="font-display text-lg font-extrabold text-brand-dark">
+                {formatPrice(subtotal)}
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-end justify-between gap-2">
+              <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.12em] text-brand-dark uppercase">
+                <ClipboardList className="h-4 w-4 text-brand-primary" strokeWidth={2.25} />
+                Tipos de presentación & empaque
+              </p>
+              <p className="text-xs text-brand-dark/45">Elige la presentación deseada</p>
+            </div>
+
+            <div className="mt-3 space-y-2.5" role="radiogroup" aria-label="Presentación">
+              {PACK_OPTIONS.map((option) => {
+                const selected = pack === option.id;
+                const units = packQuantity(product, option.id);
+                const price = packPrice(product, option.id);
+                const savings = packSavingsPercent(product, option.id);
+                const available = packAvailable(product, option.id);
+                const unitPrice = Math.round((price / units) * 100) / 100;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => {
+                      setPack(option.id);
+                      setQty((value) =>
+                        Math.min(value, Math.max(1, packAvailable(product, option.id))),
+                      );
+                    }}
+                    className={`flex w-full items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition ${
+                      selected
+                        ? "border-brand-dark bg-white shadow-[0_0_0_1px_#0B3554]"
+                        : "border-[#d7e4ef] bg-white hover:border-brand-primary/50"
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                        selected
+                          ? "border-brand-dark"
+                          : "border-brand-dark/25"
+                      }`}
+                    >
+                      {selected ? (
+                        <span className="h-2.5 w-2.5 rounded-full bg-brand-dark" />
+                      ) : null}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span className="font-display text-sm font-extrabold text-brand-dark">
+                          {packTitle(option.id, units)}
+                        </span>
+                        <span className="text-xs text-brand-dark/45">
+                          {units} unid.
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            available > 0
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-brand-gray text-brand-dark/45"
+                          }`}
+                        >
+                          {available} disp.
+                        </span>
+                      </span>
+                      <span className="mt-0.5 block text-xs text-brand-dark/50">
+                        {product.packaging[option.id]}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-right">
+                      <span className="block font-display text-base font-extrabold text-brand-dark">
+                        {formatPrice(price)}
+                      </span>
+                      {units > 1 ? (
+                        <span className="block text-[11px] text-brand-dark/40">
+                          {formatPrice(unitPrice)} / un.
+                        </span>
+                      ) : null}
+                      {option.id === "unidad" ? (
+                        <span className="mt-1 inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wide text-rose-500 uppercase">
+                          Popular
+                        </span>
+                      ) : savings > 0 ? (
+                        <span className="mt-1 inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wide text-emerald-700 uppercase">
+                          -{savings}% ahorro
+                        </span>
+                      ) : null}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-brand-dark/55">
+              <p className="inline-flex items-center gap-1.5 text-emerald-700">
+                <Check className="h-4 w-4" strokeWidth={2.5} />
+                MOQ: 1 empaque
+              </p>
+              <p className="inline-flex items-center gap-1.5">
+                <Truck className="h-3.5 w-3.5 text-brand-dark/40" strokeWidth={2} />
+                Despacho a todo el Perú
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center overflow-hidden rounded-xl border border-[#d7e4ef] bg-white">
+              <button
+                type="button"
+                onClick={() => setQty((value) => Math.max(1, value - 1))}
+                aria-label="Disminuir cantidad"
+                className="inline-flex h-11 w-11 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
+              >
+                <Minus className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+              <span className="min-w-8 text-center font-display text-base font-bold text-brand-dark">
+                {qty}
+              </span>
+              <button
+                type="button"
+                onClick={() => setQty((value) => Math.min(selectedAvailable || 1, value + 1))}
+                aria-label="Aumentar cantidad"
+                className="inline-flex h-11 w-11 items-center justify-center text-brand-dark transition hover:bg-brand-gray"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            </div>
+            <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
+              <Check className="h-4 w-4" strokeWidth={2.5} />
+              {selectedAvailable}{" "}
+              {pack === "unidad"
+                ? selectedAvailable === 1
+                  ? "unidad"
+                  : "unidades"
+                : pack === "docena"
+                  ? selectedAvailable === 1
+                    ? "docena"
+                    : "docenas"
+                  : selectedAvailable === 1
+                    ? "caja"
+                    : "cajas"}{" "}
+              disp.
+            </p>
           </div>
 
           <ul className="mt-5 grid grid-cols-3 gap-2 text-center text-[10px] font-medium text-brand-dark/60 sm:text-xs lg:flex lg:flex-wrap lg:justify-start lg:gap-x-6 lg:text-left">
@@ -529,28 +662,32 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
       </section>
 
       {related.length > 0 ? (
-        <AccordionCard
-          id="product-related"
-          title="Productos relacionados"
-          icon={ShoppingCart}
-          open={openRelated}
-          onToggle={() => setOpenRelated((value) => !value)}
-          actions={
+        <section
+          className="space-y-3"
+          aria-labelledby="productos-relacionados-heading"
+        >
+          <div className="flex items-end justify-between gap-3">
+            <h2
+              id="productos-relacionados-heading"
+              className="font-display text-lg font-bold text-brand-dark sm:text-xl"
+            >
+              Productos relacionados
+            </h2>
             <Link
               href={`/categorias/${product.category}`}
-              className="text-sm font-semibold text-brand-primary transition hover:text-brand-dark"
+              className="shrink-0 text-sm font-semibold text-brand-primary transition hover:text-brand-dark"
             >
               Ver más productos →
             </Link>
-          }
-        >
-          <div className="relative border-t border-[#e6eef5] px-3 pt-3 pb-4 sm:px-4">
+          </div>
+
+          <div className="relative">
             <button
               type="button"
               onClick={() => scrollRelated(-1)}
               disabled={!canPrev}
               aria-label="Productos anteriores"
-              className="absolute top-1/2 left-1 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35 lg:inline-flex"
+              className="absolute top-1/2 left-0 z-10 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35 sm:left-1"
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
             </button>
@@ -559,14 +696,14 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
               onClick={() => scrollRelated(1)}
               disabled={!canNext}
               aria-label="Productos siguientes"
-              className="absolute top-1/2 right-1 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35 lg:inline-flex"
+              className="absolute top-1/2 right-0 z-10 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark shadow-sm transition hover:text-brand-primary disabled:opacity-35 sm:right-1"
             >
               <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
             </button>
 
             <ul
               ref={relatedRef}
-              className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 scrollbar-none sm:gap-4 lg:px-8"
+              className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-10 pb-1 scrollbar-none sm:gap-4"
             >
               {related.map((item) => (
                 <li
@@ -611,7 +748,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
               ))}
             </ul>
           </div>
-        </AccordionCard>
+        </section>
       ) : null}
     </div>
   );

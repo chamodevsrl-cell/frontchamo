@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import CatalogFilters from "@/components/CatalogFilters";
+import CatalogPagination from "@/components/CatalogPagination";
 import ProductCatalog from "@/components/ProductCatalog";
 import Reveal from "@/components/Reveal";
 import SitePageBanner from "@/components/SitePageBanner";
-import { searchCatalog } from "@/data/products";
+import { paginateItems, parsePageParam, searchCatalog } from "@/data/products";
 
 export const metadata: Metadata = {
   title: "Catálogo | Chamo Import",
@@ -25,7 +26,14 @@ export default async function CatalogoPage({
   const q = firstParam(params.q);
   const category = firstParam(params.category);
   const brand = firstParam(params.brand);
-  const products = searchCatalog({ q, category, brand });
+  const matches = searchCatalog({ q, category, brand });
+  const {
+    items: products,
+    page,
+    pageSize,
+    total,
+    totalPages,
+  } = paginateItems(matches, parsePageParam(params.page));
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-[#f7f9fb] dark:bg-brand-dark">
@@ -52,10 +60,20 @@ export default async function CatalogoPage({
           >
             <CatalogFilters q={q} category={category} brand={brand} />
           </Suspense>
-          <ProductCatalog
-            products={products}
-            emptyMessage="No encontramos productos con esa búsqueda. Prueba otra categoría o marca."
-          />
+          <div id="catalogo-resultados" className="space-y-6 scroll-mt-28">
+            <ProductCatalog
+              products={products}
+              emptyMessage="No encontramos productos con esa búsqueda. Prueba otra categoría o marca."
+            />
+            <CatalogPagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              pageSize={pageSize}
+              basePath="/catalogo"
+              query={{ q, category, brand }}
+            />
+          </div>
         </div>
         </Reveal>
       </main>

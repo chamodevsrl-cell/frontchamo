@@ -1,6 +1,6 @@
 # Documentación técnica y manual de usuario — Chamo Import Front
 
-Última actualización: **2026-10-26**
+Última actualización: **2026-11-02**
 
 Este documento junta las dos caras del proyecto: cómo está construido (para quien
 programa) y cómo se usa hoy (para negocio/operación). Se actualiza junto con cada
@@ -80,10 +80,12 @@ components/
   QuoteForm.tsx
   ContactForm.tsx           # /contacto → WhatsApp
   CatalogPdfFloat.tsx       # Botón flotante catálogo PDF (encima de WhatsApp)
+  LegalModal.tsx / LegalCopy.tsx  # Modal footer: términos + privacidad
   WrenchCursor.tsx          # Cursor a medida (desktop, hover: hover): negro puro,
                             # blanco sobre cualquier <img> (target.closest("img"))
 data/
   contact.ts               # Teléfono, WhatsApp, correo, horario, Maps
+  legal.ts                 # Textos de términos y privacidad (modal y páginas)
   company.ts               # Ficha oficial (RUC, sedes, cifras) + misión/visión
   testimonials.ts          # Prueba social B2B de ejemplo
   media.ts                 # Slides / logo / icon
@@ -189,6 +191,8 @@ Cada producto incluye `category` / `categoryLabel`, `specs[]` (ficha técnica) y
 `getProductsByCategory`. Hay **al menos 3 productos por categoría** (22 SKUs de ejemplo).
 
 El listado público pasa por `GET /api/productos?q=&category=&brand=`.
+En `/catalogo`, `/ofertas` y `/categorias/[slug]` se muestran **16 productos por página** (`paginateItems` /
+`?page=` + `CatalogPagination` centrado); en catálogo, cambiar filtros vuelve a la página 1.
 Clic en una tarjeta navega a **`/producto/[id]`** (ficha a pantalla completa, ya no hay
 modal). `CartProvider` guarda líneas `{ productId, quantity, unitPrice, wholesaleUnitPrice }`
 en `localStorage` (`chamo-cart-v1`) — el precio se guarda al agregar, no se recalcula
@@ -199,8 +203,8 @@ ficha persiste, muestra el aviso fijo **Guardado en favoritos** y el Navbar llev
 
 Ficha (`ProductDetail.tsx`):
 1. Miga de pan + bloque comercial (marca, título, blurb, chips, precios, cantidad, CTAs) junto a la galería ancha con miniaturas.
-2. En móvil el orden es título → galería/thumbs → precio/qty/CTAs; specs, descripción y relacionados van en acordeón. En escritorio: dos columnas + specs en pares (cabecera `brand-primary` y filas azul/blanco) + descripción con checklist. La presentación (Unidad / Docena / Caja) cambia el precio: lista en unidad, mayorista × unidades en docena/caja. Las notas de mayorista y del pack van en texto `sm`/`base`. Las cards de la tienda usan `.card-glow`.
-3. **Productos relacionados** de la misma categoría (carrusel; clic abre esa ficha).
+2. En móvil el orden es título → galería/thumbs → CTAs (cotizar) → precio/qty; specs y descripción van en acordeón. En escritorio: dos columnas + specs en pares (cabecera `brand-primary` y filas azul/blanco) + descripción con checklist. El precio es una card de **tipo de compra**: radio Unidad / Docena / Caja. **Agregar a cotización** y WhatsApp van **debajo de las fotos**. Las cards de la tienda usan `.card-glow`.
+3. **Productos relacionados** de la misma categoría en carrusel (siempre visible, también en móvil; clic abre esa ficha).
 
 WhatsApp unificado: `data/contact.ts` → `wa.me/51936608583` (`+51 936 608 583`). Los formularios de
 `/contacto` y `/cotizar` abren el chat con `openWhatsApp()` (enlace `<a>`, no
@@ -670,18 +674,18 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 - Tres referencias de mayoristas de ejemplo (se reemplazan con casos reales del cliente)
 
 **Solidez en Cifras**
-- Franja `brand-dark` bajo testimonios (separada del footer): +13 años, +100 clientes/día, 20–30 despachos a provincia, 100% facturación legal (RUC)
+- Franja `brand-dark` bajo testimonios, pegada al footer y separada por una línea `brand-gold` fina casi a todo el ancho: +13 años, +100 clientes/día, 20–30 despachos a provincia, 100% facturación legal (RUC)
 
 **Pie de página**
-- Enlaces, contacto, mapa, medios de pago, boletín, términos y privacidad
+- Enlaces, contacto, mapa, medios de pago, boletín. Bajo el tagline: enlace **Términos, condiciones y privacidad** (modal con pestañas). `/terminos` y `/privacidad` siguen disponibles.
 
 ### B.3 Otras páginas
 
 | Ruta | Uso |
 | --- | --- |
 | `/producto/[id]` | Ficha de producto a pantalla completa (galería, specs, relacionados) |
-| `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros contra la API |
-| `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo |
+| `/catalogo` | Encabezado sticker **NUESTRO CATÁLOGO**; búsqueda y filtros; **16 productos por página** (`?page=`) |
+| `/categorias` | Todas las líneas; al elegir una, banner con el nombre centrado (p. ej. ELÉCTRICOS) y productos debajo (mismo límite de 16 + numerador) |
 | `/carrito` | Ítems guardados, cantidades, WhatsApp del pedido. Al entrar: puertas + carrito que se estaciona detrás de la costura (una vez por clic) y al abrir sale por el centro |
 | `/favoritos` | Productos guardados (corazón); se mantienen en este navegador |
 | `/cuenta` | Área cliente: resumen, Mi perfil y Mi empresa (cualquier rol con sesión) |
@@ -702,9 +706,9 @@ cambia el comportamiento visible — incluso un cambio pequeño como reemplazar 
 | `/admin/ajustes/canales` | WhatsApp (botón flotante), teléfono para llamar, correo y redes |
 | `/nosotros` | Banner CMS, historia, misión, visión, **equipo de trabajo en cartas** y valores |
 | `/contacto` | Banner CMS **NUESTRO CONTACTO**, tarjetas y mapa leen el footer de Ajustes, formulario WhatsApp |
-| `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** (o, con las 4 secciones completas en `/admin/ofertas`, el título **"¡Mega ofertas!"** + una grilla de 4 fotos con borde grueso en su lugar — clic en una abre el producto o la URL asignada) y productos en oferta |
+| `/ofertas` | Banner CMS **OFERTAS DESCUENTOS** (o, con las 4 secciones completas en `/admin/ofertas`, el título **"¡Mega ofertas!"** + una grilla de 4 fotos con borde grueso en su lugar — clic en una abre el producto o la URL asignada) y productos en oferta (**16 por página**) |
 | `/cotizar` | Formulario mayorista + WhatsApp prellenado |
-| `/terminos` / `/privacidad` | Políticas enlazadas desde el footer |
+| `/terminos` / `/privacidad` | Políticas (mismo texto que el modal del footer) |
 | Login (modal / cuenta) | Crear cuenta, entrar, recuperar contraseña, **editar perfil** (`/cuenta/perfil`) y cerrar sesión (este navegador) |
 
 ### B.4 Contenido que el negocio puede cambiar sin programar
